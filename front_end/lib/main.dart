@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:front_end/core/confit/router_config.dart';
+import 'package:front_end/core/util/bloc_multiprovider.dart';
 import 'package:front_end/features/authentication/presentation/screens/onboard_one.dart';
 import 'package:front_end/features/authentication/presentation/screens/onboard_three.dart';
 import 'package:front_end/features/authentication/presentation/screens/onboard_two.dart';
 import 'package:go_router/go_router.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'core/injection/injections.dart' as di;
 
-void main() {
-  runApp(MyApp(router: AppRouter.router));
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await di.init();
+  runApp(MultiBlocProvider(
+      providers: BlocMultiprovider().blocMultiProvider(),
+      child: MyApp(router: AppRouter.router)));
 }
 
 class MyApp extends StatelessWidget {
