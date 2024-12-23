@@ -5,7 +5,7 @@ import { Therapist } from "../model/therapistModel.js";
 const registerTherapist = async (req, res) => {
     try {
 
-        const { fullName, email, password, confirmPassword, specialization } = req.body
+        const { fullName, email, password, confirmPassword, specialization , certificate} = req.body
         
          if (password !== confirmPassword) {
             return res.status(400).json({ message: "Passwords do not match" });
@@ -17,7 +17,8 @@ const registerTherapist = async (req, res) => {
       FullName:fullName,
       Email:email,
       AreaofSpecification:specialization,
-      Password:hashedPassword
+      Password: hashedPassword,
+      Certificate:certificate
     })
     
         await therapist.save()
