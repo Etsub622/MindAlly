@@ -16,17 +16,17 @@ abstract class AuthRemoteDatasource {
 class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   late final http.Client client;
   AuthRemoteDatasourceImpl({required this.client});
-  final baseUrl = 'http://localhost:3000/auth';
+  final baseUrl = 'http://localhost:8000/api';
 
   @override
   Future<String> professionalSignUp(
       ProfessionalSignupModel professionalModel) async {
     try {
-      var url = Uri.parse('$baseUrl/professionalSignup');
+      var url = Uri.parse('$baseUrl/therapist/Tsignup');
       final user = await client.post(url,
           body: jsonEncode(professionalModel.toJson()),
           headers: {'Content-Type': 'application/json'});
-
+      print(user.body);
       if (user.statusCode == 200) {
         return user.body;
       } else {
@@ -41,11 +41,12 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   @override
   Future<String> studentSignUp(StudentSignupModel studentModel) async {
     try {
-      var url = Uri.parse('$baseUrl/studentSignup');
+      var url = Uri.parse('$baseUrl/patient/Psignup');
       final user = await client.post(url,
           body: jsonEncode(studentModel.toJson()),
           headers: {'Content-Type': 'application/json'});
-
+      print(user.body);
+      print(user.statusCode);
       if (user.statusCode == 200) {
         return user.body;
       } else {

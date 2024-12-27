@@ -55,11 +55,11 @@ class _StudentSignUpState extends State<StudentSignUp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocConsumer(builder: (context, state) {
+      body: BlocConsumer<AuthBloc, AuthState>(builder: (context, state) {
         if (state is AuthLoading) {
           return CircularIndicator();
         } else {
-          return _build(context);
+          return _buildForm(context);
         }
       }, listener: (context, state) {
         if (state is AuthSuccess) {
@@ -77,9 +77,9 @@ class _StudentSignUpState extends State<StudentSignUp> {
     );
   }
 
-  Widget _build(BuildContext context) {
-    return Scaffold(
-      body: Padding(
+  Widget _buildForm(BuildContext context) {
+    return Material(
+      child: Padding(
         padding: const EdgeInsets.all(15.0),
         child: Form(
           key: _key,
@@ -141,20 +141,23 @@ class _StudentSignUpState extends State<StudentSignUp> {
                   height: 40.h,
                 ),
                 CustomButton(
-                    wdth: double.infinity,
-                    rad: 10,
-                    hgt: 50,
-                    text: "Sign Up",
-                    onPressed: () {
-                      if (_key.currentState!.validate()) {
-                        if (passwordController.text !=
-                            confirmPasswordController.text) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              errorsnackBar('Password does not match'));
-                          _studentSignUP(context);
-                        }
+                  wdth: double.infinity,
+                  rad: 10,
+                  hgt: 50,
+                  text: "Sign Up",
+                  onPressed: () {
+                    if (_key.currentState!.validate()) {
+                      if (passwordController.text !=
+                          confirmPasswordController.text) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          errorsnackBar('Passwords do not match!'),
+                        );
+                        return;
                       }
-                    }),
+                      _studentSignUP(context);
+                    }
+                  },
+                ),
                 SizedBox(
                   height: 15.h,
                 ),

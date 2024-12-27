@@ -71,6 +71,8 @@ class AuthRepoImpl implements AuthRepository {
             phoneNumber: studentSignUp.phoneNumber,
             college: studentSignUp.college);
         final response = await authRemoteDatasource.studentSignUp(user);
+        print(response);
+        print('helllojkldjkljkag');
         return Right(response);
       } on ServerException {
         return Left(ServerFailure(message: 'Server Failure'));
@@ -80,9 +82,9 @@ class AuthRepoImpl implements AuthRepository {
           NetworkFailure(message: 'You are not connected to the internet'));
     }
   }
-  
+
   @override
-  Future<Either<Failure, String>> sendOtp(String phoneNumber)async {
+  Future<Either<Failure, String>> sendOtp(String phoneNumber) async {
     if (await networkInfo.isConnected) {
       try {
         final response = await authRemoteDatasource.sendOtp(phoneNumber);
@@ -95,9 +97,10 @@ class AuthRepoImpl implements AuthRepository {
           NetworkFailure(message: 'You are not connected to the internet'));
     }
   }
-  
+
   @override
-  Future<Either<Failure, String>> verifyOtp(String otp, String phoneNumber)async {
+  Future<Either<Failure, String>> verifyOtp(
+      String otp, String phoneNumber) async {
     if (await networkInfo.isConnected) {
       try {
         final response = await authRemoteDatasource.verifyOtp(otp, phoneNumber);
