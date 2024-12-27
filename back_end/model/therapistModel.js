@@ -22,6 +22,23 @@ const therapistschema = new mongoose.Schema({
     Certificate: {
         type: String,
         required:true
+    },
+    Bio: {
+        type:String
+    },
+    Fee: {
+        type:Number
+    },
+    // Reviews: {
+    //     type:[String]
+    // },
+    Rating: {
+        type:Number
+        
+    },
+    Role: {
+        type: String,
+        default:"therapist"
     }
 
 })

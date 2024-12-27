@@ -1,5 +1,6 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcrypt"
 import { Therapist } from "../model/therapistModel.js";
+import { generateJWT, hashedPassword } from "../utils/authUtils.js";
 
 
 const registerTherapist = async (req, res) => {
@@ -8,18 +9,24 @@ const registerTherapist = async (req, res) => {
         const { fullName, email, password, specialization , certificate} = req.body
         
     
-    const hashedPassword= await bcrypt.hash(password,10)
+    const hashedPass= await hashedPassword(password)
     
     const therapist = new Therapist({
       FullName:fullName,
       Email:email,
       AreaofSpecification:specialization,
-      Password: hashedPassword,
-      Certificate:certificate
+      Password: hashedPass,
+      Certificate: certificate,
+      Role:"therapist"
+      
     })
     
         await therapist.save()
-        res.status(200).json(therapist)
+        const token =generateJWT(therapist._id ,therapist.Role)
+        res.status(200).json({
+            message: "Therapist login",
+            token,
+            user:therapist,})
         
     } catch (error) {
         console.log(error)
@@ -49,7 +56,9 @@ const therapistLogin = async (req, res) => {
             return res.status(401).json({ error: "Invalid email or password." });
         }
 
-        res.status(200).json({ message: "Login successful", Therapist});
+    const token = generateJWT(therapist._id, therapist.Role);
+
+    res.status(200).json({ message: "Therapist login successful", token, user: therapist });  
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "An error occurred during login." });

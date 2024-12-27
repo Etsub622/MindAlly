@@ -16,7 +16,12 @@ const patientschema = new mongoose.Schema({
     Collage: {
         type: String,
     
+    },
+    Role: {
+        type: String,
+        default:"patient"
     }
+ 
 
 })
 
