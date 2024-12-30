@@ -3,7 +3,7 @@ import { registerPatient,patientLogin } from "../controller/patientController.js
 
 const router = express.Router()
 
-router.post("/Psignup",registerPatient )
-router.post("/Plogin",patientLogin )
+router.post("/PatientSignup",registerPatient )
+router.post("/patientLogin",patientLogin )
 
 export default router;
