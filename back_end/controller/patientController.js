@@ -16,7 +16,7 @@ const registerPatient = async (req, res) => {
       FullName:fullName,
       Email:email,
       Collage:collage,
-        Password: hashpass,
+    Password: hashpass,
       Role:"patient"
     })
     
@@ -39,26 +39,26 @@ const registerPatient = async (req, res) => {
 
 const patientLogin = async (req, res) => {
     try {
-        const { Email, Password } = req.body;
+        const { email, password } = req.body;
 
        
-        if (!Email || !Password) {
+        if (!email || !password) {
             return res.status(400).json({ error: "Email and Password are required." });
         }
 
-        const patient = await Patient.findOne({ Email });
+        const patient = await Patient.findOne({ Email:email});
         if (!patient) {
             return res.status(404).json({ error: "Invalid email or password." });
         }
 
      
-        const isMatch = await bcrypt.compare(Password, patient.Password);
+        const isMatch = await bcrypt.compare(password, patient.Password);
         if (!isMatch) {
             return res.status(401).json({ error: "Invalid email or password." });
         }
         const token =generateJWT(patient._id,patient.Role)
 
-        res.status(200).json({ message: "Login successful", token ,user:patient});
+        res.status(200).json({ message: "login successful", token ,user:patient});
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "An error occurred during login." });
