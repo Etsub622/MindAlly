@@ -17,14 +17,15 @@ const registerTherapist = async (req, res) => {
       AreaofSpecification:specialization,
       Password: hashedPass,
       Certificate: certificate,
-      Role:"therapist"
+      Role: "therapist",
+      verified:false
       
     })
     
         await therapist.save()
         const token =generateJWT(therapist._id ,therapist.Role)
         res.status(200).json({
-            message: "Therapist login",
+            message: "Therapist signup",
             token,
             user:therapist,})
         
@@ -38,20 +39,20 @@ const registerTherapist = async (req, res) => {
 
 const therapistLogin = async (req, res) => {
     try {
-        const { Email, Password } = req.body;
+        const { email, password } = req.body;
 
        
-        if (!Email || !Password) {
+        if (!email || !password) {
             return res.status(400).json({ error: "Email and Password are required." });
         }
 
-        const therapist = await Therapist.findOne({ Email });
+        const therapist = await Therapist.findOne({ Email:email });
         if (!therapist) {
             return res.status(404).json({ error: "Invalid email or password." });
         }
 
      
-        const isMatch = await bcrypt.compare(Password, therapist.Password);
+        const isMatch = await bcrypt.compare(password, therapist.Password);
         if (!isMatch) {
             return res.status(401).json({ error: "Invalid email or password." });
         }

@@ -39,6 +39,9 @@ const therapistschema = new mongoose.Schema({
     Role: {
         type: String,
         default:"therapist"
+    },
+    verified: {
+        type:Boolean
     }
 
 })

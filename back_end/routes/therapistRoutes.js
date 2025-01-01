@@ -4,6 +4,6 @@ import { registerTherapist,therapistLogin } from "../controller/therapistControl
 const router = express.Router()
 
 router.post("/therapistSignup", registerTherapist)
-router.post("therapistLogin", therapistLogin)
+router.post("/therapistLogin", therapistLogin)
 
 export default router;
