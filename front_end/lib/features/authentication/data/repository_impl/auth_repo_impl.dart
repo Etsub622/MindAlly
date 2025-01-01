@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:front_end/core/error/exception.dart';
 import 'package:front_end/core/error/failure.dart';
 import 'package:front_end/core/network/network.dart';
+import 'package:front_end/features/authentication/data/datasource/auth_local_datasource/login_local_datasource.dart';
 import 'package:front_end/features/authentication/data/datasource/auth_remote_datasource/auth_remote_datasource.dart';
 import 'package:front_end/features/authentication/data/models/login_model.dart';
 import 'package:front_end/features/authentication/data/models/professional_signup_model.dart';
+import 'package:front_end/features/authentication/data/models/student_data_model.dart';
 import 'package:front_end/features/authentication/data/models/student_signup_model.dart';
 import 'package:front_end/features/authentication/domain/entities/login_entity.dart';
 import 'package:front_end/features/authentication/domain/entities/professional_signup_entity.dart';
@@ -15,16 +17,21 @@ import 'package:front_end/features/authentication/domain/repositories/auth_repo.
 class AuthRepoImpl implements AuthRepository {
   final AuthRemoteDatasource authRemoteDatasource;
   final NetworkInfo networkInfo;
-  AuthRepoImpl(this.authRemoteDatasource, this.networkInfo);
+  final LoginLocalDataSource loginLocalDataSource;
+  AuthRepoImpl(
+      this.authRemoteDatasource, this.networkInfo, this.loginLocalDataSource);
 
   @override
-  Future<Either<Failure, String>> login(LoginEntity login) async {
+  Future<Either<Failure, StudentResponseModel>> login(LoginEntity login) async {
     if (await networkInfo.isConnected) {
       try {
         final user = LoginModel(
             id: login.id, email: login.email, password: login.password);
-        final token = await authRemoteDatasource.logIn(user);
-        return Right(token);
+        final response = await authRemoteDatasource.logIn(user);
+
+        await loginLocalDataSource.setStudentUser(response.studentData as StudentDataModel);
+        await loginLocalDataSource.cacheUser(response.token);
+        return Right(response as StudentResponseModel);
       } on ServerException {
         return Left(ServerFailure(message: 'Server Failure'));
       }
@@ -69,7 +76,7 @@ class AuthRepoImpl implements AuthRepository {
             password: studentSignUp.password,
             fullName: studentSignUp.fullName,
             phoneNumber: studentSignUp.phoneNumber,
-            college: studentSignUp.college);
+            collage: studentSignUp.collage);
         final response = await authRemoteDatasource.studentSignUp(user);
         print(response);
         print('helllojkldjkljkag');

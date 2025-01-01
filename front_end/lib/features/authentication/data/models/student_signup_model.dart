@@ -7,7 +7,7 @@ class StudentSignupModel extends StudentSignupEntity {
     required super.password,
     required super.fullName,
     required super.phoneNumber,
-    required super.college,
+    required super.collage,
   });
   factory StudentSignupModel.fromJson(Map<String, dynamic> json) {
     return StudentSignupModel(
@@ -16,7 +16,7 @@ class StudentSignupModel extends StudentSignupEntity {
       password: json['password'],
       fullName: json['fullName'],
       phoneNumber: json['phoneNumber'],
-      college: json['college'],
+      collage: json['college'],
     );
   }
 
@@ -27,7 +27,7 @@ class StudentSignupModel extends StudentSignupEntity {
       'password': super.password,
       'fullName': super.fullName,
       'phoneNumber': super.phoneNumber,
-      'college': super.college,
+      'collage': super.collage,
     };
   }
 }

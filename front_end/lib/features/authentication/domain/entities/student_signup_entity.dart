@@ -7,7 +7,7 @@ class StudentSignupEntity extends Equatable {
 
   final String fullName;
   final String phoneNumber;
-  final String college;
+  final String collage;
 
   const StudentSignupEntity({
     required this.id,
@@ -15,7 +15,7 @@ class StudentSignupEntity extends Equatable {
     required this.password,
     required this.fullName,
     required this.phoneNumber,
-    required this.college,
+    required this.collage,
   });
   @override
   List<Object> get props {
@@ -25,7 +25,7 @@ class StudentSignupEntity extends Equatable {
       password,
       fullName,
       phoneNumber,
-      college,
+      collage,
     ];
   }
 }

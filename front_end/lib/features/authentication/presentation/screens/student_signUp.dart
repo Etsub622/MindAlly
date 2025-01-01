@@ -46,7 +46,7 @@ class _StudentSignUpState extends State<StudentSignUp> {
         password: passwordController.text,
         fullName: nameController.text,
         phoneNumber: phoneController.text,
-        college: college.text);
+        collage: college.text);
     context
         .read<AuthBloc>()
         .add(StudentsignUpEvent(studentSignupEntity: newUser));

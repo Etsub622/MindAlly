@@ -1,14 +1,19 @@
 import 'package:front_end/core/error/exception.dart';
+import 'package:front_end/features/authentication/data/datasource/auth_local_datasource/login_local_datasource.dart';
 import 'package:front_end/features/authentication/data/models/login_model.dart';
 import 'package:front_end/features/authentication/data/models/professional_signup_model.dart';
+import 'package:front_end/features/authentication/data/models/student_data_model.dart';
 import 'package:front_end/features/authentication/data/models/student_signup_model.dart';
 import 'package:http/http.dart' as http;
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:jwt_decode/jwt_decode.dart';
 
 abstract class AuthRemoteDatasource {
   Future<String> studentSignUp(StudentSignupModel studentModel);
   Future<String> professionalSignUp(ProfessionalSignupModel professionalModel);
-  Future<String> logIn(LoginModel loginModel);
+  Future<StudentResponseModel> logIn(LoginModel loginModel);
   Future<String> sendOtp(String phoneNumber);
   Future<String> verifyOtp(String otp, String phoneNumber);
 }
@@ -41,11 +46,12 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   @override
   Future<String> studentSignUp(StudentSignupModel studentModel) async {
     try {
-      var url = Uri.parse('$baseUrl/patient/Psignup');
+      var url = Uri.parse('$baseUrl/patient/patientSignup');
       final user = await client.post(url,
           body: jsonEncode(studentModel.toJson()),
           headers: {'Content-Type': 'application/json'});
       print(user.body);
+      
       print(user.statusCode);
       if (user.statusCode == 200) {
         return user.body;
@@ -59,9 +65,23 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   }
 
   @override
-  Future<String> logIn(LoginModel loginModel) async {
+  Future<StudentResponseModel> logIn(LoginModel loginModel) async {
     try {
-      var url = Uri.parse('$baseUrl/login');
+      final sharedPreferences = await SharedPreferences.getInstance();
+      final loginLocalDataSource =
+          LoginLocalDataSourceImpl(sharedPreferences: sharedPreferences);
+      final token = await loginLocalDataSource.getToken();
+
+      // Decode the token to get the role
+      Map<String, dynamic> payload = JwtDecoder.decode(token);
+      String role = payload['role'];
+
+      var url;
+      if (role == 'student') {
+        url = Uri.parse('$baseUrl/patient/patientLogin');
+      } else if (role == 'professional') {
+        url = Uri.parse('$baseUrl/therapist/therapistLogin');
+      }
       final user = await client.post(url,
           body: jsonEncode(loginModel.toJson()),
           headers: {'Content-Type': 'application/json'});

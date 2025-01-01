@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:front_end/core/common_widget.dart/snack_bar.dart';
 import 'package:front_end/core/confit/app_path.dart';
+import 'package:front_end/features/authentication/data/models/reset_password_model.dart';
+import 'package:front_end/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:front_end/features/authentication/presentation/widget/custom_button.dart';
 import 'package:front_end/features/authentication/presentation/widget/text_field.dart';
 import 'package:go_router/go_router.dart';
@@ -18,9 +22,50 @@ class _ResetPasswordState extends State<ResetPassword> {
       TextEditingController();
 
   @override
+  void dispose() {
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  void resetPassword(BuildContext context) {
+    final resetPassword = ResetPasswordModel(
+      id: '',
+      password: passwordController.text,
+    );
+    context
+        .read<AuthBloc>()
+        .add(ResetPasswordEvent(resetPasswordEntity: resetPassword));
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
+      body: BlocConsumer<AuthBloc, AuthState>(builder: (context, state) {
+        if (state is AuthInitial) {
+          return CircularProgressIndicator();
+        } else {
+          return _buildForm(context);
+        }
+      }, listener: (context, state) {
+        if (state is ResetPasswordSuccess) {
+          final snack = snackBar('Password reset successfully');
+          ScaffoldMessenger.of(context).showSnackBar(snack);
+
+          Future.delayed(const Duration(seconds: 2), () {
+            context.go(AppPath.login);
+          });
+        } else if (state is ResetPasswordError) {
+          final snack = errorsnackBar('Try again later');
+          ScaffoldMessenger.of(context).showSnackBar(snack);
+        }
+      }),
+    );
+  }
+
+  Widget _buildForm(BuildContext context) {
+    return Material(
+      child: Padding(
         padding: const EdgeInsets.only(left: 15.0, right: 15.0, top: 150),
         child: SingleChildScrollView(
           child: Column(
@@ -68,7 +113,13 @@ class _ResetPasswordState extends State<ResetPassword> {
                 hgt: 50.h,
                 text: "Set Password",
                 onPressed: () {
-                  GoRouter.of(context).go(AppPath.forgotPassword);
+                  if (passwordController.text ==
+                      confirmPasswordController.text) {
+                    resetPassword(context);
+                  } else {
+                    final snack = errorsnackBar('Password does not match');
+                    ScaffoldMessenger.of(context).showSnackBar(snack);
+                  }
                 },
               ),
               SizedBox(

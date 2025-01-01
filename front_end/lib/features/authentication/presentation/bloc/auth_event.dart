@@ -15,20 +15,29 @@ final class ProfessionalsignUpEvent extends AuthEvent {
   const ProfessionalsignUpEvent({required this.professionalSignupEntity});
 }
 
-final class LoginEvent extends AuthEvent{
+final class LoginEvent extends AuthEvent {
   final LoginEntity loginEntity;
   const LoginEvent({required this.loginEntity});
 }
 
-final class sendOtpEvent extends AuthEvent{
+final class sendOtpEvent extends AuthEvent {
   final String phoneNumber;
   const sendOtpEvent({required this.phoneNumber});
 }
 
-final class verifyOtpEvent extends AuthEvent{
+final class verifyOtpEvent extends AuthEvent {
   final String otp;
   final String phoneNumber;
   const verifyOtpEvent({required this.otp, required this.phoneNumber});
 }
 
+final class ResetPasswordEvent extends AuthEvent {
+  final ResetPasswordEntity resetPasswordEntity;
+  ResetPasswordEvent({required this.resetPasswordEntity});
+}
 
+final class StudentDataEvent extends AuthEvent {}
+
+final class GetStudentDataEvent extends AuthEvent {
+  const GetStudentDataEvent();
+}

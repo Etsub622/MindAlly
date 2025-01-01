@@ -1,4 +1,5 @@
 import 'package:front_end/core/error/failure.dart';
+import 'package:front_end/features/authentication/data/models/student_data_model.dart';
 import 'package:front_end/features/authentication/domain/entities/login_entity.dart';
 import 'package:front_end/features/authentication/domain/entities/professional_signup_entity.dart';
 import 'package:front_end/features/authentication/domain/entities/student_signup_entity.dart';
@@ -11,7 +12,7 @@ abstract interface class AuthRepository {
       StudentSignupEntity studentSignUp);
   Future<Either<Failure, String>> professionalSignup(
       ProfessionalSignupEntity professionalSignup);
-  Future<Either<Failure, String>> login(LoginEntity login);
+  Future<Either<Failure, StudentResponseModel>> login(LoginEntity login);
   Future<Either<Failure, String>> sendOtp(String phoneNumber);
   Future<Either<Failure, String>> verifyOtp(String otp,String phoneNumber);
 }

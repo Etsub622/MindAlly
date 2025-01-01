@@ -45,7 +45,36 @@ final class AuthOtpVerifyError extends AuthState {
   const AuthOtpVerifyError(this.message);
 }
 
+final class ResetPasswordSuccess extends AuthState {
+  final String message;
 
+  const ResetPasswordSuccess(this.message);
+}
+
+final class ResetPasswordError extends AuthState {
+  final String message;
+
+  const ResetPasswordError(this.message);
+}
+
+
+final class StudentDataLoaded extends AuthState {
+  final StudentUserEntity studentData;
+
+  const StudentDataLoaded(this.studentData);
+}
+
+final class StudentDataError extends AuthState {
+  final String message;
+
+  const StudentDataError(this.message);
+}
+
+final class studentDataLoaded extends AuthState {
+  final StudentUserEntity studentData;
+
+  const studentDataLoaded(this.studentData);
+}
 
 
 
