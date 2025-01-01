@@ -47,11 +47,11 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   Future<String> studentSignUp(StudentSignupModel studentModel) async {
     try {
       var url = Uri.parse('$baseUrl/patient/patientSignup');
+
       final user = await client.post(url,
           body: jsonEncode(studentModel.toJson()),
           headers: {'Content-Type': 'application/json'});
       print(user.body);
-      
       print(user.statusCode);
       if (user.statusCode == 200) {
         return user.body;

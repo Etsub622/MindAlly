@@ -29,9 +29,10 @@ class AuthRepoImpl implements AuthRepository {
             id: login.id, email: login.email, password: login.password);
         final response = await authRemoteDatasource.logIn(user);
 
-        await loginLocalDataSource.setStudentUser(response.studentData as StudentDataModel);
+        await loginLocalDataSource
+            .setStudentUser(response.studentData as StudentDataModel);
         await loginLocalDataSource.cacheUser(response.token);
-        return Right(response as StudentResponseModel);
+        return Right(response);
       } on ServerException {
         return Left(ServerFailure(message: 'Server Failure'));
       }
