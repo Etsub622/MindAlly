@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { FaCertificate } from "react-icons/fa";
 
 const therapistschema = new mongoose.Schema({
     FullName: {
@@ -17,6 +18,27 @@ const therapistschema = new mongoose.Schema({
         type: String,
         required: true
     
+    },
+    Certificate: {
+        type: String,
+        required:true
+    },
+    Bio: {
+        type:String
+    },
+    Fee: {
+        type:Number
+    },
+    // Reviews: {
+    //     type:[String]
+    // },
+    Rating: {
+        type:Number
+        
+    },
+    Role: {
+        type: String,
+        default:"therapist"
     }
 
 })

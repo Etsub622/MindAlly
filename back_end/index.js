@@ -27,7 +27,7 @@ app.use(cors({
   credentials:true
 }));
 
-app.use("/api/patinet",patientRoutes)
+app.use("/api/patient",patientRoutes)
 app.use("/api/therapist", therapistRoutes)
 
 
