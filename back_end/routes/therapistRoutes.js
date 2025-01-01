@@ -3,7 +3,7 @@ import { registerTherapist,therapistLogin } from "../controller/therapistControl
 
 const router = express.Router()
 
-router.post("/Tsignup", registerTherapist)
-router.post("/Tlogin", therapistLogin)
+router.post("/therapistSignup", registerTherapist)
+router.post("therapistLogin", therapistLogin)
 
 export default router;
