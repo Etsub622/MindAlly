@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import bodyParser from "body-parser";
 import patientRoutes from "./routes/patientRoutes.js"
 import therapistRoutes from "./routes/therapistRoutes.js"
+import otpRoutes from "./routes/otpRoutes.js"
  
 
 
@@ -29,6 +30,7 @@ app.use(cors({
 
 app.use("/api/patient",patientRoutes)
 app.use("/api/therapist", therapistRoutes)
+app.use("/api/otp",otpRoutes)
 
 
 app.listen(process.env.PORT, () => {
