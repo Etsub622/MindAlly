@@ -13,6 +13,6 @@ abstract interface class AuthRepository {
   Future<Either<Failure, String>> professionalSignup(
       ProfessionalSignupEntity professionalSignup);
   Future<Either<Failure, StudentResponseModel>> login(LoginEntity login);
-  Future<Either<Failure, String>> sendOtp(String phoneNumber);
-  Future<Either<Failure, String>> verifyOtp(String otp,String phoneNumber);
+  Future<Either<Failure, String>> sendOtp(String email);
+  Future<Either<Failure, String>> verifyOtp(String otp,String email);
 }

@@ -21,6 +21,12 @@ final class AuthSuccess extends AuthState {
   const AuthSuccess(this.message);
 }
 
+final class LoginSuccess extends AuthState {
+    final StudentResponseModel response;
+
+  const LoginSuccess(this.response);
+}
+
 final class AuthOtpSent extends AuthState {
   final String message;
 

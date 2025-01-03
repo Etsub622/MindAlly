@@ -31,6 +31,11 @@ class AppRouter {
     GoRoute(
         path: AppPath.resetPassword,
         builder: (context, state) => ResetPassword()),
-    GoRoute(path: AppPath.otp, builder: (context, state) => OtpVerification()),
+    GoRoute(
+        path: AppPath.otp,
+        builder: (context, state) {
+          final email = state.extra as String;
+          return OtpVerification(email: email);
+        }),
   ]);
 }

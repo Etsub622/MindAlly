@@ -4,16 +4,17 @@ class StudentResponseModel extends StudentDataResponse {
   const StudentResponseModel({
     required super.token,
     required super.studentData,
+    required super.message,
   });
 
   factory StudentResponseModel.fromJson(Map<String, dynamic> json) {
     return StudentResponseModel(
       token: json["token"],
-      studentData: StudentDataModel.fromJson(json["dataResponse"]),
+      message: json["message"],
+      studentData: StudentDataModel.fromJson(json["user"]),
     );
   }
 }
-
 
 class StudentDataModel extends StudentUserEntity {
   StudentDataModel({
@@ -26,33 +27,35 @@ class StudentDataModel extends StudentUserEntity {
     required super.phoneNumber,
     required super.profileImage,
     required super.role,
+    required super.collage,
   });
 
   factory StudentDataModel.fromJson(Map<String, dynamic> json) {
     return StudentDataModel(
-      id: json['id'],
-      fullName: json['fullName']?? "",
-      email: json['email'] ?? "",
-      password: json['password'] ?? "",
-      bio: json['bio'] ?? "",
-      phoneNumber: json['phoneNumber'] ?? "",
-      gender: json['gender'] ?? "",
-      profileImage: json['profileImage'] ?? "",
-      role: json['role'] ?? "",
+      id: json['_id'],
+      fullName: json['FullName'] ?? "",
+      email: json['Email'] ?? "",
+      password: json['Password'] ?? "",
+      bio: json['Bio'] ?? "",
+      phoneNumber: json['PhoneNumber'] ?? "",
+      gender: json['Gender'] ?? "",
+      profileImage: json['ProfileImage'] ?? "",
+      role: json['Role'] ?? "",
+      collage:json['collage'] ?? "",
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
-      'fullName': fullName,
-      'email': email,
-      'password': password,
-      'bio': bio,
-      'phoneNumber': phoneNumber,
-      'gender': gender,
-      'profileImage': profileImage,
-      'role': role,
+      '_id': id,
+      'FullName': fullName,
+      'Email': email,
+      'Password': password,
+      'Bio': bio,
+      'PhoneNumber': phoneNumber,
+      'Gender': gender,
+      'ProfileImage': profileImage,
+      'Role': role,
     };
   }
 }

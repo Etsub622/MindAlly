@@ -92,10 +92,10 @@ class AuthRepoImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, String>> sendOtp(String phoneNumber) async {
+  Future<Either<Failure, String>> sendOtp(String email) async {
     if (await networkInfo.isConnected) {
       try {
-        final response = await authRemoteDatasource.sendOtp(phoneNumber);
+        final response = await authRemoteDatasource.sendOtp(email);
         return Right(response);
       } on ServerException {
         return Left(ServerFailure(message: 'Server Failure'));
@@ -108,10 +108,10 @@ class AuthRepoImpl implements AuthRepository {
 
   @override
   Future<Either<Failure, String>> verifyOtp(
-      String otp, String phoneNumber) async {
+      String otp, String email) async {
     if (await networkInfo.isConnected) {
       try {
-        final response = await authRemoteDatasource.verifyOtp(otp, phoneNumber);
+        final response = await authRemoteDatasource.verifyOtp(otp, email);
         return Right(response);
       } on ServerException {
         return Left(ServerFailure(message: 'Server Failure'));

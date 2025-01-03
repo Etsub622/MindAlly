@@ -9,12 +9,12 @@ class SendOtpUseCase extends Usecase<String,sendOtpParams>{
 
   @override
   Future<Either<Failure, String>> call(sendOtpParams params) async {
-    return await authRepository.sendOtp(params.phoneNumber);
+    return await authRepository.sendOtp(params.email);
   }
 }
 class sendOtpParams{
-  final String phoneNumber;
-  sendOtpParams(this.phoneNumber);
+  final String email;
+  sendOtpParams(this.email);
 }
 
 class verifyOtpUsecase extends Usecase<String,verifyOtpParams>{
@@ -23,11 +23,11 @@ class verifyOtpUsecase extends Usecase<String,verifyOtpParams>{
 
   @override
   Future<Either<Failure, String>> call(verifyOtpParams params) async {
-    return await authRepository.verifyOtp(params.otp,params.phoneNumber);
+    return await authRepository.verifyOtp(params.otp,params.email);
   }
 }
 class verifyOtpParams{
   final String otp;
-  final String phoneNumber;
-  verifyOtpParams(this.otp,this.phoneNumber);
+  final String email;
+  verifyOtpParams(this.otp,this.email);
 }

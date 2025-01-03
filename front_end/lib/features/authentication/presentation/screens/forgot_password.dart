@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:front_end/core/common_widget.dart/snack_bar.dart';
 import 'package:front_end/core/confit/app_path.dart';
+import 'package:front_end/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:front_end/features/authentication/presentation/widget/custom_button.dart';
 import 'package:front_end/features/authentication/presentation/widget/text_field.dart';
 import 'package:go_router/go_router.dart';
@@ -15,10 +18,38 @@ class ForgotPassword extends StatefulWidget {
 class _ForgotPasswordState extends State<ForgotPassword> {
   final TextEditingController emailController = TextEditingController();
 
+  void _sentOtp(BuildContext context) {
+    final email = emailController.text;
+
+    context.read<AuthBloc>().add(SendOtpEvent(email: email));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
+      body: BlocConsumer<AuthBloc, AuthState>(builder: (context, state) {
+        if (state is AuthLoading) {
+          return const CircularProgressIndicator();
+        } else {
+          return _buildForm(context);
+        }
+      }, listener: (context, state) {
+        if (state is AuthOtpSent) {
+          const snack = SnackBar(content: Text('OTP is sent to your email.'));
+          ScaffoldMessenger.of(context).showSnackBar(snack);
+
+          context.go(AppPath.otp, extra: emailController.text);
+        } else if (state is AuthOtpSendError) {
+          final snack = errorsnackBar('Try again');
+          ScaffoldMessenger.of(context).showSnackBar(snack);
+        }
+      }),
+    );
+  }
+
+  Widget _buildForm(BuildContext context) {
+    return Material(
+      child: Padding(
         padding: const EdgeInsets.only(left: 15.0, right: 15.0, top: 150),
         child: SingleChildScrollView(
           child: Column(
@@ -83,7 +114,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 hgt: 50.h,
                 text: "Send",
                 onPressed: () {
-                  context.go(AppPath.resetPassword);
+                  _sentOtp(context);
                 },
               ),
               SizedBox(

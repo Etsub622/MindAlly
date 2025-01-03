@@ -64,25 +64,25 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final result = await loginUsecase(LogInParams(event.loginEntity));
       result.fold(
         (failure) => emit(AuthError(failure.message)),
-        (success) => emit(AuthSuccess(success as String)),
+        (success) => emit(LoginSuccess(success)),
       );
     });
 
-    on<sendOtpEvent>((event, emit) async {
+    on<SendOtpEvent>((event, emit) async {
       emit(AuthLoading());
-      final result = await sendOtpUseCase(sendOtpParams(event.phoneNumber));
+      final result = await sendOtpUseCase(sendOtpParams(event.email));
       result.fold(
         (failure) => emit(AuthError(failure.message)),
         (success) => emit(AuthOtpSent(success)),
       );
     });
 
-    on<verifyOtpEvent>((event, emit) async {
+    on<VerifyOtpEvent>((event, emit) async {
       emit(AuthLoading());
       final result =
-          await verifyOtpUseCase(verifyOtpParams(event.otp, event.phoneNumber));
+          await verifyOtpUseCase(verifyOtpParams(event.otp, event.email));
       result.fold(
-        (failure) => emit(AuthError(failure.message)),
+        (failure) => emit(AuthOtpVerifyError(failure.message)),
         (success) => emit(AuthOtpVerified(success)),
       );
     });

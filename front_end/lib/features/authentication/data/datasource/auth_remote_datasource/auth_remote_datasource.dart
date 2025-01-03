@@ -8,14 +8,13 @@ import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:jwt_decode/jwt_decode.dart';
 
 abstract class AuthRemoteDatasource {
   Future<String> studentSignUp(StudentSignupModel studentModel);
   Future<String> professionalSignUp(ProfessionalSignupModel professionalModel);
   Future<StudentResponseModel> logIn(LoginModel loginModel);
-  Future<String> sendOtp(String phoneNumber);
-  Future<String> verifyOtp(String otp, String phoneNumber);
+  Future<String> sendOtp(String email);
+  Future<String> verifyOtp(String otp, String email);
 }
 
 class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
@@ -33,7 +32,14 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
           headers: {'Content-Type': 'application/json'});
       print(user.body);
       if (user.statusCode == 200) {
-        return user.body;
+        final jsonResponse = jsonDecode(user.body);
+        final token = jsonResponse['token'];
+
+        // Save the token to SharedPreferences
+        final sharedPreferences = await SharedPreferences.getInstance();
+        await sharedPreferences.setString('token_key', token);
+
+        return token;
       } else {
         throw ServerException(message: 'Failed to sign up');
       }
@@ -54,7 +60,14 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       print(user.body);
       print(user.statusCode);
       if (user.statusCode == 200) {
-        return user.body;
+        final jsonResponse = jsonDecode(user.body);
+        final token = jsonResponse['token'];
+
+        // Save the token to SharedPreferences
+        final sharedPreferences = await SharedPreferences.getInstance();
+        await sharedPreferences.setString('token_key', token);
+
+        return token;
       } else {
         throw ServerException(message: 'Failed to sign up');
       }
@@ -77,32 +90,41 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       String role = payload['role'];
 
       var url;
-      if (role == 'student') {
+      if (role == 'patient') {
         url = Uri.parse('$baseUrl/patient/patientLogin');
-      } else if (role == 'professional') {
+      } else if (role == 'therapist') {
         url = Uri.parse('$baseUrl/therapist/therapistLogin');
       }
+
       final user = await client.post(url,
           body: jsonEncode(loginModel.toJson()),
           headers: {'Content-Type': 'application/json'});
 
       if (user.statusCode == 200) {
-        return jsonDecode(user.body)['token'];
+        final responseJson = jsonDecode(user.body);
+
+        if (responseJson['user'] == null) {
+          throw ServerException(message: 'User data is null');
+        }
+
+        final studentResponse = StudentResponseModel.fromJson(responseJson);
+        print(studentResponse);
+        return studentResponse;
       } else {
         throw ServerException(message: 'Failed to sign up');
       }
     } catch (e) {
       throw ServerException(
-          message: 'Unexpected error occured: ${e.toString()}');
+          message: 'Unexpected error occurred: ${e.toString()}');
     }
   }
 
   @override
-  Future<String> sendOtp(String phoneNumber) async {
+  Future<String> sendOtp(String email) async {
     try {
-      var url = Uri.parse('$baseUrl/sendOtp');
+      var url = Uri.parse('$baseUrl/otp/sendOtp');
       final res = await client.post(url,
-          body: jsonEncode({'phoneNumber': phoneNumber}),
+          body: jsonEncode({'email': email}),
           headers: {'Content-Type': 'application/json; charset=UTF-8'});
 
       if (res.statusCode == 200) {
@@ -117,12 +139,16 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   }
 
   @override
-  Future<String> verifyOtp(String otp, String phoneNumber) async {
+  Future<String> verifyOtp(String otp, String email) async {
     try {
-      var url = Uri.parse('$baseUrl/verifyOtp');
+      var url = Uri.parse('$baseUrl/otp/verifyOtp');
       final res = await client.post(url,
-          body: jsonEncode({'otp': otp, 'phoneNumber': phoneNumber}),
+          body: jsonEncode({'otp': otp, 'email': email}),
           headers: {'Content-Type': 'application/json; charset=UTF-8'});
+      print(res.statusCode);
+      print('email: $email');
+      print('otp: $otp');
+      print(res.body);
 
       if (res.statusCode == 200) {
         return jsonDecode(res.body)['message'];

@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:front_end/core/common_widget.dart/circular_indicator.dart';
+import 'package:front_end/core/common_widget.dart/snack_bar.dart';
 import 'package:front_end/core/confit/app_path.dart';
+import 'package:front_end/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:front_end/features/authentication/presentation/widget/custom_button.dart';
 import 'package:front_end/features/authentication/presentation/widget/otp_widget.dart';
 import 'package:go_router/go_router.dart';
 
 class OtpVerification extends StatefulWidget {
-  const OtpVerification({super.key});
+  final String email;
+  const OtpVerification({super.key, required this.email});
 
   @override
   State<OtpVerification> createState() => _OtpVerificationState();
@@ -22,11 +27,47 @@ class _OtpVerificationState extends State<OtpVerification> {
   final FocusNode num2Focus = FocusNode();
   final FocusNode num3Focus = FocusNode();
   final FocusNode num4Focus = FocusNode();
+  @override
+  void initState() {
+    super.initState();
+    print('Received email: ${widget.email}');
+  }
+
+  void _verifyOtp(BuildContext context) {
+    final otp = num1Conttroller.text +
+        num2Contoller.text +
+        num3Controller.text +
+        num4Controller.text;
+    print('otp:$otp');
+    print('email:${widget.email}');
+    context.read<AuthBloc>().add(VerifyOtpEvent(otp: otp, email: widget.email));
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
+      body: BlocConsumer<AuthBloc, AuthState>(builder: (context, state) {
+        if (state is AuthLoading) {
+          return const CircularIndicator();
+        } else {
+          return _buildForm(context);
+        }
+      }, listener: (context, state) {
+        if (state is AuthOtpVerified) {
+          const snack = SnackBar(content: Text('OTP verified successfully.'));
+          ScaffoldMessenger.of(context).showSnackBar(snack);
+          context.go(AppPath.resetPassword);
+        } else if (state is AuthOtpVerifyError) {
+          final snack = errorsnackBar('Enter the valid otp');
+          ScaffoldMessenger.of(context).showSnackBar(snack);
+        }
+      }),
+    );
+  }
+
+  Widget _buildForm(BuildContext context) {
+    return Material(
+      child: Padding(
         padding: const EdgeInsets.only(left: 15.0, right: 15.0, top: 150),
         child: SingleChildScrollView(
           child: Column(
@@ -94,7 +135,7 @@ class _OtpVerificationState extends State<OtpVerification> {
                 hgt: 50.h,
                 text: "Verify",
                 onPressed: () {
-                  GoRouter.of(context).go(AppPath.forgotPassword);
+                  _verifyOtp(context);
                 },
               ),
               SizedBox(

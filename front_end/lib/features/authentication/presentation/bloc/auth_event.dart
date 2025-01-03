@@ -20,15 +20,15 @@ final class LoginEvent extends AuthEvent {
   const LoginEvent({required this.loginEntity});
 }
 
-final class sendOtpEvent extends AuthEvent {
-  final String phoneNumber;
-  const sendOtpEvent({required this.phoneNumber});
+final class SendOtpEvent extends AuthEvent {
+  final String email;
+  const SendOtpEvent({required this.email});
 }
 
-final class verifyOtpEvent extends AuthEvent {
+final class VerifyOtpEvent extends AuthEvent {
   final String otp;
-  final String phoneNumber;
-  const verifyOtpEvent({required this.otp, required this.phoneNumber});
+  final String email;
+  const VerifyOtpEvent({required this.otp, required this.email});
 }
 
 final class ResetPasswordEvent extends AuthEvent {
