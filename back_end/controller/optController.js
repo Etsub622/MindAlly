@@ -4,7 +4,7 @@ import { sendEmail } from "../utils/sendEmail.js";
 
 function generateOTP() {
     return randomstring.generate({
-        length: 6,
+        length: 4,
         charset: 'numeric'
     });
 }
@@ -13,7 +13,7 @@ const sendOTPverification = async (req, res, next) => {
     try {
         const { email } = req.body;
 
-        const expiresInMinutes = 10;
+        const expiresInMinutes = 100;
         const otp = generateOTP();
 
       
