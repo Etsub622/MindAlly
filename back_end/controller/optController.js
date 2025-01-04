@@ -2,9 +2,10 @@ import { Otp } from "../model/otpModel.js";
 import randomstring from "randomstring";
 import { sendEmail } from "../utils/sendEmail.js";
 
+
 function generateOTP() {
     return randomstring.generate({
-        length: 6,
+        length: 4,
         charset: 'numeric'
     });
 }
@@ -56,4 +57,5 @@ const verifyOTP = async (req, res) => {
     }
 };
 
-export { sendOTPverification,verifyOTP };
+export{sendOTPverification,verifyOTP}
+
