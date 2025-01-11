@@ -23,20 +23,20 @@ class CustomButton extends StatelessWidget {
       child: Container(
         width: wdth,
         height: hgt,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(rad),
+          color: color,
+        ),
         child: Center(
           child: Text(
             text,
-            style: TextStyle(
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 18,
               fontFamily: 'Poppins',
             ),
             textAlign: TextAlign.center,
           ),
-        ),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(rad),
-          color: color,
         ),
       ),
     );
