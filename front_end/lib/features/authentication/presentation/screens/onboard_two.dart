@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:front_end/core/confit/app_path.dart';
+import 'package:front_end/core/routes/app_path.dart';
+import 'package:front_end/features/authentication/presentation/screens/onboard_three.dart';
 import 'package:front_end/features/authentication/presentation/widget/custom_button.dart';
 import 'package:front_end/features/authentication/presentation/widget/onboard_widget.dart';
 import 'package:front_end/features/authentication/presentation/widget/scroll.dart';
@@ -21,10 +22,10 @@ class OnboardTwo extends StatelessWidget {
                     "Connect with professionals for affordable therapy and "
                     "instant AI support anytime.",
                 image: Image.asset('asset/image/onboard2.webp')),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
-            Row(
+            const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ScrollDesign(),
@@ -38,11 +39,16 @@ class OnboardTwo extends StatelessWidget {
                 ScrollDesign(),
               ],
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             CustomButton(text: 'Next', onPressed: () {
-              context.go(AppPath.onboard3);
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const OnboardThree(),
+                  ),
+        );
             }),
           ],
         ),

@@ -14,7 +14,7 @@ const sendOTPverification = async (req, res, next) => {
     try {
         const { email } = req.body;
 
-        const expiresInMinutes = 10;
+        const expiresInMinutes = 100;
         const otp = generateOTP();
 
       
