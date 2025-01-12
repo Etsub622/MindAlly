@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:front_end/core/common_widget.dart/snack_bar.dart';
-import 'package:front_end/core/confit/app_path.dart';
+import 'package:front_end/core/routes/app_path.dart';
 import 'package:front_end/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:front_end/features/authentication/presentation/widget/custom_button.dart';
 import 'package:front_end/features/authentication/presentation/widget/text_field.dart';
@@ -57,39 +57,39 @@ class _ForgotPasswordState extends State<ForgotPassword> {
             children: [
               Image.asset(
                 'asset/image/logo.webp',
-                height: 100.h,
-                width: 100.w,
+                height: 100,
+                width: 100,
               ),
               SizedBox(
-                height: 30.h,
+                height: 30,
               ),
               Text(
                 'Forgot Password ?',
                 style: TextStyle(
                   fontFamily: 'Poppins',
-                  fontSize: 17.sp,
+                  fontSize: 17,
                   color: Colors.black,
                   fontWeight: FontWeight.w600,
                 ),
               ),
               SizedBox(
-                height: 15.h,
+                height: 15,
               ),
               Text(
                 'Enter your email address below to reset your password',
                 style: TextStyle(
                   fontFamily: 'Poppins',
-                  fontSize: 11.sp,
+                  fontSize: 11,
                   color: Colors.black,
                   fontWeight: FontWeight.w500,
                 ),
               ),
               SizedBox(
-                height: 45.h,
+                height: 45,
               ),
               CustomTextField(text: "email", controller: emailController),
               SizedBox(
-                height: 5.h,
+                height: 5,
               ),
               Align(
                 alignment: Alignment.centerRight,
@@ -99,26 +99,26 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                   },
                   child: Text('Remember password?',
                       style: TextStyle(
-                        fontSize: 10.sp,
+                        fontSize: 10,
                         fontFamily: 'Poppins',
                         fontWeight: FontWeight.w600,
                       )),
                 ),
               ),
               SizedBox(
-                height: 30.h,
+                height: 30,
               ),
               CustomButton(
                 wdth: double.infinity,
                 rad: 10,
-                hgt: 50.h,
+                hgt: 50,
                 text: "Send",
                 onPressed: () {
                   _sentOtp(context);
                 },
               ),
               SizedBox(
-                height: 10.h,
+                height: 10,
               ),
             ],
           ),

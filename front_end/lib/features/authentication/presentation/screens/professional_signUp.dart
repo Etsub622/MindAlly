@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:front_end/core/common_widget.dart/circular_indicator.dart';
 import 'package:front_end/core/common_widget.dart/snack_bar.dart';
-import 'package:front_end/core/confit/app_path.dart';
+import 'package:front_end/core/routes/app_path.dart';
 import 'package:front_end/features/authentication/data/models/professional_signup_model.dart';
 import 'package:front_end/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:front_end/features/authentication/presentation/widget/custom_button.dart';
@@ -91,31 +91,31 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
               children: [
                 Image.asset(
                   'asset/image/logo.webp',
-                  height: 100.h,
-                  width: 100.w,
+                  height: 100,
+                  width: 100,
                 ),
                 SizedBox(
-                  height: 30.h,
+                  height: 30,
                 ),
                 Text(
                   'Create your account',
                   style: TextStyle(
                     fontFamily: 'Poppins',
-                    fontSize: 18.sp,
+                    fontSize: 18,
                     color: Colors.black,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 SizedBox(
-                  height: 30.h,
+                  height: 30,
                 ),
                 CustomTextField(text: "full name", controller: nameController),
                 SizedBox(
-                  height: 20.h,
+                  height: 20,
                 ),
                 CustomTextField(text: "email", controller: emailController),
                 SizedBox(
-                  height: 20.h,
+                  height: 20,
                 ),
                 CustomTextField(
                     text: "password",
@@ -123,7 +123,7 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
                     controller: passwordController,
                     isPassword: true),
                 SizedBox(
-                  height: 20.h,
+                  height: 20,
                 ),
                 CustomTextField(
                     text: "confirm password",
@@ -131,22 +131,22 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
                     controller: confirmPasswordController,
                     isPassword: true),
                 SizedBox(
-                  height: 20.h,
+                  height: 20,
                 ),
                 CustomTextField(
                     text: "Phone Number", controller: phoneController),
                 SizedBox(
-                  height: 20.h,
+                  height: 20,
                 ),
                 CustomTextField(
                     text: "Area of Specialization", controller: areaContloller),
                 SizedBox(
-                  height: 20.h,
+                  height: 20,
                 ),
                 CustomTextField(
                     text: "Certified document", controller: documentController),
                 SizedBox(
-                  height: 40.h,
+                  height: 40,
                 ),
                 CustomButton(
                   wdth: double.infinity,
@@ -166,7 +166,7 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
                   },
                 ),
                 SizedBox(
-                  height: 15.h,
+                  height: 15,
                 ),
                 Align(
                   alignment: Alignment.bottomRight,
@@ -179,7 +179,7 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
                         text: 'Already have an account? ',
                         style: TextStyle(
                           color: Colors.black,
-                          fontSize: 12.sp,
+                          fontSize: 12,
                           fontFamily: 'Poppins',
                           fontWeight: FontWeight.w500,
                         ),
@@ -188,7 +188,7 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
                             text: 'Login',
                             style: TextStyle(
                               color: Color(0xffB57EDC),
-                              fontSize: 12.sp,
+                              fontSize: 12,
                               fontFamily: 'Poppins',
                               fontWeight: FontWeight.w600,
                             ),

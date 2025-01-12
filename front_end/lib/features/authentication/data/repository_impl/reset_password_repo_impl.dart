@@ -11,7 +11,7 @@ import 'package:front_end/features/authentication/domain/repositories/reset_repo
 class ResetPasswordRepoImpl implements ResetPasswordRepo{
   final ResetPasswordRemoteDatasource resetPasswordRemoteDatasource;
   final NetworkInfo networkInfo;
-  ResetPasswordRepoImpl(this.resetPasswordRemoteDatasource, this.networkInfo);
+  ResetPasswordRepoImpl({ required this.resetPasswordRemoteDatasource, required this.networkInfo});
 
   @override
   Future<Either<Failure, StudentResponseModel>> resetPassword(ResetPasswordEntity resetPassword) async {

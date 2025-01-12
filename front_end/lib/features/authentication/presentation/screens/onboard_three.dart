@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:front_end/core/confit/app_path.dart';
+import 'package:front_end/core/routes/app_path.dart';
 import 'package:front_end/features/authentication/presentation/widget/custom_button.dart';
 import 'package:front_end/features/authentication/presentation/widget/onboard_widget.dart';
 import 'package:front_end/features/authentication/presentation/widget/scroll.dart';
+import 'package:go_router/go_router.dart';
 import 'package:go_router/go_router.dart';
 
 class OnboardThree extends StatelessWidget {
@@ -19,10 +20,10 @@ class OnboardThree extends StatelessWidget {
                 subtext: "Join our community and unlock resources that inspire "
                     "and support your mental wellness journey.",
                 image: Image.asset('asset/image/onb3.webp')),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
-            Row(
+            const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ScrollDesign(),
@@ -36,7 +37,7 @@ class OnboardThree extends StatelessWidget {
                 ScrollDesign2(),
               ],
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             CustomButton(

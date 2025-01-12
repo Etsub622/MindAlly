@@ -19,7 +19,7 @@ class AuthRepoImpl implements AuthRepository {
   final NetworkInfo networkInfo;
   final LoginLocalDataSource loginLocalDataSource;
   AuthRepoImpl(
-      this.authRemoteDatasource, this.networkInfo, this.loginLocalDataSource);
+      {required this.authRemoteDatasource, required this.networkInfo, required this.loginLocalDataSource});
 
   @override
   Future<Either<Failure, StudentResponseModel>> login(LoginEntity login) async {

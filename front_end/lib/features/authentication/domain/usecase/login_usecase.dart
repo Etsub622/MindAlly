@@ -7,7 +7,7 @@ import 'package:front_end/features/authentication/domain/repositories/auth_repo.
 
 class LoginUsecase implements Usecase<StudentResponseModel, LogInParams>{
   final AuthRepository authRepository;
-  LoginUsecase(this.authRepository);
+  LoginUsecase({required this.authRepository});
 
   @override
   Future<Either<Failure, StudentResponseModel>> call(LogInParams params) async {

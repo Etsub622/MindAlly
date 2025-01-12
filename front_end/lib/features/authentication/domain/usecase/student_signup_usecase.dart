@@ -6,7 +6,7 @@ import 'package:front_end/features/authentication/domain/repositories/auth_repo.
 
 class StudentSignupUsecase implements Usecase<String, SignUpParams> {
   final AuthRepository authRepository;
-  StudentSignupUsecase(this.authRepository);
+  StudentSignupUsecase({required this.authRepository});
 
   @override
   Future<Either<Failure, String>> call(SignUpParams params) async {

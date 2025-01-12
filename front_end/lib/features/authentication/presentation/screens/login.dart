@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:front_end/core/common_widget.dart/circular_indicator.dart';
 import 'package:front_end/core/common_widget.dart/snack_bar.dart';
-import 'package:front_end/core/confit/app_path.dart';
+import 'package:front_end/core/routes/app_path.dart';
 import 'package:front_end/features/authentication/data/datasource/auth_local_datasource/login_local_datasource.dart';
 import 'package:front_end/features/authentication/data/models/login_model.dart';
 import 'package:front_end/features/authentication/presentation/bloc/auth_bloc.dart';
@@ -63,7 +63,7 @@ class _LoginState extends State<Login> {
         
 
           if (role == 'patient') {
-            context.go(AppPath.onboard);
+            context.go(AppPath.authOnboarding);
           } else if (role == 'professional') {
             context.go(AppPath.onboard2);
           }
@@ -87,27 +87,27 @@ class _LoginState extends State<Login> {
               children: [
                 Image.asset(
                   'asset/image/logo.webp',
-                  height: 100.h,
-                  width: 100.w,
+                  height: 100,
+                  width: 100,
                 ),
                 SizedBox(
-                  height: 30.h,
+                  height: 30,
                 ),
                 Text(
                   'Log in to your account',
                   style: TextStyle(
                     fontFamily: 'Poppins',
-                    fontSize: 17.sp,
+                    fontSize: 17,
                     color: Colors.black,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 SizedBox(
-                  height: 40.h,
+                  height: 40,
                 ),
                 CustomTextField(text: "email", controller: emailController),
                 SizedBox(
-                  height: 20.h,
+                  height: 20,
                 ),
                 CustomTextField(
                     text: "password",
@@ -115,7 +115,7 @@ class _LoginState extends State<Login> {
                     controller: passwordController,
                     isPassword: true),
                 SizedBox(
-                  height: 10.h,
+                  height: 10,
                 ),
                 Align(
                   alignment: Alignment.centerRight,
@@ -125,19 +125,19 @@ class _LoginState extends State<Login> {
                     },
                     child: Text('Forgot password?',
                         style: TextStyle(
-                          fontSize: 10.sp,
+                          fontSize: 10,
                           fontFamily: 'Poppins',
                           fontWeight: FontWeight.w600,
                         )),
                   ),
                 ),
                 SizedBox(
-                  height: 40.h,
+                  height: 40,
                 ),
                 CustomButton(
                   wdth: double.infinity,
                   rad: 10,
-                  hgt: 50.h,
+                  hgt: 50,
                   text: "Log In",
                   onPressed: () {
                     if (_key.currentState!.validate()) {
@@ -146,7 +146,7 @@ class _LoginState extends State<Login> {
                   },
                 ),
                 SizedBox(
-                  height: 10.h,
+                  height: 10,
                 ),
                 Align(
                   alignment: Alignment.bottomRight,
@@ -159,7 +159,7 @@ class _LoginState extends State<Login> {
                         text: 'Don\'t have an account yet? ',
                         style: TextStyle(
                           color: Colors.black,
-                          fontSize: 11.sp,
+                          fontSize: 11,
                           fontFamily: 'Poppins',
                           fontWeight: FontWeight.w500,
                         ),
@@ -168,7 +168,7 @@ class _LoginState extends State<Login> {
                             text: 'SignUp',
                             style: TextStyle(
                               color: Color(0xffB57EDC),
-                              fontSize: 11.sp,
+                              fontSize: 11,
                               fontFamily: 'Poppins',
                               fontWeight: FontWeight.w600,
                             ),
@@ -179,24 +179,24 @@ class _LoginState extends State<Login> {
                   ),
                 ),
                 SizedBox(
-                  height: 50.h,
+                  height: 50,
                 ),
                 Text(
                   'Or continue with',
                   style: TextStyle(
                     fontFamily: 'Poppins',
-                    fontSize: 14.sp,
+                    fontSize: 14,
                     color: Colors.black,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 SizedBox(
-                  height: 20.h,
+                  height: 20,
                 ),
                 CustomButton(
                   rad: 10,
                   wdth: double.infinity,
-                  hgt: 50.h,
+                  hgt: 50,
                   text: 'Log in with Google',
                   onPressed: () {},
                   icon: Image.asset(

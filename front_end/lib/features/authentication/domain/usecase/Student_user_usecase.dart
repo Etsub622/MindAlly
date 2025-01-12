@@ -6,7 +6,7 @@ import 'package:front_end/features/authentication/domain/repositories/student_da
 
 class StudentUserUsecase extends Usecase<StudentUserEntity ,StudentParams> {
   final StudentDataRepo studentDataRepo;
-  StudentUserUsecase(this.studentDataRepo);
+  StudentUserUsecase({required this.studentDataRepo});
 
   @override
   Future<Either<Failure,StudentUserEntity>> call(StudentParams params) async {
