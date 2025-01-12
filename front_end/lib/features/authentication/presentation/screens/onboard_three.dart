@@ -39,7 +39,11 @@ class OnboardThree extends StatelessWidget {
             const SizedBox(
               height: 20,
             ),
-            CustomButton(text: 'Get Started', onPressed: () => context.go(AppPath.home)),
+            CustomButton(
+                text: 'Get Started',
+                onPressed: () {
+                  context.go(AppPath.role);
+                }),
           ],
         ),
       ),

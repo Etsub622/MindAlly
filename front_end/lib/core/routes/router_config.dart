@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:front_end/core/routes/app_path.dart';
 import 'package:front_end/features/Home/presentation/screens/home_navigation_screen.dart';
+import 'package:front_end/features/authentication/presentation/screens/forgot_password.dart';
+import 'package:front_end/features/authentication/presentation/screens/login.dart';
 import 'package:front_end/features/authentication/presentation/screens/onboard_one.dart';
+import 'package:front_end/features/authentication/presentation/screens/otp.dart';
+import 'package:front_end/features/authentication/presentation/screens/professional_signUp.dart';
+import 'package:front_end/features/authentication/presentation/screens/reset_password.dart';
+import 'package:front_end/features/authentication/presentation/screens/role_selection.dart';
+import 'package:front_end/features/authentication/presentation/screens/student_signUp.dart';
+
 import 'package:go_router/go_router.dart';
 
 
@@ -18,6 +26,25 @@ final routes = <GoRoute>[
     builder: (BuildContext context, GoRouterState state) =>
         const OnboardOne(),
   ),
+    GoRoute(path: AppPath.role, builder: (context, state) => const RoleSelection()),
+    GoRoute(
+        path: AppPath.student, builder: (context, state) => const StudentSignUp()),
+    GoRoute(
+        path: AppPath.professional,
+        builder: (context, state) => const ProfessionalSignup()),
+    GoRoute(path: AppPath.login, builder: (context, state) => const Login()),
+    GoRoute(
+        path: AppPath.forgotPassword,
+        builder: (context, state) => const ForgotPassword()),
+    GoRoute(
+        path: AppPath.resetPassword,
+        builder: (context, state) => const ResetPassword()),
+    GoRoute(
+        path: AppPath.otp,
+        builder: (context, state) {
+          final email = state.extra as String;
+          return OtpVerification(email: email);
+        }),
 
 ];
 

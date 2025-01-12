@@ -7,12 +7,14 @@ class CustomButton extends StatelessWidget {
   final double hgt;
   final double rad;
   final Color color;
+  final Image? icon;
   const CustomButton(
       {super.key,
       required this.text,
       required this.onPressed,
       this.wdth = 360,
       this.rad = 30,
+      this.icon,
       this.color = const Color(0xFFB57EDC),
       this.hgt = 40});
 
@@ -28,14 +30,23 @@ class CustomButton extends StatelessWidget {
           color: color,
         ),
         child: Center(
-          child: Text(
-            text,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontFamily: 'Poppins',
-            ),
-            textAlign: TextAlign.center,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (icon != null) ...[
+                icon!,
+                SizedBox(width: 8),
+              ],
+              Text(
+                text,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontFamily: 'Poppins',
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
         ),
       ),
