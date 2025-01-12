@@ -4,6 +4,7 @@ import 'package:front_end/features/authentication/presentation/widget/custom_but
 import 'package:front_end/features/authentication/presentation/widget/onboard_widget.dart';
 import 'package:front_end/features/authentication/presentation/widget/scroll.dart';
 import 'package:go_router/go_router.dart';
+import 'package:go_router/go_router.dart';
 
 class OnboardThree extends StatelessWidget {
   const OnboardThree({super.key});
@@ -39,6 +40,11 @@ class OnboardThree extends StatelessWidget {
             const SizedBox(
               height: 20,
             ),
+            CustomButton(
+                text: 'Get Started',
+                onPressed: () {
+                  context.go(AppPath.role);
+                }),
             CustomButton(
                 text: 'Get Started',
                 onPressed: () {

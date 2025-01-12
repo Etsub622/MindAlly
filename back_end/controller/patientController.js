@@ -16,7 +16,7 @@ const registerPatient = async (req, res) => {
       FullName:fullName,
       Email:email,
       Collage:collage,
-    Password: hashpass,
+      Password: hashpass,
       Role:"patient"
     })
     
