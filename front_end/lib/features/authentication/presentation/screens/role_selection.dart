@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:front_end/core/confit/app_path.dart';
 import 'package:front_end/features/authentication/presentation/widget/custom_button.dart';
 import 'package:front_end/features/authentication/presentation/widget/role_widget.dart';
-import 'package:front_end/main.dart';
 import 'package:go_router/go_router.dart';
+import 'package:front_end/core/routes/app_path.dart';
+
 
 class RoleSelection extends StatefulWidget {
   const RoleSelection({super.key});
@@ -27,17 +27,17 @@ class _RoleSelectionState extends State<RoleSelection> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
+            const Text(
               "Welcome to MindAlly",
               style: TextStyle(
                 fontFamily: 'Poppins',
-                fontSize: 20.sp,
+                // fontSize: 20,
                 color: Color(0xffB57EDC),
                 fontWeight: FontWeight.w600,
               ),
             ),
             SizedBox(
-              height: 30.h,
+              height: 30,
             ),
             RoleWidget(
                 onPressed: () {
@@ -51,7 +51,7 @@ class _RoleSelectionState extends State<RoleSelection> {
                 image: Image.asset('asset/image/student.png'),
                 text: 'Sign up as student'),
             SizedBox(
-              height: 35.h,
+              height: 35,
             ),
             RoleWidget(
                 onPressed: () {
@@ -65,7 +65,7 @@ class _RoleSelectionState extends State<RoleSelection> {
                 image: Image.asset('asset/image/therapist.jpg'),
                 text: 'Sign up as professional'),
             SizedBox(
-              height: 30.h,
+              height: 30,
             ),
             CustomButton(
               rad: 10,
@@ -88,7 +88,7 @@ class _RoleSelectionState extends State<RoleSelection> {
               },
             ),
             SizedBox(
-              height: 15.h,
+              height: 15,
             ),
             Align(
               alignment: Alignment.bottomRight,
@@ -99,7 +99,7 @@ class _RoleSelectionState extends State<RoleSelection> {
                     text: 'Already have an account? ',
                     style: TextStyle(
                       color: Colors.black,
-                      fontSize: 14.sp,
+                      // fontSize: 14,
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.w500,
                     ),
@@ -108,7 +108,7 @@ class _RoleSelectionState extends State<RoleSelection> {
                         text: 'Login',
                         style: TextStyle(
                           color: Color(0xffB57EDC),
-                          fontSize: 14.sp,
+                          // fontSize: 14,
                           fontFamily: 'Poppins',
                           fontWeight: FontWeight.w600,
                         ),
@@ -116,7 +116,7 @@ class _RoleSelectionState extends State<RoleSelection> {
                     ],
                   ),
                 ),
-              ),
+              ), 
             ),
           ],
         ),

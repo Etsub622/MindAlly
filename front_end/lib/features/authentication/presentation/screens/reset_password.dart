@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:front_end/core/common_widget.dart/snack_bar.dart';
-import 'package:front_end/core/confit/app_path.dart';
+import 'package:front_end/core/routes/app_path.dart';
 import 'package:front_end/features/authentication/data/models/reset_password_model.dart';
 import 'package:front_end/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:front_end/features/authentication/presentation/widget/custom_button.dart';
@@ -73,23 +73,23 @@ class _ResetPasswordState extends State<ResetPassword> {
             children: [
               Image.asset(
                 'asset/image/logo.webp',
-                height: 100.h,
-                width: 100.w,
+                height: 100,
+                width: 100,
               ),
               SizedBox(
-                height: 30.h,
+                height: 30,
               ),
               Text(
                 'Set new Password',
                 style: TextStyle(
                   fontFamily: 'Poppins',
-                  fontSize: 17.sp,
+                  fontSize: 17,
                   color: Colors.black,
                   fontWeight: FontWeight.w600,
                 ),
               ),
               SizedBox(
-                height: 40.h,
+                height: 40,
               ),
               CustomTextField(
                   text: "password",
@@ -97,7 +97,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                   controller: passwordController,
                   isPassword: true),
               SizedBox(
-                height: 20.h,
+                height: 20,
               ),
               CustomTextField(
                   text: "confirm password",
@@ -105,12 +105,12 @@ class _ResetPasswordState extends State<ResetPassword> {
                   controller: confirmPasswordController,
                   isPassword: true),
               SizedBox(
-                height: 40.h,
+                height: 40,
               ),
               CustomButton(
                 wdth: double.infinity,
                 rad: 10,
-                hgt: 50.h,
+                hgt: 50,
                 text: "Set Password",
                 onPressed: () {
                   if (passwordController.text ==
@@ -123,7 +123,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                 },
               ),
               SizedBox(
-                height: 10.h,
+                height: 10,
               ),
             ],
           ),

@@ -19,8 +19,8 @@ class RoleWidget extends StatelessWidget {
     return GestureDetector(
       onTap: onPressed,
       child: Container(
-        height: 180.h,
-        width: 352.w,
+        height: 180,
+        width: 352,
         child: Card(
           color: color,
           elevation: 5,
@@ -38,7 +38,7 @@ class RoleWidget extends StatelessWidget {
                 text,
                 style: TextStyle(
                   fontFamily: 'Poppins',
-                  fontSize: 20.sp,
+                  fontSize: 20,
                 ),
               ),
             ],

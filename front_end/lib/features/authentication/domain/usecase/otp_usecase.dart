@@ -5,7 +5,7 @@ import 'package:front_end/features/authentication/domain/repositories/auth_repo.
 
 class SendOtpUseCase extends Usecase<String,sendOtpParams>{
   final AuthRepository authRepository;
-  SendOtpUseCase(this.authRepository);
+  SendOtpUseCase({required this.authRepository});
 
   @override
   Future<Either<Failure, String>> call(sendOtpParams params) async {
@@ -19,7 +19,7 @@ class sendOtpParams{
 
 class verifyOtpUsecase extends Usecase<String,verifyOtpParams>{
   final AuthRepository authRepository;
-  verifyOtpUsecase(this.authRepository);
+  verifyOtpUsecase({required  this.authRepository});
 
   @override
   Future<Either<Failure, String>> call(verifyOtpParams params) async {

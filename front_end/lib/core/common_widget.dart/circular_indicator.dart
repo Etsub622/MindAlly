@@ -9,7 +9,7 @@ class CircularIndicator extends StatelessWidget {
     return Center(
       child: Container(
         color: Colors.white,
-        height: 100.h,
+        height: 100,
         child: const Center(
           child: CircularProgressIndicator(
             color: (Color(0xff800080)),

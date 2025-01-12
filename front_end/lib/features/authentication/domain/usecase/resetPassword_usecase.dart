@@ -7,7 +7,7 @@ import 'package:front_end/features/authentication/domain/repositories/reset_repo
 
 class ResetpasswordUsecase extends Usecase<StudentResponseModel, ResetParams> {
   final ResetPasswordRepo resetPasswordRepo;
-  ResetpasswordUsecase(this.resetPasswordRepo);
+  ResetpasswordUsecase({required this.resetPasswordRepo});
 
   @override
   Future<Either<Failure, StudentResponseModel>> call(ResetParams params) async {

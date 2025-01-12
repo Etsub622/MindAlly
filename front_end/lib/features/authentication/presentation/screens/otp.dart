@@ -3,11 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:front_end/core/common_widget.dart/circular_indicator.dart';
 import 'package:front_end/core/common_widget.dart/snack_bar.dart';
-import 'package:front_end/core/confit/app_path.dart';
 import 'package:front_end/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:front_end/features/authentication/presentation/widget/custom_button.dart';
 import 'package:front_end/features/authentication/presentation/widget/otp_widget.dart';
 import 'package:go_router/go_router.dart';
+import 'package:front_end/core/routes/app_path.dart';
 
 class OtpVerification extends StatefulWidget {
   final String email;
@@ -75,23 +75,23 @@ class _OtpVerificationState extends State<OtpVerification> {
             children: [
               Image.asset(
                 'asset/image/logo.webp',
-                height: 100.h,
-                width: 100.w,
+                height: 100,
+                width: 100,
               ),
               SizedBox(
-                height: 30.h,
+                height: 30,
               ),
               Text(
                 'Enter your OTP code',
                 style: TextStyle(
                   fontFamily: 'Poppins',
-                  fontSize: 17.sp,
+                  fontSize: 17,
                   color: Colors.black,
                   fontWeight: FontWeight.w600,
                 ),
               ),
               SizedBox(
-                height: 30.h,
+                height: 30,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -102,7 +102,7 @@ class _OtpVerificationState extends State<OtpVerification> {
                     nextFocusNode: num2Focus,
                   ),
                   SizedBox(
-                    width: 15.h,
+                    width: 15,
                   ),
                   OtpWidget(
                     controller: num2Contoller,
@@ -110,7 +110,7 @@ class _OtpVerificationState extends State<OtpVerification> {
                     nextFocusNode: num3Focus,
                   ),
                   SizedBox(
-                    width: 15.h,
+                    width: 15,
                   ),
                   OtpWidget(
                     controller: num3Controller,
@@ -118,7 +118,7 @@ class _OtpVerificationState extends State<OtpVerification> {
                     nextFocusNode: num4Focus,
                   ),
                   SizedBox(
-                    width: 15.h,
+                    width: 15,
                   ),
                   OtpWidget(
                     controller: num4Controller,
@@ -127,19 +127,19 @@ class _OtpVerificationState extends State<OtpVerification> {
                 ],
               ),
               SizedBox(
-                height: 40.h,
+                height: 40,
               ),
               CustomButton(
                 wdth: double.infinity,
                 rad: 10,
-                hgt: 50.h,
+                hgt: 50,
                 text: "Verify",
                 onPressed: () {
                   _verifyOtp(context);
                 },
               ),
               SizedBox(
-                height: 10.h,
+                height: 10,
               ),
             ],
           ),

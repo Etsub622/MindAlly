@@ -7,7 +7,7 @@ import 'package:front_end/features/authentication/domain/repositories/auth_repo.
 
 class ProfessionalSignupUsecase implements Usecase<String, ProfessionalSignUpParams> {
   final AuthRepository authRepository;
-  ProfessionalSignupUsecase(this.authRepository);
+  ProfessionalSignupUsecase({required this.authRepository});
 
   @override
   Future<Either<Failure, String>> call(ProfessionalSignUpParams params) async {

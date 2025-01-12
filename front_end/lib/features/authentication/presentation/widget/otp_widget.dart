@@ -16,8 +16,8 @@ class OtpWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 65.h,
-      width: 50.w,
+      height: 65,
+      width: 50,
       child: TextFormField(
         controller: controller,
         focusNode: focusNode,
@@ -42,7 +42,7 @@ class OtpWidget extends StatelessWidget {
         maxLength: 1,
         textAlign: TextAlign.center,
         style: TextStyle(
-          fontSize: 20.sp,
+          fontSize: 20,
           color: Color(0xffB57EDC),
           fontWeight: FontWeight.w500,
           fontFamily: 'Poppins',

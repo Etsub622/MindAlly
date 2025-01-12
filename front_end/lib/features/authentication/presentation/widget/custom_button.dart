@@ -37,7 +37,7 @@ class CustomButton extends StatelessWidget {
             children: [
               if (icon != null) ...[
                 icon!,
-                SizedBox(width: 8.w),
+                SizedBox(width: 8),
               ],
               Text(
                 text,

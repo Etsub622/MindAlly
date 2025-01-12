@@ -13,7 +13,7 @@ class GetStudentDataRepoImpl extends StudentDataRepo {
   final AuthRemoteDatasource authRemoteDatasource;
 
   GetStudentDataRepoImpl(
-      this.loginLocalDataSource, this.networkInfo, this.authRemoteDatasource);
+      {required this.loginLocalDataSource, required this.networkInfo, required this.authRemoteDatasource});
 
   @override
   Future<Either<Failure, StudentUserEntity>> getStudentData()async {
