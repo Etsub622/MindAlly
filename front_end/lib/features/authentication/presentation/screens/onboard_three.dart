@@ -45,11 +45,6 @@ class OnboardThree extends StatelessWidget {
                 onPressed: () {
                   context.go(AppPath.role);
                 }),
-            CustomButton(
-                text: 'Get Started',
-                onPressed: () {
-                  context.go(AppPath.role);
-                }),
           ],
         ),
       ),
