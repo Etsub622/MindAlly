@@ -1,6 +1,6 @@
 import express from "express";
-import { sendOTPverification ,verifyOTP} from "../controller/optController.js";
-import { forgotPassword, resetPassword, verifyPasswordResetOTP } from "../controller/resetpassword.js";
+import { sendOTPverification ,verifyOTP} from "../../controller/authentication/optController.js";
+import { forgotPassword, resetPassword, verifyPasswordResetOTP } from "../../controller/authentication/resetpassword.js";
 const router = express.Router()
 
 router.post("/sendOTP",sendOTPverification )

@@ -1,6 +1,6 @@
-import { Otp } from "../model/otpModel.js";
+import { Otp } from "../../model/otpModel.js";
 import randomstring from "randomstring";
-import { sendEmail } from "../utils/sendEmail.js";
+import { sendEmail } from "../../utils/sendEmail.js";
 
 
 function generateOTP() {

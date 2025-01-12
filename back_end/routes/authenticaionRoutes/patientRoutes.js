@@ -1,5 +1,5 @@
 import express from "express";
-import { registerPatient,patientLogin } from "../controller/patientController.js";
+import { registerPatient,patientLogin } from "../../controller/authentication/patientController.js";
 
 const router = express.Router()
 

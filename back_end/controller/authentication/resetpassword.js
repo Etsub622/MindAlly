@@ -1,9 +1,9 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { Patient } from "../model/patientModel.js";
-import { Therapist } from "../model/therapistModel.js";
-import { hashedPassword } from "../utils/authUtils.js";
-import { Otp } from "../model/otpModel.js";
+import { Patient } from "../../model/patientModel.js";
+import { Therapist } from "../../model/therapistModel.js";
+import { hashedPassword } from "../../utils/authUtils.js";
+import { Otp } from "../../model/otpModel.js";
 
 const resetPassword = async (req, res) => {
     try {

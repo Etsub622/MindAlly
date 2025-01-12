@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt"
-import { Therapist } from "../model/therapistModel.js";
-import { generateJWT, hashedPassword } from "../utils/authUtils.js";
+import { Therapist } from "../../model/therapistModel.js";
+import { generateJWT, hashedPassword } from "../../utils/authUtils.js";
 
 
 const registerTherapist = async (req, res) => {

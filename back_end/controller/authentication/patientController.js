@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
-import { Patient } from "../model/patientModel.js";
-import { hashedPassword,generateJWT } from "../utils/authUtils.js";
+import { Patient } from "../../model/patientModel.js";
+import { hashedPassword,generateJWT } from "../../utils/authUtils.js";
 
 
 const registerPatient = async (req, res) => {
