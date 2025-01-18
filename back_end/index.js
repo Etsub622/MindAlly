@@ -3,8 +3,7 @@ import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 import bodyParser from "body-parser";
-import patientRoutes from "./routes/authenticaionRoutes/patientRoutes.js"
-import therapistRoutes from "./routes/authenticaionRoutes/therapistRoutes.js"
+import userRoutes from "./routes/authenticaionRoutes/userAuth.js"
 import otpRoutes from "./routes/authenticaionRoutes/otpRoutes.js"
 import googleRoutes from "./routes/authenticaionRoutes/loginwithGoogle.js"
 // import session from "express-session";
@@ -89,8 +88,8 @@ app.use(cors({
   credentials:true
 }));
 
-app.use("/api/patient",patientRoutes)
-app.use("/api/therapist", therapistRoutes)
+
+app.use("/api/user", userRoutes)
 app.use("/api/otp", otpRoutes)
 app.use("/api/google",googleRoutes)
 
