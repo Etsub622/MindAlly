@@ -52,7 +52,8 @@ class _LoginState extends State<Login> {
         if (state is LoginSuccess) {
           const snack = SnackBar(content: Text('User logged in successfully'));
           ScaffoldMessenger.of(context).showSnackBar(snack);
-          context.go(AppPath.otp, extra: emailController.text);
+          // context.go(AppPath.otp, extra: emailController.text);
+          context.go(AppPath.home);
         } else if (state is AuthError) {
           final snack = errorsnackBar('Try again later');
           ScaffoldMessenger.of(context).showSnackBar(snack);

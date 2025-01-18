@@ -20,13 +20,13 @@ abstract class AuthRemoteDatasource {
 class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   late final http.Client client;
   AuthRemoteDatasourceImpl({required this.client});
-  final baseUrl = 'http://localhost:8000/api';
+  final baseUrl = 'http://localhost:8000/api/user';
 
   @override
   Future<String> professionalSignUp(
       ProfessionalSignupModel professionalModel) async {
     try {
-      var url = Uri.parse('$baseUrl/therapist/therapistSignup');
+      var url = Uri.parse('$baseUrl/therapistSignup');
       final user = await client.post(url,
           body: jsonEncode(professionalModel.toJson()),
           headers: {'Content-Type': 'application/json'});
@@ -52,7 +52,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   @override
   Future<String> studentSignUp(StudentSignupModel studentModel) async {
     try {
-      var url = Uri.parse('$baseUrl/patient/patientSignup');
+      var url = Uri.parse('$baseUrl/PatientSignup');
 
       final user = await client.post(url,
           body: jsonEncode(studentModel.toJson()),
@@ -81,24 +81,24 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   Future<StudentResponseModel> logIn(LoginModel loginModel) async {
     try {
       final sharedPreferences = await SharedPreferences.getInstance();
-      final loginLocalDataSource =
-          LoginLocalDataSourceImpl(sharedPreferences: sharedPreferences);
-      final token = await loginLocalDataSource.getToken();
+      // final loginLocalDataSource =
+      //     LoginLocalDataSourceImpl(sharedPreferences: sharedPreferences);
+      // final token = await loginLocalDataSource.getToken();
 
-      // Decode the token to get the role
-      Map<String, dynamic> payload = JwtDecoder.decode(token);
-      String role = payload['role'];
-      print(role);
-      print('token:$token');
+      // // Decode the token to get the role
+      // Map<String, dynamic> payload = JwtDecoder.decode(token);
+      // String role = payload['role'];
+      // print(role);
+      // print('token:$token');
 
-      var url;
-      if (role == 'patient') {
-        url = Uri.parse('$baseUrl/patient/patientLogin');
-      } else if (role == 'therapist') {
-        url = Uri.parse('$baseUrl/therapist/therapistLogin');
-      } else {
-        url = '';
-      }
+      var url = Uri.parse('$baseUrl/Login');
+      // if (role == 'patient') {
+      //   url = Uri.parse('$baseUrl/Login');
+      // } else if (role == 'therapist') {
+      //   url = Uri.parse('$baseUrl/therapist/therapistLogin');
+      // } else {
+      //   url = '';
+      // }
       print(url);
       final user = await client.post(url,
           body: jsonEncode(loginModel.toJson()),
