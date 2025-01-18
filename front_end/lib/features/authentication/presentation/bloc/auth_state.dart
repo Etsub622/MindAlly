@@ -34,9 +34,9 @@ final class AuthOtpSent extends AuthState {
 }
 
 final class AuthOtpVerified extends AuthState {
-  final String message;
+  final String resetToken;
 
-  const AuthOtpVerified(this.message);
+  const AuthOtpVerified(this.resetToken);
 }
 
 final class AuthOtpSendError extends AuthState {
@@ -82,6 +82,16 @@ final class studentDataLoaded extends AuthState {
   const studentDataLoaded(this.studentData);
 }
 
+enum AuthStatus { loaded, loading, error }
+
+class UserLogoutState extends AuthState {
+  final String message;
+  final AuthStatus status;
+
+  UserLogoutState({required this.message, required this.status});
+  @override
+  List<Object> get props => [status];
+}
 
 
 

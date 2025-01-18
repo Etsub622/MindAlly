@@ -8,7 +8,7 @@ class ProfessionalSignupModel extends ProfessionalSignupEntity {
     required super.fullName,
     required super.phoneNumber,
     required super.specialization,
-    required super.document,
+    required super.certificate,
   });
   factory ProfessionalSignupModel.fromJson(Map<String, dynamic> json) {
     return ProfessionalSignupModel(
@@ -18,7 +18,7 @@ class ProfessionalSignupModel extends ProfessionalSignupEntity {
       fullName: json['fullName'],
       phoneNumber: json['phoneNumber'],
       specialization: json['specialization'],
-      document: json['document'],
+      certificate: json['certificate'],
     );
   }
 
@@ -30,7 +30,7 @@ class ProfessionalSignupModel extends ProfessionalSignupEntity {
       'fullName': super.fullName,
       'phoneNumber': super.phoneNumber,
       'specialization': super.specialization,
-      'document': super.document,
+      'certificate': super.certificate,
     };
   }
 }

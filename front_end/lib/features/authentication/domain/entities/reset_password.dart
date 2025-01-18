@@ -1,15 +1,15 @@
 import 'package:equatable/equatable.dart';
 
 class ResetPasswordEntity extends Equatable {
-  final String id;
-  final String password;
+  final String resetToken;
+  final String newPassword;
   const ResetPasswordEntity({
-    required this.id,
-    required this.password,
+    required this.resetToken,
+    required this.newPassword,
   });
 
   @override
-  List<Object> get props => [id, password];
+  List<Object> get props => [resetToken, newPassword];
 
 }
 

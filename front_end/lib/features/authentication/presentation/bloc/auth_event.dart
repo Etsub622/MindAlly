@@ -41,3 +41,5 @@ final class StudentDataEvent extends AuthEvent {}
 final class GetStudentDataEvent extends AuthEvent {
   const GetStudentDataEvent();
 }
+
+class LogoutEvent extends AuthEvent {}

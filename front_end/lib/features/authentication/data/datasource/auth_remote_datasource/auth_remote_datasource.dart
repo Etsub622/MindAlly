@@ -26,7 +26,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   Future<String> professionalSignUp(
       ProfessionalSignupModel professionalModel) async {
     try {
-      var url = Uri.parse('$baseUrl/therapist/Tsignup');
+      var url = Uri.parse('$baseUrl/therapist/therapistSignup');
       final user = await client.post(url,
           body: jsonEncode(professionalModel.toJson()),
           headers: {'Content-Type': 'application/json'});
@@ -88,14 +88,18 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       // Decode the token to get the role
       Map<String, dynamic> payload = JwtDecoder.decode(token);
       String role = payload['role'];
+      print(role);
+      print('token:$token');
 
       var url;
       if (role == 'patient') {
         url = Uri.parse('$baseUrl/patient/patientLogin');
       } else if (role == 'therapist') {
         url = Uri.parse('$baseUrl/therapist/therapistLogin');
+      } else {
+        url = '';
       }
-
+      print(url);
       final user = await client.post(url,
           body: jsonEncode(loginModel.toJson()),
           headers: {'Content-Type': 'application/json'});
@@ -141,17 +145,13 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   @override
   Future<String> verifyOtp(String otp, String email) async {
     try {
-      var url = Uri.parse('$baseUrl/otp/verifyOtp');
+      var url = Uri.parse('$baseUrl/otp/verifyReset');
       final res = await client.post(url,
           body: jsonEncode({'otp': otp, 'email': email}),
           headers: {'Content-Type': 'application/json; charset=UTF-8'});
-      print(res.statusCode);
-      print('email: $email');
-      print('otp: $otp');
       print(res.body);
-
       if (res.statusCode == 200) {
-        return jsonDecode(res.body)['message'];
+        return jsonDecode(res.body)['resetToken'];
       } else {
         throw ServerException(message: 'Failed to verify OTP');
       }

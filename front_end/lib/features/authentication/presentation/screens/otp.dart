@@ -38,8 +38,6 @@ class _OtpVerificationState extends State<OtpVerification> {
         num2Contoller.text +
         num3Controller.text +
         num4Controller.text;
-    print('otp:$otp');
-    print('email:${widget.email}');
     context.read<AuthBloc>().add(VerifyOtpEvent(otp: otp, email: widget.email));
   }
 
@@ -56,7 +54,7 @@ class _OtpVerificationState extends State<OtpVerification> {
         if (state is AuthOtpVerified) {
           const snack = SnackBar(content: Text('OTP verified successfully.'));
           ScaffoldMessenger.of(context).showSnackBar(snack);
-          context.go(AppPath.resetPassword);
+          context.go(AppPath.resetPassword,extra: {'resetToken':state.resetToken});
         } else if (state is AuthOtpVerifyError) {
           final snack = errorsnackBar('Enter the valid otp');
           ScaffoldMessenger.of(context).showSnackBar(snack);

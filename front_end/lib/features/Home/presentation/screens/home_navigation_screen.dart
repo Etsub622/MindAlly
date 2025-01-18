@@ -17,7 +17,7 @@ class HomeNavigationScreen extends StatefulWidget {
 class _HomeNavigationScreenState extends State<HomeNavigationScreen> {
   int index = 0;
   final screens = [
-    const HomeScreen(),
+    HomeScreen(),
     const QARoom(),
     const ResourceRoom(),
     const ChatRoom(),
@@ -47,31 +47,39 @@ class _HomeNavigationScreenState extends State<HomeNavigationScreen> {
           },
           items: [
             BottomNavigationBarItem(
-              icon: index == 0 ? Image.asset(AppImage.homeUnselected): Image.asset(AppImage.homeUnselected), 
+              icon: index == 0
+                  ? Image.asset(AppImage.homeUnselected)
+                  : Image.asset(AppImage.homeUnselected),
               label: 'Home',
             ),
             BottomNavigationBarItem(
-              icon: index == 1 ?  Image.asset(
-                AppImage.qaUnselected,
-              ): Image.asset(
-                AppImage.qaUnselected,
-              ), 
+              icon: index == 1
+                  ? Image.asset(
+                      AppImage.qaUnselected,
+                    )
+                  : Image.asset(
+                      AppImage.qaUnselected,
+                    ),
               label: 'Q&A',
             ),
             BottomNavigationBarItem(
-              icon: index== 2 ? Image.asset(
-                AppImage.resourceUnselected,
-              ): Image.asset(
-                AppImage.resourceUnselected,
-              ), 
+              icon: index == 2
+                  ? Image.asset(
+                      AppImage.resourceUnselected,
+                    )
+                  : Image.asset(
+                      AppImage.resourceUnselected,
+                    ),
               label: 'Resource',
             ),
             BottomNavigationBarItem(
-              icon: index == 3 ? Image.asset(
-                AppImage.chatSelected,
-              ) : Image.asset(
-                AppImage.chatSelected,
-              ), 
+              icon: index == 3
+                  ? Image.asset(
+                      AppImage.chatSelected,
+                    )
+                  : Image.asset(
+                      AppImage.chatSelected,
+                    ),
               label: 'Chat',
             ),
           ],

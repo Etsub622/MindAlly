@@ -117,4 +117,4 @@ const forgotPassword = async (req, res) => {
 
 
 
-export {resetPassword ,forgotPassword,verifyPasswordResetOTP}
+export {resetPassword , forgotPassword , verifyPasswordResetOTP}

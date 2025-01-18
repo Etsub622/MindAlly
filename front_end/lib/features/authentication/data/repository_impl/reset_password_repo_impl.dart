@@ -8,19 +8,24 @@ import 'package:front_end/features/authentication/data/models/student_data_model
 import 'package:front_end/features/authentication/domain/entities/reset_password.dart';
 import 'package:front_end/features/authentication/domain/repositories/reset_repo.dart';
 
-class ResetPasswordRepoImpl implements ResetPasswordRepo{
+class ResetPasswordRepoImpl implements ResetPasswordRepo {
   final ResetPasswordRemoteDatasource resetPasswordRemoteDatasource;
   final NetworkInfo networkInfo;
-  ResetPasswordRepoImpl({ required this.resetPasswordRemoteDatasource, required this.networkInfo});
+  ResetPasswordRepoImpl(
+      {required this.resetPasswordRemoteDatasource, required this.networkInfo});
 
   @override
-  Future<Either<Failure, StudentResponseModel>> resetPassword(ResetPasswordEntity resetPassword) async {
+  Future<Either<Failure, String>> resetPassword(
+      ResetPasswordEntity resetPassword) async {
     if (await networkInfo.isConnected) {
       try {
         final user = ResetPasswordModel(
-            id: resetPassword.id, password: resetPassword.password);
-        final response = await resetPasswordRemoteDatasource.resetPassword(user);
-        return Right(response as StudentResponseModel);
+            resetToken: resetPassword.resetToken,
+            newPassword: resetPassword.newPassword);
+        final response =
+            await resetPasswordRemoteDatasource.resetPassword(user);
+        print(response);
+        return Right(response);
       } on ServerException {
         return Left(ServerFailure(message: 'Server Failure'));
       }

@@ -1,20 +1,20 @@
 import 'package:front_end/features/authentication/domain/entities/reset_password.dart';
 class ResetPasswordModel extends ResetPasswordEntity {
   ResetPasswordModel({
-    required super.id,
-    required super.password,
+    required super.resetToken,
+    required super.newPassword,
   });
   factory ResetPasswordModel.fromJson(Map<String, dynamic> json) {
     return ResetPasswordModel(
-      id: json['id'],
-      password: json['password'],
+      resetToken: json['resetToken'],
+      newPassword: json['newPassword'],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'id': super.id,
-      'password': super.password,
+      'resetToken': super.resetToken,
+      'newPassword': super.newPassword,
     };
   }
 }
