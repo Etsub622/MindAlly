@@ -48,7 +48,7 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
         fullName: nameController.text,
         phoneNumber: phoneController.text,
         specialization: areaContloller.text,
-        document: documentController.text);
+        certificate: documentController.text);
     context
         .read<AuthBloc>()
         .add(ProfessionalsignUpEvent(professionalSignupEntity: newUser));
@@ -57,7 +57,7 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocConsumer(builder: (context, state) {
+      body: BlocConsumer<AuthBloc, AuthState>(builder: (context, state) {
         if (state is AuthLoading) {
           return CircularIndicator();
         } else {
@@ -71,7 +71,7 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
           Future.delayed(const Duration(seconds: 2), () {
             context.go(AppPath.login);
           });
-        }else if(state is AuthError){
+        } else if (state is AuthError) {
           final snack = errorsnackBar('Try again later');
           ScaffoldMessenger.of(context).showSnackBar(snack);
         }

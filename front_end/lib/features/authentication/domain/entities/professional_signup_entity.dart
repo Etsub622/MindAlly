@@ -4,11 +4,10 @@ class ProfessionalSignupEntity extends Equatable {
   final String id;
   final String email;
   final String password;
-
   final String fullName;
   final String phoneNumber;
   final String specialization;
-  final String document;
+  final String certificate;
 
   const ProfessionalSignupEntity({
     required this.id,
@@ -17,7 +16,7 @@ class ProfessionalSignupEntity extends Equatable {
     required this.fullName,
     required this.phoneNumber,
     required this.specialization,
-    required this.document,
+    required this.certificate,
   });
   @override
   List<Object> get props {
@@ -28,7 +27,7 @@ class ProfessionalSignupEntity extends Equatable {
       fullName,
       phoneNumber,
       specialization,
-      document,
+      certificate,
     ];
   }
 }

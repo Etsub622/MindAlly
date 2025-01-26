@@ -54,7 +54,7 @@ class AuthRepoImpl implements AuthRepository {
             fullName: professionalSignup.fullName,
             phoneNumber: professionalSignup.phoneNumber,
             specialization: professionalSignup.specialization,
-            document: professionalSignup.document);
+            certificate: professionalSignup.certificate);
         final response = await authRemoteDatasource.professionalSignUp(user);
         return Right(response);
       } on ServerException {

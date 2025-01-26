@@ -52,21 +52,8 @@ class _LoginState extends State<Login> {
         if (state is LoginSuccess) {
           const snack = SnackBar(content: Text('User logged in successfully'));
           ScaffoldMessenger.of(context).showSnackBar(snack);
-
-          final sharedPreferences = await SharedPreferences.getInstance();
-          final loginLocalDataSource =
-              LoginLocalDataSourceImpl(sharedPreferences: sharedPreferences);
-          final token = await loginLocalDataSource.getToken();
-
-          Map<String, dynamic> payload = JwtDecoder.decode(token);
-          String role = payload['role'];
-        
-
-          if (role == 'patient') {
-            context.go(AppPath.authOnboarding);
-          } else if (role == 'professional') {
-            context.go(AppPath.onboard2);
-          }
+          // context.go(AppPath.otp, extra: emailController.text);
+          context.go(AppPath.home);
         } else if (state is AuthError) {
           final snack = errorsnackBar('Try again later');
           ScaffoldMessenger.of(context).showSnackBar(snack);

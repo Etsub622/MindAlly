@@ -12,42 +12,42 @@ import 'package:front_end/features/authentication/presentation/screens/student_s
 
 import 'package:go_router/go_router.dart';
 
-
-
 final routes = <GoRoute>[
-    GoRoute(
+  GoRoute(
       name: 'home',
-      path: AppPath.home, 
-      builder: (context, state) => const HomeNavigationScreen(index: 0)
-    ),
-    GoRoute(
+      path: AppPath.home,
+      builder: (context, state) => const HomeNavigationScreen(index: 0)),
+  GoRoute(
     name: 'auth_onboarding',
     path: AppPath.authOnboarding,
-    builder: (BuildContext context, GoRouterState state) =>
-        const OnboardOne(),
+    builder: (BuildContext context, GoRouterState state) => const OnboardOne(),
   ),
-    GoRoute(path: AppPath.role, builder: (context, state) => const RoleSelection()),
-    GoRoute(
-        path: AppPath.student, builder: (context, state) => const StudentSignUp()),
-    GoRoute(
-        path: AppPath.professional,
-        builder: (context, state) => const ProfessionalSignup()),
-    GoRoute(path: AppPath.login, builder: (context, state) => const Login()),
-    GoRoute(
-        path: AppPath.forgotPassword,
-        builder: (context, state) => const ForgotPassword()),
-    GoRoute(
-        path: AppPath.resetPassword,
-        builder: (context, state) => const ResetPassword()),
-    GoRoute(
-        path: AppPath.otp,
-        builder: (context, state) {
-          final email = state.extra as String;
-          return OtpVerification(email: email);
-        }),
-
+  GoRoute(
+      path: AppPath.role, builder: (context, state) => const RoleSelection()),
+  GoRoute(
+      path: AppPath.student,
+      builder: (context, state) => const StudentSignUp()),
+  GoRoute(
+      path: AppPath.professional,
+      builder: (context, state) => const ProfessionalSignup()),
+  GoRoute(path: AppPath.login, builder: (context, state) => const Login()),
+  GoRoute(
+      path: AppPath.forgotPassword,
+      builder: (context, state) => const ForgotPassword()),
+  GoRoute(
+      path: AppPath.resetPassword,
+      builder: (context, state) {
+        final extra = state.extra as Map<String, String>;
+        final resetToken = extra['resetToken']!;
+        return ResetPassword(resetToken: resetToken);
+      }),
+  GoRoute(
+      path: AppPath.otp,
+      builder: (context, state) {
+        final email = state.extra as String;
+        return OtpVerification(email: email);
+      }),
 ];
-
 
 GoRouter routerConfig() {
   return GoRouter(
@@ -56,13 +56,12 @@ GoRouter routerConfig() {
   );
 }
 
-
 class AppRouter extends StatelessWidget {
   final GoRouter router;
 
   late String title;
   late String image;
-  
+
   AppRouter({Key? key, required this.router}) : super(key: key);
 
   @override
