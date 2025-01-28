@@ -1,7 +1,7 @@
 import 'package:front_end/features/resource/domain/entity/article_entity.dart';
 
 class ArticleModel extends ArticleEntity {
-   ArticleModel(
+  ArticleModel(
       {required super.id,
       required super.title,
       required super.content,
@@ -26,5 +26,14 @@ class ArticleModel extends ArticleEntity {
       'link': super.link,
       'logo': super.logo,
     };
+  }
+
+  ArticleEntity toEntity() {
+    return ArticleEntity(
+        id: super.id,
+        title: super.title,
+        content: super.content,
+        link: super.link,
+        logo: super.logo);
   }
 }

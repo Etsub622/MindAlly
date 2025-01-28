@@ -32,14 +32,14 @@ class VideoModel extends VideoEntity {
     };
   }
 
-  // VideoEntity toEntity() {
-  //   return VideoEntity(
-  //     id: super.id,
-  //     title: super.title,
-  //     link: super.link,
-  //     profilePicture: super.profilePicture,
-  //     name: super.name,
-  //     image: super.image,
-  //   );
-  // }
+  VideoEntity toEntity() {
+    return VideoEntity(
+      id: super.id,
+      title: super.title,
+      link: super.link,
+      profilePicture: super.profilePicture,
+      name: super.name,
+      image: super.image,
+    );
+  }
 }
