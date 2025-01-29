@@ -12,6 +12,9 @@ import therapistRoutes from "./routes/profile/therapist.js";
 // import passport from "passport";
 // import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 
+import { resourceRoutes } from "./routes/resource/resourceRoutes.js";
+
+
 
  
 
@@ -97,6 +100,8 @@ app.use("/api/google",googleRoutes)
 
 app.use("/api/patients", patientRoutes);
 app.use("/api/therapists", therapistRoutes);
+
+app.use("/api/resources", resourceRoutes);
 
 app.listen(process.env.PORT, () => {
     console.log(   `server is running on port ${process.env.PORT}`)
