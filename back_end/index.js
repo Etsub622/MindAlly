@@ -6,6 +6,8 @@ import bodyParser from "body-parser";
 import userRoutes from "./routes/authenticaionRoutes/userAuth.js"
 import otpRoutes from "./routes/authenticaionRoutes/otpRoutes.js"
 import googleRoutes from "./routes/authenticaionRoutes/loginwithGoogle.js"
+import patientRoutes from "./routes/profile/profile.js";
+import therapistRoutes from "./routes/profile/therapist.js";
 // import session from "express-session";
 // import passport from "passport";
 // import { Strategy as GoogleStrategy } from "passport-google-oauth20";
@@ -93,6 +95,8 @@ app.use("/api/user", userRoutes)
 app.use("/api/otp", otpRoutes)
 app.use("/api/google",googleRoutes)
 
+app.use("/api/patients", patientRoutes);
+app.use("/api/therapists", therapistRoutes);
 
 app.listen(process.env.PORT, () => {
     console.log(   `server is running on port ${process.env.PORT}`)
