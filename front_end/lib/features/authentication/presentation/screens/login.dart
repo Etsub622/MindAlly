@@ -42,7 +42,8 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocConsumer<AuthBloc, AuthState>(builder: (context, state) {
+      body: BlocConsumer<AuthBloc, AuthState>(
+        builder: (context, state) {
         if (state is AuthLoading) {
           return const CircularIndicator();
         } else {

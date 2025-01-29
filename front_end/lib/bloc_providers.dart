@@ -1,11 +1,15 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front_end/features/authentication/presentation/bloc/auth_bloc.dart';
-import 'package:front_end/injection_container.dart';
+import 'package:front_end/features/resource/presentation/bloc/book_bloc/bloc/book_bloc.dart';
+import 'package:front_end/core/injection/injections.dart';
 
 class MultiBLOCProvider {
   static final blocProvider = [
     BlocProvider<AuthBloc>(
-      create: (_) => serviceLocator<AuthBloc>(),
+      create: (_) => sl<AuthBloc>(),
+    ),
+    BlocProvider<BookBloc>(
+      create: (_) => sl<BookBloc>(),
     ),
   ];
 }

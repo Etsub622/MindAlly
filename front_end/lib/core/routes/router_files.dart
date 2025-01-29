@@ -4,12 +4,12 @@ import 'package:front_end/core/routes/app_path.dart';
 import 'package:front_end/core/routes/error_path.dart';
 import 'package:front_end/core/routes/route_matcher.dart';
 import 'package:front_end/core/routes/router_config.dart';
-import 'package:front_end/injection_container.dart';
+import 'package:front_end/core/injection/injections.dart';
 import 'package:go_router/go_router.dart';
 
 final router = GoRouter(
   redirect: ((context, state) =>
-      redirector(state, serviceLocator())),
+      redirector(state, sl())),
   initialLocation: AppPath.authOnboarding,
   routes: routes,
   errorBuilder: (context, state) => const ErrorPage(
