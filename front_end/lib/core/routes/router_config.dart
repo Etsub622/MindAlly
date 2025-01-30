@@ -13,6 +13,7 @@ import 'package:front_end/features/authentication/presentation/screens/student_s
 import 'package:go_router/go_router.dart';
 
 final routes = <GoRoute>[
+  
   GoRoute(
       name: 'home',
       path: AppPath.home,

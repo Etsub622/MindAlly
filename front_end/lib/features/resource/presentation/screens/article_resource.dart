@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:front_end/features/resource/presentation/screens/add_article.dart';
 
 class ArticleResource extends StatefulWidget {
   const ArticleResource({super.key});
@@ -21,6 +22,16 @@ class _ArticleResourceState extends State<ArticleResource> {
             Text('Welcome to article Resources :)'),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AddArticle()),
+          );
+        },
+        child: Icon(Icons.add),
+        backgroundColor: Colors.purple,
       ),
     );
   }

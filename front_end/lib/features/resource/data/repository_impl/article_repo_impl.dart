@@ -10,6 +10,7 @@ import 'package:front_end/features/resource/domain/repository/article_repository
 class ArticleRepoImpl implements ArticleRepository {
   final ArticleRemoteDatasource remoteDatasource;
   final NetworkInfo networkInfo;
+
   ArticleRepoImpl(this.networkInfo, this.remoteDatasource);
 
   @override
@@ -17,19 +18,19 @@ class ArticleRepoImpl implements ArticleRepository {
     if (await networkInfo.isConnected) {
       try {
         final newArticle = ArticleModel(
-            id: article.id,
-            title: article.title,
-            content: article.content,
-            link: article.link,
-            logo: article.logo);
+          id: article.id,
+          title: article.title,
+          content: article.content,
+          link: article.link,
+          logo: article.logo,
+        );
         final res = await remoteDatasource.addArticle(newArticle);
         return Right(res);
       } on ServerException {
-        return Left(ServerFailure(message: 'sever failure'));
+        return Left(ServerFailure(message: 'server failure'));
       }
     } else {
-      return Left(
-          NetworkFailure(message: 'you are not connected to the internet'));
+      return Left(NetworkFailure(message: 'you are not connected to the internet'));
     }
   }
 
@@ -43,8 +44,7 @@ class ArticleRepoImpl implements ArticleRepository {
         return Left(ServerFailure(message: 'server failure'));
       }
     } else {
-      return Left(
-          NetworkFailure(message: 'you are not connected to the internet'));
+      return Left(NetworkFailure(message: 'you are not connected to the internet'));
     }
   }
 
@@ -53,21 +53,18 @@ class ArticleRepoImpl implements ArticleRepository {
     if (await networkInfo.isConnected) {
       try {
         final res = await remoteDatasource.getArticles();
-        final articleEntities =
-            res.map((article) => article.toEntity()).toList();
+        final articleEntities = res.map((article) => article.toEntity()).toList();
         return Right(articleEntities);
       } on ServerException {
         return Left(ServerFailure(message: 'server failure'));
       }
     } else {
-      return Left(
-          NetworkFailure(message: 'you are not connected to the internet'));
+      return Left(NetworkFailure(message: 'you are not connected to the internet'));
     }
   }
 
   @override
-  Future<Either<Failure, List<ArticleEntity>>> searchArticle(
-      String title) async {
+  Future<Either<Failure, List<ArticleEntity>>> searchArticle(String title) async {
     if (await networkInfo.isConnected) {
       try {
         final res = await remoteDatasource.searchArticles(title);
@@ -76,30 +73,28 @@ class ArticleRepoImpl implements ArticleRepository {
         return Left(ServerFailure(message: 'server failure'));
       }
     } else {
-      return Left(
-          NetworkFailure(message: 'you are not connected to the internet'));
+      return Left(NetworkFailure(message: 'you are not connected to the internet'));
     }
   }
 
   @override
-  Future<Either<Failure, String>> updateArticle(
-      ArticleEntity article, String id) async {
+  Future<Either<Failure, String>> updateArticle(ArticleEntity article, String id) async {
     if (await networkInfo.isConnected) {
       try {
         final updatedArticle = ArticleModel(
-            id: article.id,
-            title: article.title,
-            content: article.content,
-            link: article.link,
-            logo: article.logo);
+          id: article.id,
+          title: article.title,
+          content: article.content,
+          link: article.link,
+          logo: article.logo,
+        );
         final res = await remoteDatasource.updateArticle(updatedArticle, id);
         return Right(res);
       } on ServerException {
         return Left(ServerFailure(message: 'server failure'));
       }
     } else {
-      return Left(
-          NetworkFailure(message: 'you are not connected to the internet'));
+      return Left(NetworkFailure(message: 'you are not connected to the internet'));
     }
   }
 }

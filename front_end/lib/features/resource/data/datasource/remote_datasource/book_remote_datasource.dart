@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 abstract class BookRemoteDatasource {
   Future<List<BookModel>> getBooks();
   Future<String> addBook(BookModel book);
-  Future<String> updateBook(BookModel book,String id);
+  Future<String> updateBook(BookModel book, String id);
   Future<String> deleteBook(String id);
   Future<List<BookModel>> searchBooks(String title);
 }
@@ -25,6 +25,7 @@ class BookRemoteDataSourceImpl implements BookRemoteDatasource {
       final newBook = await client.post(url, body: jsonEncode(book.toJson()));
       if (newBook.statusCode == 200) {
         final decodedResponse = jsonDecode(newBook.body);
+        print(decodedResponse);
         return decodedResponse['message'];
       } else {
         throw ServerException(
@@ -103,7 +104,7 @@ class BookRemoteDataSourceImpl implements BookRemoteDatasource {
   }
 
   @override
-  Future<String> updateBook(BookModel book,String id) async {
+  Future<String> updateBook(BookModel book, String id) async {
     try {
       var url = Uri.parse('$baseUrl/updateBook/$id');
       final updatedBook =

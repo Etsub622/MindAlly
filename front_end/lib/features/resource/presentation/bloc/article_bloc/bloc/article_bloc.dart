@@ -13,13 +13,13 @@ class ArticleBloc extends Bloc<ArticleEvent, ArticleState> {
   final DeleteArticleUsecase deleteArticleUsecase;
   final SearchArticleUsecase searchArticleUsecase;
   final UpdateArticleUsecase updateArticleUsecase;
-  ArticleBloc(
-    this.addArticleUsecase,
-    this.deleteArticleUsecase,
-    this.getArticlesUsecase,
-    this.searchArticleUsecase,
-    this.updateArticleUsecase,
-  ) : super(ArticleInitial()) {
+  ArticleBloc({
+    required this.addArticleUsecase,
+    required this.deleteArticleUsecase,
+    required this.getArticlesUsecase,
+    required this.searchArticleUsecase,
+    required this.updateArticleUsecase,
+  }) : super(ArticleInitial()) {
     on<AddArticleEvent>((event, emit) async {
       emit(ArticleLoading());
 
@@ -68,7 +68,8 @@ class ArticleBloc extends Bloc<ArticleEvent, ArticleState> {
 
     on<SearchArticleEvent>((event, emit) async {
       emit(ArticleLoading());
-      final result = await searchArticleUsecase(SearchArticleParams(event.title));
+      final result =
+          await searchArticleUsecase(SearchArticleParams(event.title));
 
       result.fold((l) {
         emit(ArticleError(l.message));

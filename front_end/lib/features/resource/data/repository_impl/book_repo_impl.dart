@@ -22,6 +22,8 @@ class BookRepoImpl implements BookRepository {
             author: book.author,
             image: book.image);
         final res = await remoteDatasource.addBook(newBook);
+        print(res);
+        print(newBook);
         return right(res);
       } on ServerException {
         return (Left(ServerFailure(message: 'server failure')));

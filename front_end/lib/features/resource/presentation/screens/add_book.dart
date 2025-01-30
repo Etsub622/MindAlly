@@ -61,13 +61,13 @@ class _AddBookState extends State<AddBook> {
     }
   }
 
-  void _uplooadBook(BuildContext context) {
+  void _uploadBook(BuildContext context) async {
     final uploadedBook = BookModel(
         id: '',
         title: titleController.text,
         author: authorController.text,
         image: _imageUrls[0]);
-    context.read()<BookBloc>().add(AddBookEvent(uploadedBook));
+    context.read<BookBloc>().add(AddBookEvent(uploadedBook));
   }
 
   @override
@@ -156,12 +156,12 @@ class _AddBookState extends State<AddBook> {
               rad: 10,
               hgt: 50,
               text: "Upload Book",
-              onPressed: () {
+              onPressed: () async {
                 if (_imageFiles.isNotEmpty &&
                     titleController.text.isNotEmpty &&
                     authorController.text.isNotEmpty) {
-                  _uploadImages().then((_) {
-                    _uplooadBook(context);
+                  await _uploadImages().then((_) {
+                    _uploadBook(context);
                   });
                   return;
                 }

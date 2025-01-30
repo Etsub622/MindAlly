@@ -13,13 +13,13 @@ class VideoBloc extends Bloc<VideoEvent, VideoState> {
   final UpdateVideoUsecase updateVideoUsecase;
   final DeleteVideoUsecase deleteVideoUsecase;
   final SearchVideoUsecase searchVideoUsecase;
-  VideoBloc(
-    this.addVideoUsecase,
-    this.deleteVideoUsecase,
-    this.getVideosUsecase,
-    this.searchVideoUsecase,
-    this.updateVideoUsecase,
-  ) : super(VideoInitial()) {
+  VideoBloc({
+    required this.addVideoUsecase,
+    required this.deleteVideoUsecase,
+    required this.getVideosUsecase,
+    required this.searchVideoUsecase,
+    required this.updateVideoUsecase,
+  }) : super(VideoInitial()) {
     on<AddVideoEvent>((event, emit) async {
       emit(VideoLoading());
 
@@ -42,8 +42,7 @@ class VideoBloc extends Bloc<VideoEvent, VideoState> {
       });
     });
 
-
-     on<UpdateVideoEvent>((event, emit) async {
+    on<UpdateVideoEvent>((event, emit) async {
       emit(VideoLoading());
       final result = await updateVideoUsecase(
           UPdateVideoParams(event.videoEntity, event.id));
@@ -55,8 +54,7 @@ class VideoBloc extends Bloc<VideoEvent, VideoState> {
       });
     });
 
-
-     on<DeleteVideoEvent>((event, emit) async {
+    on<DeleteVideoEvent>((event, emit) async {
       emit(VideoLoading());
       final result = await deleteVideoUsecase(DeleteVideoParams(event.id));
 
@@ -69,8 +67,7 @@ class VideoBloc extends Bloc<VideoEvent, VideoState> {
 
     on<SearchVideoEvent>((event, emit) async {
       emit(VideoLoading());
-      final result =
-          await searchVideoUsecase(SearchVideoParams(event.title));
+      final result = await searchVideoUsecase(SearchVideoParams(event.title));
 
       result.fold((l) {
         emit(VideoError(l.message));

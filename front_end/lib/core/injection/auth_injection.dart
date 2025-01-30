@@ -3,9 +3,11 @@ import 'package:front_end/features/authentication/data/datasource/auth_local_dat
 import 'package:front_end/features/authentication/data/datasource/auth_remote_datasource/auth_remote_datasource.dart';
 import 'package:front_end/features/authentication/data/datasource/reset_password_remote_datasource.dart';
 import 'package:front_end/features/authentication/data/repository_impl/auth_repo_impl.dart';
+import 'package:front_end/features/authentication/data/repository_impl/log_out_repo_impl.dart';
 import 'package:front_end/features/authentication/data/repository_impl/reset_password_repo_impl.dart';
 import 'package:front_end/features/authentication/data/repository_impl/student_data_repo_impl.dart';
 import 'package:front_end/features/authentication/domain/repositories/auth_repo.dart';
+import 'package:front_end/features/authentication/domain/repositories/log_out_repo.dart';
 import 'package:front_end/features/authentication/domain/repositories/reset_repo.dart';
 import 'package:front_end/features/authentication/domain/repositories/student_data_repo.dart';
 import 'package:front_end/features/authentication/domain/usecase/Student_user_usecase.dart';
@@ -49,12 +51,11 @@ class AuthInjection {
         networkInfo: sl(),
         authRemoteDatasource: sl()));
     sl.registerLazySingleton<LogOutRepo>(() => LogOutRepoImpl(
-        loginLocalDataSource: sl(), 
+        loginLocalDataSource: sl(),
         networkInfo: sl(),
-         authRemoteDatasource: sl()));
-         sl.registerLazySingleton<ResetPasswordRepo>(() => ResetPasswordRepoImpl(
-        resetPasswordRemoteDatasource: sl(), networkInfo: sl())
-        );
+        authRemoteDatasource: sl()));
+    sl.registerLazySingleton<ResetPasswordRepo>(() => ResetPasswordRepoImpl(
+        resetPasswordRemoteDatasource: sl(), networkInfo: sl()));
     sl.registerLazySingleton<StudentDataRepo>(() => GetStudentDataRepoImpl(
         loginLocalDataSource: sl(),
         networkInfo: sl(),
@@ -68,8 +69,5 @@ class AuthInjection {
 
     sl.registerLazySingleton<ResetPasswordRemoteDatasource>(
         () => ResetPasswordRemoteImpl(sl()));
-
-        sl.registerLazySinglton<logoutRemoteDatasource>(
-        () => LogOutRemoteImpl(sl()));
   }
 }
