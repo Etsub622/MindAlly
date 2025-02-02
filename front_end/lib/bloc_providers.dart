@@ -12,9 +12,6 @@ class MultiBLOCProvider {
     BlocProvider<AuthBloc>(
       create: (_) => sl<AuthBloc>(),
     ),
-    BlocProvider<UserProfileBloc>(
-      create: (_) => serviceLocator<UserProfileBloc>()
-      ),
     BlocProvider<BookBloc>(
       create: (_) => sl<BookBloc>(),
     ),
