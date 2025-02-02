@@ -10,9 +10,11 @@ import 'package:go_router/go_router.dart';
 
 class ManageAccountScreen extends StatefulWidget {
   final String userName;
+  final String email;
 
   const ManageAccountScreen({
     required this.userName,
+    required this.email,
     Key? key,
   }) : super(key: key);
 
@@ -23,18 +25,13 @@ class ManageAccountScreen extends StatefulWidget {
 enum UserNameStatus { unknown, available, notAvailable }
 
 class ManageAccountScreenState extends State<ManageAccountScreen> {
-  final _oldPasswordController = TextEditingController();
   final _userNameController = TextEditingController();
-  final _newPasswordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
-
+  
   TextEditingController currencyController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController firstNameController = TextEditingController();
   TextEditingController lastNameController = TextEditingController();
   TextEditingController phoneNumberController = TextEditingController();
-  String _avatarUrlController = "";
-  bool _changePassword = false;
   UserNameStatus usernameIdFound = UserNameStatus.unknown;
   bool isLoading = false;
   String userName = "your username";
@@ -58,9 +55,6 @@ class ManageAccountScreenState extends State<ManageAccountScreen> {
     //   hasPassword = hasPassword;
     // });
     context.read<UserProfileBloc>().add(GetUserProfileEvent());
-
-
-    _avatarUrlController = profilePicture;
     _userNameController.text = widget.userName;
   }
 
@@ -211,7 +205,7 @@ class ManageAccountScreenState extends State<ManageAccountScreen> {
                                         SizedBox(
                                           width: width * 0.3,
                                           child: Text(
-                                            userName,
+                                            widget.userName,
                                             style: TextStyle(
                                                 fontSize: 12,
                                                 color: AppColor.hexToColor(
@@ -245,7 +239,7 @@ class ManageAccountScreenState extends State<ManageAccountScreen> {
                                       children: [
                                         Expanded(
                                           child: Text(
-                                            email,
+                                            widget.email,
                                             overflow: TextOverflow.ellipsis,
                                             style: TextStyle(
                                                 fontSize: 12,
