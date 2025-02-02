@@ -20,7 +20,7 @@ abstract class AuthRemoteDatasource {
 class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   late final http.Client client;
   AuthRemoteDatasourceImpl({required this.client});
-  final baseUrl = 'http://localhost:8000/api/user';
+  final baseUrl = 'http://10.0.2.2:8000/api/user';
 
   @override
   Future<String> professionalSignUp(

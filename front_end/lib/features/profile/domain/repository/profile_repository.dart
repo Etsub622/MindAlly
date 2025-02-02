@@ -8,8 +8,15 @@ import 'package:front_end/features/profile/domain/entities/patient_entity.dart';
 import 'package:front_end/features/profile/domain/entities/therapist_entity.dart';
 
 abstract class ProfileRepository {
-  Future<Either<Failure, PatientModel>> getPatientProfile();
-  Future<Either<Failure, TherapistModel>> getTherapistProfile();
-  Future<Either<Failure, String>> updatePatientProfile(PatientEntity profile);
-  Future<Either<Failure, String>> updateTherapistProfile(TherapistEntity profile);
+  Future<Either<Failure, PatientModel>> getPatient({required String id});
+  Future<Either<Failure, PatientModel>> createPatient({required PatientEntity patient});
+  Future<Either<Failure, PatientModel>> updatePatient({required PatientEntity patient});
+  Future<Either<Failure, Null>> deletePatient({required String id});
+
+  
+  Future<Either<Failure, TherapistModel>> getTherapist({required String id});
+  Future<Either<Failure, TherapistModel>> createTherapist({required TherapistEntity therapist});
+  Future<Either<Failure, TherapistModel>> updateTherapist({required TherapistEntity therapist});
+  Future<Either<Failure, Null>> deleteTherapist({required String id});
+
 }
