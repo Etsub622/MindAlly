@@ -99,7 +99,7 @@ class _ProfilePageState extends State<ProfilePageBody> {
                                     userName: state.userEntity!.fullName,
                                     // profilePicture: widget.profilePicture,
                                     // hasPassword: widget.hasPassword,
-                                    // email: widget.email
+                                    email: state.userEntity!.email
                                   )),
                         );
                       },
@@ -217,7 +217,7 @@ class _ProfilePageState extends State<ProfilePageBody> {
                                   userName: widget.profile.username,
                                   // profilePicture: widget.profilePicture,
                                   // hasPassword: widget.hasPassword,
-                                  // email: widget.email
+                                  email: widget.profile.email
                                 )),
                       );
                     },
