@@ -59,3 +59,16 @@ export const deleteResource = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+export const getResourceById = async (req, res) => {
+  try {
+    const resource = await Resource.findById(req.params.id);
+    if (!resource) {
+      return res.status(404).json({ error: "Resource not found" });
+    }
+    res.status(200).json(resource);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
