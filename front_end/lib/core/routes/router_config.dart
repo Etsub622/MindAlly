@@ -9,6 +9,7 @@ import 'package:front_end/features/authentication/presentation/screens/professio
 import 'package:front_end/features/authentication/presentation/screens/reset_password.dart';
 import 'package:front_end/features/authentication/presentation/screens/role_selection.dart';
 import 'package:front_end/features/authentication/presentation/screens/student_signUp.dart';
+import 'package:front_end/features/resource/presentation/screens/book_resource.dart';
 
 import 'package:go_router/go_router.dart';
 
@@ -41,17 +42,22 @@ final routes = <GoRoute>[
         final resetToken = extra['resetToken']!;
         return ResetPassword(resetToken: resetToken);
       }),
+       GoRoute(
+      path: AppPath.bookResource,
+      builder: (context, state) => BookResource ()),
   GoRoute(
       path: AppPath.otp,
       builder: (context, state) {
         final email = state.extra as String;
         return OtpVerification(email: email);
       }),
+
+
 ];
 
 GoRouter routerConfig() {
   return GoRouter(
-    initialLocation: AppPath.authOnboarding,
+    initialLocation: AppPath.home,
     routes: routes,
   );
 }

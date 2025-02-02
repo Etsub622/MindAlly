@@ -17,6 +17,7 @@ const ArticleSchema = new mongoose.Schema({
 
 // Book schema
 const BookSchema = new mongoose.Schema({
+
   image: { type: String, required: true },
   author: { type: String, required: true },
   title: { type: String, required: true },
