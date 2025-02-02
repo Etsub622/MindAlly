@@ -29,3 +29,8 @@ class SearchEvent extends BookEvent {
   final String title;
   SearchEvent(this.title);
 }
+
+class GetSingleBookEvent extends BookEvent {
+  final String id;
+  GetSingleBookEvent(this.id);
+}

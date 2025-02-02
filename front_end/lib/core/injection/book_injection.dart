@@ -14,6 +14,7 @@ class BookInjection {
           deleteBookUsecase: sl(),
           updateBookUsecase: sl(),
           searchBookUsecase: sl(),
+          getSingleBookUsecase: sl(),
         ));
 
     // Usecase
@@ -22,6 +23,7 @@ class BookInjection {
     sl.registerLazySingleton(() => DeleteBookUsecase(sl()));
     sl.registerLazySingleton(() => UpdateBookUsecase(sl()));
     sl.registerLazySingleton(() => SearchBookUsecase(sl()));
+    sl.registerLazySingleton(() => GetSingleBookUsecase(sl()));
 
     // Repository
     sl.registerLazySingleton<BookRepository>(() => BookRepoImpl(sl(), sl()));

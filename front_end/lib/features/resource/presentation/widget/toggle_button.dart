@@ -13,13 +13,13 @@ class CustomToggleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final toggleTitles = ['Articles', 'Videos', 'Books'];
+    final toggleTitles = ['Books', 'Videos', 'Articles'];
 
     return SizedBox(
       height: 80,
       width: double.infinity,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+        padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: List.generate(toggleTitles.length, (index) {
@@ -28,21 +28,19 @@ class CustomToggleButton extends StatelessWidget {
                 onToggle(index);
               },
               child: SizedBox(
-                height: 50,
-                width: 110,
+                height: 60,
+                width: 150,
                 child: Card(
-                  color: Colors.white,
-                  elevation: 5,
+                  color: isSelected[index] ? Color(0xff08E0EEA) : Colors.white,
+                  elevation: 7,
                   child: Center(
                     child: Text(
                       toggleTitles[index],
                       style: TextStyle(
-                        color: isSelected[index]
-                            ? const Color(0xff08E0EEA)
-                            : Colors.black,
+                        color: isSelected[index] ? Colors.white : Colors.black,
                         fontFamily: 'Poppins',
                         fontWeight: FontWeight.w600,
-                        fontSize: 18,
+                        fontSize: 19,
                       ),
                     ),
                   ),

@@ -9,27 +9,36 @@ import '../../features/resource/domain/usecase/article_usecase.dart';
 
 class ArticleInjection {
   init() {
-    // Bloc
-    sl.registerFactory(() => ArticleBloc(
-          getArticlesUsecase: sl(),
-          addArticleUsecase: sl(),
-          deleteArticleUsecase: sl(),
-          updateArticleUsecase: sl(),
-          searchArticleUsecase: sl(),
-        ));
+    print('ArticleInjection initialized');
+    // Ensure all dependencies are correctly registered
+    try {
+      // Bloc
+      sl.registerFactory(() => ArticleBloc(
+            getArticlesUsecase: sl(),
+            addArticleUsecase: sl(),
+            deleteArticleUsecase: sl(),
+            updateArticleUsecase: sl(),
+            searchArticleUsecase: sl(),
+          ));
 
-    // Usecase
-    sl.registerLazySingleton(() => GetArticlesUsecase(sl()));
-    sl.registerLazySingleton(() => AddArticleUsecase(sl()));
-    sl.registerLazySingleton(() => DeleteArticleUsecase(sl()));
-    sl.registerLazySingleton(() => UpdateArticleUsecase(sl()));
-    sl.registerLazySingleton(() => SearchArticleUsecase(sl()));
+      // Usecase
+      sl.registerLazySingleton(() => GetArticlesUsecase(sl()));
+      sl.registerLazySingleton(() => AddArticleUsecase(sl()));
+      sl.registerLazySingleton(() => DeleteArticleUsecase(sl()));
+      sl.registerLazySingleton(() => UpdateArticleUsecase(sl()));
+      sl.registerLazySingleton(() => SearchArticleUsecase(sl()));
 
-// repository
-    sl.registerLazySingleton<ArticleRepository>(
-        () => ArticleRepoImpl(sl(), sl()));
-    // Data Source
-    sl.registerLazySingleton<ArticleRemoteDatasource>(
-        () => ArticleRemoteDataSourceImpl(sl()));
+      // Repository
+      sl.registerLazySingleton<ArticleRepository>(
+          () => ArticleRepoImpl(sl(), sl()));
+
+      // Data Source
+      sl.registerLazySingleton<ArticleRemoteDatasource>(
+          () => ArticleRemoteDataSourceImpl(sl()));
+
+      print("Dependencies registered successfully");
+    } catch (e) {
+      print("Error registering dependencies: $e");
+    }
   }
 }

@@ -23,10 +23,10 @@ class ArticleBloc extends Bloc<ArticleEvent, ArticleState> {
     on<AddArticleEvent>((event, emit) async {
       emit(ArticleLoading());
 
-      final book =
+      final article =
           await addArticleUsecase(AddArticleParams(event.articleEntity));
 
-      book.fold((l) {
+      article.fold((l) {
         emit(ArticleError(l.message));
       }, (r) {
         emit(ArticleAdded(r));

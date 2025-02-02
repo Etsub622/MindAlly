@@ -14,10 +14,13 @@ class BookRepoImpl implements BookRepository {
 
   @override
   Future<Either<Failure, String>> addBook(BookEntity book) async {
+    print('is inknkkkkkkkkkkkkkk');
     if (await networkInfo.isConnected) {
+      print('uguguguiiguu');
       try {
         final newBook = BookModel(
-            id: book.id,
+          id:'',
+            type: 'Book',
             title: book.title,
             author: book.author,
             image: book.image);
@@ -85,7 +88,8 @@ class BookRepoImpl implements BookRepository {
     if (await networkInfo.isConnected) {
       try {
         final updatedBook = BookModel(
-            id: book.id,
+          id:'',
+            type: 'Book',
             title: book.title,
             author: book.author,
             image: book.image);
@@ -98,5 +102,21 @@ class BookRepoImpl implements BookRepository {
       return Left(
           NetworkFailure(message: 'you are not connected to the internet.'));
     }
+  }
+  
+  @override
+  Future<Either<Failure, BookEntity>> getSingleBook(String id) async{
+    if (await networkInfo.isConnected) {
+      try {
+        final res = await remoteDatasource.getSingleBook(id);
+        return Right(res);
+      } on ServerException {
+        return Left(ServerFailure(message: 'server failure'));
+      }
+    } else {
+      return Left(
+          NetworkFailure(message: 'you are not connected to the internet.'));
+    }
+   
   }
 }

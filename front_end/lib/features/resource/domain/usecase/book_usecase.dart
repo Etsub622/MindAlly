@@ -14,6 +14,20 @@ class GetBooksUsecase extends Usecase<List<BookEntity>, NoParams> {
     return await repository.getBooks();
   }
 }
+class GetSingleBookUsecase extends Usecase<BookEntity, SingleBookParams> {
+  final BookRepository repository;
+
+  GetSingleBookUsecase(this.repository);
+
+  @override
+  Future<Either<Failure, BookEntity>> call(SingleBookParams params) async {
+    return await repository.getSingleBook(params.id);
+  }
+}
+class SingleBookParams {
+  final String id;
+  SingleBookParams(this.id);
+}
 
 class AddBookUsecase extends Usecase<String, AddBookParams> {
   final BookRepository repository;

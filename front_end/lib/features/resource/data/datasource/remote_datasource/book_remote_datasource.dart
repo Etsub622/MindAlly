@@ -10,28 +10,34 @@ abstract class BookRemoteDatasource {
   Future<String> updateBook(BookModel book, String id);
   Future<String> deleteBook(String id);
   Future<List<BookModel>> searchBooks(String title);
+  Future<BookModel> getSingleBook(String id);
 }
 
 class BookRemoteDataSourceImpl implements BookRemoteDatasource {
   final http.Client client;
   BookRemoteDataSourceImpl(this.client);
 
-  final baseUrl = 'http://localhost:3000/addBook';
+  final baseUrl = 'http://localhost:8000/api/resources';
 
   @override
   Future<String> addBook(BookModel book) async {
     try {
-      var url = Uri.parse('$baseUrl/addBook');
-      final newBook = await client.post(url, body: jsonEncode(book.toJson()));
-      if (newBook.statusCode == 200) {
-        final decodedResponse = jsonDecode(newBook.body);
-        print(decodedResponse);
-        return decodedResponse['message'];
+      var url = Uri.parse(baseUrl);
+      final newBook = await client.post(url,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode(book.toJson()));
+      print(newBook.statusCode);
+      print(newBook.body);
+      if (newBook.statusCode == 201) {
+        return 'Book added successfully';
       } else {
         throw ServerException(
             message: 'Failed to add book:${newBook.statusCode}');
       }
     } catch (e) {
+      print(e.toString());
       throw ServerException(message: e.toString());
     }
   }
@@ -39,10 +45,12 @@ class BookRemoteDataSourceImpl implements BookRemoteDatasource {
   @override
   Future<String> deleteBook(String id) async {
     try {
-      var url = Uri.parse('$baseUrl/deleteBook/$id');
+      var url = Uri.parse('$baseUrl/$id');
       final deletedBook = await client.delete(url);
+      print(deletedBook.statusCode);
       if (deletedBook.statusCode == 200) {
         final decodedResponse = jsonDecode(deletedBook.body);
+        print(decodedResponse['message']);
         return decodedResponse['message'];
       } else {
         throw ServerException(
@@ -56,7 +64,7 @@ class BookRemoteDataSourceImpl implements BookRemoteDatasource {
   @override
   Future<List<BookModel>> getBooks() async {
     try {
-      var url = Uri.parse('baseUrl/getBooks');
+      var url = Uri.parse(baseUrl);
       final response = await client.get(url, headers: {
         'Content-Type': 'application/json',
       });
@@ -106,16 +114,35 @@ class BookRemoteDataSourceImpl implements BookRemoteDatasource {
   @override
   Future<String> updateBook(BookModel book, String id) async {
     try {
-      var url = Uri.parse('$baseUrl/updateBook/$id');
+      var url = Uri.parse('$baseUrl/$id');
       final updatedBook =
           await client.put(url, body: jsonEncode(book.toJson()));
 
       if (updatedBook.statusCode == 200) {
-        final decodedResponse = jsonDecode(updatedBook.body);
-        return decodedResponse['message'];
+        // final decodedResponse = jsonDecode(updatedBook.body);
+        return 'Book Updated Successfully';
       } else {
         throw ServerException(
             message: 'Failed to update book:${updatedBook.statusCode}');
+      }
+    } catch (e) {
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<BookModel> getSingleBook(String id) async {
+    try {
+      var url = Uri.parse('$baseUrl/getSingleBook/$id');
+      final response = await client.get(url, headers: {
+        'Content-Type': 'application/json',
+      });
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> bookJson = json.decode(response.body);
+        return BookModel.fromJson(bookJson);
+      } else {
+        throw ServerException(
+            message: 'Failed to get book:${response.statusCode}');
       }
     } catch (e) {
       throw ServerException(message: e.toString());

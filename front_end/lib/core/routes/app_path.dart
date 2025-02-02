@@ -14,6 +14,7 @@ class AppPath {
   static const String forgotPassword = '/forgotPassword';
   static const String resetPassword = '/resetPassword';
   static const String otp = '/otp';
+  static String bookResource ='bookResource';
 }
 
 const List<String> publicRoutes = [

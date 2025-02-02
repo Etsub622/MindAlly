@@ -26,38 +26,39 @@ class _AddBookState extends State<AddBook> {
   TextEditingController titleController = TextEditingController();
 
   // Pick images from the device
-  List<File> _imageFiles = [];
-  final List<String> _imageUrls = [];
+  File? _imageFile;
+  String? _imageUrl;
 
   Future<void> _pickImage(ImageSource source) async {
     final ImagePicker picker = ImagePicker();
+    final XFile? pickedFile = await picker.pickImage(source: source);
 
-    final List<XFile>? pickedFiles = await picker.pickMultiImage();
     setState(() {
-      if (pickedFiles != null) {
-        _imageFiles = pickedFiles.map((file) => File(file.path)).toList();
+      if (pickedFile != null) {
+        _imageFile = File(pickedFile.path);
       }
     });
   }
 
-  // image uploading to cloudinary
-  Future<void> _uploadImages() async {
-    for (var imageFile in _imageFiles) {
-      final url = Uri.parse('https://api.cloudinary.com/v1_1/dzfbycabj/upload');
-      final request = http.MultipartRequest('POST', url)
-        ..fields['upload_preset'] = 'imagePreset'
-        ..files.add(await http.MultipartFile.fromPath('file', imageFile.path));
-      final response = await request.send();
+  // Image uploading to Cloudinary
+  Future<void> _uploadImage() async {
+    if (_imageFile == null) return;
 
-      if (response.statusCode == 200) {
-        final responseData = await response.stream.toBytes();
-        final responseString = String.fromCharCodes(responseData);
-        final jsonMap = json.decode(responseString);
-        final url = jsonMap['url'];
-        _imageUrls.add(url);
-      } else {
-        print('Failed to upload image');
-      }
+    final url = Uri.parse('https://api.cloudinary.com/v1_1/dzfbycabj/upload');
+    final request = http.MultipartRequest('POST', url)
+      ..fields['upload_preset'] = 'imagePreset'
+      ..files.add(await http.MultipartFile.fromPath('file', _imageFile!.path));
+    final response = await request.send();
+
+    if (response.statusCode == 200) {
+      final responseData = await response.stream.toBytes();
+      final responseString = String.fromCharCodes(responseData);
+      final jsonMap = json.decode(responseString);
+      setState(() {
+        _imageUrl = jsonMap['url'];
+      });
+    } else {
+      print('Failed to upload image');
     }
   }
 
@@ -65,8 +66,12 @@ class _AddBookState extends State<AddBook> {
     final uploadedBook = BookModel(
         id: '',
         title: titleController.text,
+        type: 'Book',
         author: authorController.text,
-        image: _imageUrls[0]);
+        image:
+            'https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.penguin.co.uk%2Fbooks%2F457714%2Fyour-mental-health-by-westbrook-edited-by-chris-brady-and-tony%2F9781785044656&psig=AOvVaw0NeQbT8wh54GhHzetPFUUt&ust=1738603342529000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCICl5bW_pYsDFQAAAAAdAAAAABAE');
+    print(uploadedBook);
+
     context.read<BookBloc>().add(AddBookEvent(uploadedBook));
   }
 
@@ -93,6 +98,10 @@ class _AddBookState extends State<AddBook> {
         if (state is BookAdded) {
           const snack = SnackBar(content: Text('Book added successfully'));
           ScaffoldMessenger.of(context).showSnackBar(snack);
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AddBook()),
+          );
         } else if (state is BookError) {
           final snack = errorsnackBar('Try again later');
           ScaffoldMessenger.of(context).showSnackBar(snack);
@@ -157,13 +166,10 @@ class _AddBookState extends State<AddBook> {
               hgt: 50,
               text: "Upload Book",
               onPressed: () async {
-                if (_imageFiles.isNotEmpty &&
-                    titleController.text.isNotEmpty &&
+                if (titleController.text.isNotEmpty &&
                     authorController.text.isNotEmpty) {
-                  await _uploadImages().then((_) {
-                    _uploadBook(context);
-                  });
-                  return;
+                  await _uploadImage();
+                  _uploadBook(context);
                 }
               },
             ),

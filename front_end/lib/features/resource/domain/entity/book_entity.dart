@@ -5,11 +5,14 @@ class BookEntity extends Equatable {
   final String image;
   final String author;
   final String title;
-  BookEntity(
-      {required this.id,
-      required this.image,
-      required this.author,
-      required this.title});
+  final String type;
+  BookEntity({
+    required this.id,
+    required this.image,
+    required this.author,
+    required this.title,
+    required this.type,
+  });
   @override
   List<Object> get props {
     return [
@@ -17,8 +20,7 @@ class BookEntity extends Equatable {
       image,
       author,
       title,
+      type,
     ];
   }
-  
-
 }

@@ -25,6 +25,7 @@ class _ArticleResourceState extends State<ArticleResource> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
+          print('add articlefjdk;ajddddddddddddddddddddddd');
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => AddArticle()),

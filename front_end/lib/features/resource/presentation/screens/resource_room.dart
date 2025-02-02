@@ -16,20 +16,17 @@ class _ResourceRoomState extends State<ResourceRoom> {
 
   Widget _getSelectedPage() {
     if (isSelected[0]) {
-      return const ArticleResource();
+      return const BookResource();
     } else if (isSelected[1]) {
       return const VideoResource();
     } else {
-      return const BookResource();
+      return const ArticleResource();
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Resource Room'),
-      ),
       body: Column(
         children: [
           CustomToggleButton(
