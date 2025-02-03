@@ -68,8 +68,7 @@ class _AddBookState extends State<AddBook> {
         title: titleController.text,
         type: 'Book',
         author: authorController.text,
-        image:
-            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtx1sz0xpB3i0V8Pj1AAc6LG3rQqAX32qBIg&s');
+        image: _imageUrl!);
     print(uploadedBook);
 
     context.read<BookBloc>().add(AddBookEvent(uploadedBook));

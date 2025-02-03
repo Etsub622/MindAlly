@@ -17,7 +17,7 @@ class BookRemoteDataSourceImpl implements BookRemoteDatasource {
   final http.Client client;
   BookRemoteDataSourceImpl(this.client);
 
-  final baseUrl = 'http://localhost:8000/api/resources';
+  final baseUrl = 'http://10.0.2.2:8000/api/resources';
 
   @override
   Future<String> addBook(BookModel book) async {
@@ -71,7 +71,7 @@ class BookRemoteDataSourceImpl implements BookRemoteDatasource {
       if (response.statusCode == 200) {
         final List<dynamic> bookJson = json.decode(response.body);
         if (bookJson.isEmpty) {
-          throw ServerException(message: 'No books found');
+          return [];
         } else {
           return bookJson.map((jsonItem) {
             return BookModel.fromJson(jsonItem as Map<String, dynamic>);
