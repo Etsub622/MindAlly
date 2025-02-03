@@ -117,7 +117,8 @@ class BookRemoteDataSourceImpl implements BookRemoteDatasource {
       var url = Uri.parse('$baseUrl/$id');
       final updatedBook =
           await client.put(url, body: jsonEncode(book.toJson()));
-
+      print(updatedBook.body);
+      print(updatedBook.statusCode);
       if (updatedBook.statusCode == 200) {
         // final decodedResponse = jsonDecode(updatedBook.body);
         return 'Book Updated Successfully';

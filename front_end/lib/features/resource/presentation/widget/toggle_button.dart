@@ -28,8 +28,8 @@ class CustomToggleButton extends StatelessWidget {
                 onToggle(index);
               },
               child: SizedBox(
-                height: 60,
-                width: 150,
+                height: 50,
+                width: 140,
                 child: Card(
                   color: isSelected[index] ? Color(0xff08E0EEA) : Colors.white,
                   elevation: 7,

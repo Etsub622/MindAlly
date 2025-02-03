@@ -10,17 +10,18 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppbarHome(context: context),
-      // AppBar(
-      //   title: Text('Home Screen'),
-      //   actions: [
-      //     IconButton(
-      //       icon: Icon(Icons.logout),
-      //       onPressed: () => _showDialog(context),
-      //     ),
-      //   ],
-      // ),
-      body: const Center(
-        child: Text('Welcome to the Home Screen!'),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Welcome to the Home Screen!'),
+            SizedBox(height: 20),
+            IconButton(
+              icon: Icon(Icons.logout),
+              onPressed: () => _showDialog(context),
+            ),
+          ],
+        ),
       ),
     );
   }

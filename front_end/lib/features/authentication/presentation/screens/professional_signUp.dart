@@ -40,6 +40,31 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
     super.dispose();
   }
 
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Email is required';
+    }
+    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+    if (!emailRegex.hasMatch(value)) {
+      return 'Enter a valid email address';
+    }
+    return null;
+  }
+
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Password is required';
+    }
+    if (value.length < 8) {
+      return 'Password must be at least 8 characters';
+    }
+    if (!RegExp(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$')
+        .hasMatch(value)) {
+      return 'Password must contain letters, numbers, and a special character';
+    }
+    return null;
+  }
+
   void _professionalSignUp(BuildContext context) {
     final newUser = ProfessionalSignupModel(
         id: '',
@@ -109,11 +134,23 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
                 SizedBox(
                   height: 30,
                 ),
-                CustomTextField(text: "full name", controller: nameController),
+                CustomTextField(
+                  text: "full name",
+                  controller: nameController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Full name is required';
+                    }
+                    return null;
+                  },
+                ),
                 SizedBox(
                   height: 20,
                 ),
-                CustomTextField(text: "email", controller: emailController),
+                CustomTextField(
+                    text: "email",
+                    controller: emailController,
+                    validator: _validateEmail),
                 SizedBox(
                   height: 20,
                 ),
@@ -121,7 +158,8 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
                     text: "password",
                     sign: Icon(Icons.remove_red_eye),
                     controller: passwordController,
-                    isPassword: true),
+                    isPassword: true,
+                    validator: _validatePassword),
                 SizedBox(
                   height: 20,
                 ),
@@ -134,12 +172,28 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
                   height: 20,
                 ),
                 CustomTextField(
-                    text: "Phone Number", controller: phoneController),
+                  text: "Phone Number",
+                  controller: phoneController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Phone number is required';
+                    }
+                    return null;
+                  },
+                ),
                 SizedBox(
                   height: 20,
                 ),
                 CustomTextField(
-                    text: "Area of Specialization", controller: areaContloller),
+                  text: "Area of Specialization",
+                  controller: areaContloller,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Area of specialization is required';
+                    }
+                    return null;
+                  },
+                ),
                 SizedBox(
                   height: 20,
                 ),

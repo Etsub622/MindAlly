@@ -22,7 +22,8 @@ class _StudentSignUpState extends State<StudentSignUp> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController college = TextEditingController();
 
@@ -35,6 +36,31 @@ class _StudentSignUpState extends State<StudentSignUp> {
     phoneController.dispose();
     college.dispose();
     super.dispose();
+  }
+
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Email is required';
+    }
+    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+    if (!emailRegex.hasMatch(value)) {
+      return 'Enter a valid email address';
+    }
+    return null;
+  }
+
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Password is required';
+    }
+    if (value.length < 8) {
+      return 'Password must be at least 8 characters';
+    }
+    if (!RegExp(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$')
+        .hasMatch(value)) {
+      return 'Password must contain letters, numbers, and a special character';
+    }
+    return null;
   }
 
   void _studentSignUP(BuildContext context) {
@@ -105,36 +131,71 @@ class _StudentSignUpState extends State<StudentSignUp> {
                 SizedBox(
                   height: 30,
                 ),
-                CustomTextField(text: "full name", controller: nameController),
-                SizedBox(
-                  height: 20,
+                CustomTextField(
+                  text: "full name",
+                  controller: nameController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Full name is required';
+                    }
+                    return null;
+                  },
                 ),
-                CustomTextField(text: "email", controller: emailController),
                 SizedBox(
                   height: 20,
                 ),
                 CustomTextField(
-                    text: "password",
-                    sign: Icon(Icons.remove_red_eye),
-                    controller: passwordController,
-                    isPassword: true),
+                  text: "email",
+                  controller: emailController,
+                  validator: _validateEmail,
+                ),
                 SizedBox(
                   height: 20,
                 ),
                 CustomTextField(
-                    text: "confirm password",
-                    sign: Icon(Icons.remove_red_eye),
-                    controller: confirmPasswordController,
-                    isPassword: true),
+                  text: "password",
+                  controller: passwordController,
+                  isPassword: true,
+                  validator: _validatePassword,
+                ),
+                SizedBox(height: 20),
+                CustomTextField(
+                  text: "confirm password",
+                  controller: confirmPasswordController,
+                  isPassword: true,
+                  validator: (value) {
+                    if (value != passwordController.text) {
+                      return 'Passwords do not match';
+                    }
+                    return null;
+                  },
+                ),
                 SizedBox(
                   height: 20,
                 ),
                 CustomTextField(
-                    text: "Phone Number", controller: phoneController),
+                  text: "Phone Number",
+                  controller: phoneController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Phone number is required';
+                    }
+                    return null;
+                  },
+                ),
                 SizedBox(
                   height: 20,
                 ),
-                CustomTextField(text: "College(Optional)", controller: college),
+                CustomTextField(
+                  text: "College",
+                  controller: college,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'College is required';
+                    }
+                    return null;
+                  },
+                ),
                 SizedBox(
                   height: 40,
                 ),
