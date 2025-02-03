@@ -48,16 +48,26 @@ class _HomeNavigationScreenState extends State<HomeNavigationScreen> {
           items: [
             BottomNavigationBarItem(
               icon: index == 0
-                  ? Image.asset(AppImage.homeUnselected)
-                  : Image.asset(AppImage.homeUnselected),
+                  ? Image.asset(
+                     width: 30,
+                      height: 40,
+                    AppImage.homeSelected)
+                  : Image.asset(
+                     width: 30,
+                      height: 40,
+                    AppImage.homeUnselected),
               label: 'Home',
             ),
             BottomNavigationBarItem(
               icon: index == 1
                   ? Image.asset(
-                      AppImage.qaUnselected,
+                     width: 30,
+                      height: 40,
+                      AppImage.qaSelected,
                     )
                   : Image.asset(
+                     width: 30,
+                      height: 40,
                       AppImage.qaUnselected,
                     ),
               label: 'Q&A',
@@ -65,9 +75,13 @@ class _HomeNavigationScreenState extends State<HomeNavigationScreen> {
             BottomNavigationBarItem(
               icon: index == 2
                   ? Image.asset(
-                      AppImage.resourceUnselected,
+                     width: 30,
+                      height: 40,
+                      AppImage.resourceSelected,
                     )
                   : Image.asset(
+                     width: 30,
+                      height: 40,
                       AppImage.resourceUnselected,
                     ),
               label: 'Resource',
@@ -75,10 +89,14 @@ class _HomeNavigationScreenState extends State<HomeNavigationScreen> {
             BottomNavigationBarItem(
               icon: index == 3
                   ? Image.asset(
+                      width: 30,
+                      height: 40,
                       AppImage.chatSelected,
                     )
                   : Image.asset(
-                      AppImage.chatSelected,
+                     width: 30,
+                      height: 40,
+                      AppImage.chatUnselected,
                     ),
               label: 'Chat',
             ),

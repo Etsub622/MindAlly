@@ -68,8 +68,7 @@ class _AddBookState extends State<AddBook> {
         title: titleController.text,
         type: 'Book',
         author: authorController.text,
-        image:
-            'https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.penguin.co.uk%2Fbooks%2F457714%2Fyour-mental-health-by-westbrook-edited-by-chris-brady-and-tony%2F9781785044656&psig=AOvVaw0NeQbT8wh54GhHzetPFUUt&ust=1738603342529000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCICl5bW_pYsDFQAAAAAdAAAAABAE');
+        image: _imageUrl!);
     print(uploadedBook);
 
     context.read<BookBloc>().add(AddBookEvent(uploadedBook));
