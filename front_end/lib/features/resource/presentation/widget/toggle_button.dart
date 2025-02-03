@@ -15,39 +15,41 @@ class CustomToggleButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final toggleTitles = ['Books', 'Videos', 'Articles'];
 
-    return SizedBox(
-      height: 80,
-      width: double.infinity,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: List.generate(toggleTitles.length, (index) {
-            return GestureDetector(
-              onTap: () {
-                onToggle(index);
-              },
-              child: SizedBox(
-                height: 50,
-                width: 140,
-                child: Card(
-                  color: isSelected[index] ? Color(0xff08E0EEA) : Colors.white,
-                  elevation: 7,
-                  child: Center(
-                    child: Text(
-                      toggleTitles[index],
-                      style: TextStyle(
-                        color: isSelected[index] ? Colors.white : Colors.black,
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w600,
-                        fontSize: 19,
+    return SingleChildScrollView(
+      child: SizedBox(
+        height: 60,
+        width: MediaQuery.of(context).size.width ,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 2.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: List.generate(toggleTitles.length, (index) {
+              return GestureDetector(
+                onTap: () {
+                  onToggle(index);
+                },
+                child: SizedBox(
+                  height: 50,
+                  width: MediaQuery.of(context).size.width * 0.33,
+                  child: Card(
+                    color: isSelected[index] ? Color(0xff08E0EEA) : Colors.white,
+                    elevation: 7,
+                    child: Center(
+                      child: Text(
+                        toggleTitles[index],
+                        style: TextStyle(
+                          color: isSelected[index] ? Colors.white : Colors.black,
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w600,
+                          fontSize: 19,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            );
-          }),
+              );
+            }),
+          ),
         ),
       ),
     );

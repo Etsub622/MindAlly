@@ -28,10 +28,10 @@ class _ResourceRoomState extends State<ResourceRoom> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 12.0, right: 12.0, top: 16),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(90),
+        child:  Padding(
+            padding:  EdgeInsets.only(top: MediaQuery.of(context).padding.top, bottom: MediaQuery.of(context).padding.top * 0.3, left: MediaQuery.of(context).size.width * 0.02, right: MediaQuery.of(context).size.width * 0.02),
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
@@ -53,6 +53,9 @@ class _ResourceRoomState extends State<ResourceRoom> {
               style: TextStyle(color: Colors.black),
             ),
           ),
+      ), 
+      body: Column(
+        children: [
           CustomToggleButton(
             isSelected: isSelected,
             onToggle: (idx) {
