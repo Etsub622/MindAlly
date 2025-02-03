@@ -24,6 +24,12 @@ class HomeScreen extends StatelessWidget {
         },
         child: Image.asset("asset/image/chatbot_icon.png"),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          _showChatBot(context);
+        },
+        child: Image.asset("asset/image/chatbot_icon.png"),
+      ),
     );
   }
 
