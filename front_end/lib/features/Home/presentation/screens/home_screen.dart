@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front_end/core/routes/app_path.dart';
+import 'package:front_end/features/Home/presentation/screens/home_app_bar.dart';
 import 'package:front_end/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:go_router/go_router.dart';
 
@@ -8,16 +9,17 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Home Screen'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.logout),
-            onPressed: () => _showDialog(context),
-          ),
-        ],
-      ),
-      body: Center(
+      appBar: AppbarHome(context: context),
+      // AppBar(
+      //   title: Text('Home Screen'),
+      //   actions: [
+      //     IconButton(
+      //       icon: Icon(Icons.logout),
+      //       onPressed: () => _showDialog(context),
+      //     ),
+      //   ],
+      // ),
+      body: const Center(
         child: Text('Welcome to the Home Screen!'),
       ),
     );
