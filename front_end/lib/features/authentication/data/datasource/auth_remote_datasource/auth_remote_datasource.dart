@@ -20,7 +20,7 @@ abstract class AuthRemoteDatasource {
 class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   late final http.Client client;
   AuthRemoteDatasourceImpl({required this.client});
-  final baseUrl = 'http://10.0.2.2:8000/api/user';
+  final baseUrl = 'http://localhost:8000/api';
 
   @override
   Future<String> professionalSignUp(
@@ -79,9 +79,8 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
 
   @override
   Future<StudentResponseModel> logIn(LoginModel loginModel) async {
-    print('hellofklaffffffffff');
     try {
-      // final sharedPreferences = await SharedPreferences.getInstance();
+      final sharedPreferences = await SharedPreferences.getInstance();
       // final loginLocalDataSource =
       //     LoginLocalDataSourceImpl(sharedPreferences: sharedPreferences);
       // final token = await loginLocalDataSource.getToken();
@@ -104,8 +103,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       final user = await client.post(url,
           body: jsonEncode(loginModel.toJson()),
           headers: {'Content-Type': 'application/json'});
-      print(user.body);
-      print(user.statusCode);
+
       if (user.statusCode == 200) {
         final responseJson = jsonDecode(user.body);
 

@@ -12,6 +12,7 @@ class ResourceRoom extends StatefulWidget {
 }
 
 class _ResourceRoomState extends State<ResourceRoom> {
+  final TextEditingController _searchController = TextEditingController();
   List<bool> isSelected = [true, false, false];
 
   Widget _getSelectedPage() {
@@ -29,6 +30,29 @@ class _ResourceRoomState extends State<ResourceRoom> {
     return Scaffold(
       body: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 12.0, right: 12.0, top: 16),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: 'Search for books, videos, articles',
+                hintStyle: TextStyle(color: Color(0xff08E0EEA)),
+                prefixIcon: Icon(Icons.search, color: Colors.grey[700]),
+                filled: true,
+                fillColor: Color.fromARGB(255, 226, 225, 225),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30.0),
+                  borderSide: BorderSide.none,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30.0),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: EdgeInsets.symmetric(vertical: 15.0),
+              ),
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
           CustomToggleButton(
             isSelected: isSelected,
             onToggle: (idx) {

@@ -31,6 +31,20 @@ class _ResetPasswordState extends State<ResetPassword> {
     super.dispose();
   }
 
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Password is required';
+    }
+    if (value.length < 8) {
+      return 'Password must be at least 8 characters';
+    }
+    if (!RegExp(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$')
+        .hasMatch(value)) {
+      return 'Password must contain letters, numbers, and a special character';
+    }
+    return null;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -109,6 +123,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                 sign: const Icon(Icons.remove_red_eye),
                 controller: passwordController,
                 isPassword: true,
+                validator: _validatePassword,
               ),
               const SizedBox(height: 20),
               CustomTextField(

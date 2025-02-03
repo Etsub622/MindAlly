@@ -50,7 +50,8 @@ class _UpdateBookState extends State<UpdateBook> {
     final Map<String, Object> updatedbook = {
       'title': titleController.text,
       'author': authorController.text,
-      'imageUrl': _imageUrl ?? imageController.text,
+      'imageUrl':
+          _imageUrl?.isNotEmpty == true ? _imageUrl! : imageController.text,
     };
     widget.onUpdate(updatedbook);
   }
@@ -66,7 +67,7 @@ class _UpdateBookState extends State<UpdateBook> {
     setState(() {
       if (pickedFile != null) {
         _imageFile = File(pickedFile.path);
-        _imageUrl = null;
+       
       }
     });
   }

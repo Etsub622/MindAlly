@@ -11,7 +11,7 @@ abstract class ResetPasswordRemoteDatasource {
 class ResetPasswordRemoteImpl implements ResetPasswordRemoteDatasource {
   late final http.Client client;
   ResetPasswordRemoteImpl(this.client);
-  final baseUrl = 'http://10.0.2.2:8000/api/otp';
+  final baseUrl = 'http://localhost:8000/api/otp';
 
   @override
   Future<String> resetPassword(ResetPasswordModel resetPassword) async {
