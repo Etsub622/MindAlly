@@ -26,7 +26,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   Future<String> professionalSignUp(
       ProfessionalSignupModel professionalModel) async {
     try {
-      var url = Uri.parse('$baseUrl/therapistSignup');
+      var url = Uri.parse('$baseUrl/user/therapistSignup');
       final user = await client.post(url,
           body: jsonEncode(professionalModel.toJson()),
           headers: {'Content-Type': 'application/json'});
