@@ -32,6 +32,7 @@ class AuthRepoImpl implements AuthRepository {
         await loginLocalDataSource
             .setStudentUser(response.studentData as StudentDataModel);
         await loginLocalDataSource.cacheUser(response.token);
+        await loginLocalDataSource.cacheUserData(userCredentialModel: response.studentData as StudentDataModel);
         return Right(response);
       } on ServerException {
         return Left(ServerFailure(message: 'Server Failure'));

@@ -1,6 +1,8 @@
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:front_end/core/injection/article_injection.dart';
 import 'package:front_end/core/injection/auth_injection.dart';
 import 'package:front_end/core/injection/book_injection.dart';
+import 'package:front_end/core/injection/profile_injection.dart';
 import 'package:front_end/core/injection/video_injection.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import '../network/network.dart';
@@ -15,9 +17,11 @@ Future<void> init() async {
   BookInjection().init();
   ArticleInjection().init();
   VideoInjection().init();
+  ProfileInjection().init();  
   sl.registerLazySingleton<http.Client>(() => http.Client());
   sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl()));
   sl.registerLazySingleton(() => InternetConnection());
+  sl.registerLazySingleton(() => const FlutterSecureStorage());
 
   final sharedPref = await SharedPreferences.getInstance();
   sl.registerLazySingleton(() => sharedPref);

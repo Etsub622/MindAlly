@@ -65,7 +65,7 @@ class AuthInjection {
     sl.registerLazySingleton<AuthRemoteDatasource>(
         () => AuthRemoteDatasourceImpl(client: sl()));
     sl.registerLazySingleton<LoginLocalDataSource>(
-        () => LoginLocalDataSourceImpl(sharedPreferences: sl()));
+        () => LoginLocalDataSourceImpl(sharedPreferences: sl(), flutterSecureStorage: sl()));
 
     sl.registerLazySingleton<ResetPasswordRemoteDatasource>(
         () => ResetPasswordRemoteImpl(sl()));
