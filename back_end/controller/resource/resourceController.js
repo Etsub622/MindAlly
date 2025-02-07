@@ -34,16 +34,21 @@ export const getResourcesByType = async (req, res) => {
 
 export const updateResource = async (req, res) => {
   try {
-    const updatedResource = await Resource.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
-    if (!updatedResource) {
+    
+    let resource = await Resource.findById(req.params.id);
+
+    if (!resource) {
+      
       return res.status(404).json({ error: "Resource not found" });
     }
+
+    Object.assign(resource, req.body); // Merge new data
+    const updatedResource = await resource.save(); // Save to database
+
+   
     res.status(200).json(updatedResource);
   } catch (error) {
+   
     res.status(400).json({ error: error.message });
   }
 };

@@ -5,6 +5,7 @@ import {
   getResourcesByType,
   updateResource,
   deleteResource,
+  getResourceById,
 } from "../../controller/resource/resourceController.js";
 import { validateResource } from "../../middlewares/validateResource.js";
 
