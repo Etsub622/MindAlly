@@ -67,6 +67,7 @@ class _AddArticleState extends State<AddArticle> {
   void _uploadArticle(BuildContext context) async {
     final uploadedArticle = ArticleModel(
       id: '',
+      type: 'Article',
       title: titleController.text,
       content: contentController.text,
       link: linkController.text,
@@ -179,10 +180,7 @@ class _AddArticleState extends State<AddArticle> {
                     contentController.text.isNotEmpty &&
                     linkController.text.isNotEmpty &&
                     logoController.text.isNotEmpty) {
-                  await _uploadImages().then((_) {
-                    _uploadArticle(context);
-                  });
-                  return;
+                  _uploadArticle(context);
                 }
               },
             ),

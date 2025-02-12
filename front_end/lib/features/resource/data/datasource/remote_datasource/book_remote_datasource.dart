@@ -64,19 +64,20 @@ class BookRemoteDataSourceImpl implements BookRemoteDatasource {
   @override
   Future<List<BookModel>> getBooks() async {
     try {
-      var url = Uri.parse(baseUrl);
+      var url = Uri.parse('$baseUrl/type/Book');
+      print(url);
       final response = await client.get(url, headers: {
         'Content-Type': 'application/json',
       });
+      print(response.body);
+      print(response.statusCode);
       if (response.statusCode == 200) {
         final List<dynamic> bookJson = json.decode(response.body);
-        if (bookJson.isEmpty) {
-          throw ServerException(message: 'No books found');
-        } else {
-          return bookJson.map((jsonItem) {
-            return BookModel.fromJson(jsonItem as Map<String, dynamic>);
-          }).toList();
-        }
+        return bookJson.map((jsonItem) {
+          return BookModel.fromJson(jsonItem as Map<String, dynamic>);
+        }).toList();
+      } else if (response.statusCode == 404) {
+        return [];
       } else {
         throw ServerException(
             message: 'Failed to get books:${response.statusCode}');

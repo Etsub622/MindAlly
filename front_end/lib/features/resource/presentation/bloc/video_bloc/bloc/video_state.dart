@@ -34,3 +34,8 @@ class SearchVideoLoaded extends VideoState {
   final List<VideoEntity> videos;
   SearchVideoLoaded(this.videos);
 }
+
+class SingleVideoLoaded extends VideoState {
+  final VideoEntity video;
+  SingleVideoLoaded(this.video);
+}

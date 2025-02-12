@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:front_end/features/resource/domain/entity/video_entity.dart';
 
 class VideoCard extends StatelessWidget {
-  final String image;
-  final String title;
-  final String link;
-  final String profilePicture;
-  final String name;
+final VideoEntity video;
+  final VoidCallback onUpdate;
+  final VoidCallback onDelete;
+
 
   const VideoCard(
       {super.key,
-      required this.image,
-      required this.link,
-      required this.name,
-      required this.profilePicture,
-      required this.title});
+      required this.video,
+      required this.onDelete,
+      required this.onUpdate
+      
+      });
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +23,7 @@ class VideoCard extends StatelessWidget {
       child: Column(
         children: [
           Image.network(
-            image,
+            video.image,
             width: double.infinity,
             height: 400,
           ),
@@ -34,7 +34,7 @@ class VideoCard extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 20,
-                backgroundImage: NetworkImage(profilePicture),
+                backgroundImage: NetworkImage(video.profilePicture),
               ),
               SizedBox(
                 width: 10,
@@ -42,7 +42,7 @@ class VideoCard extends StatelessWidget {
               Column(
                 children: [
                   Text(
-                    title,
+                    video.title,
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontFamily: 'Poppins',
@@ -51,7 +51,27 @@ class VideoCard extends StatelessWidget {
                   SizedBox(
                     height: 15,
                   ),
-                  Text(name),
+                  Text(video.name),
+                ],
+              ),
+              PopupMenuButton<String>(
+                icon: Icon(Icons.more_vert),
+                onSelected: (value) {
+                  if (value == 'update') {
+                    onUpdate();
+                  } else if (value == 'delete') {
+                    onDelete();
+                  }
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: 'update',
+                    child: Text('Update'),
+                  ),
+                  PopupMenuItem(
+                    value: 'delete',
+                    child: Text('Delete'),
+                  ),
                 ],
               ),
             ],

@@ -10,35 +10,33 @@ import '../../features/resource/domain/usecase/article_usecase.dart';
 class ArticleInjection {
   init() {
     print('ArticleInjection initialized');
-    // Ensure all dependencies are correctly registered
-    try {
-      // Bloc
-      sl.registerFactory(() => ArticleBloc(
-            getArticlesUsecase: sl(),
-            addArticleUsecase: sl(),
-            deleteArticleUsecase: sl(),
-            updateArticleUsecase: sl(),
-            searchArticleUsecase: sl(),
-          ));
 
-      // Usecase
-      sl.registerLazySingleton(() => GetArticlesUsecase(sl()));
-      sl.registerLazySingleton(() => AddArticleUsecase(sl()));
-      sl.registerLazySingleton(() => DeleteArticleUsecase(sl()));
-      sl.registerLazySingleton(() => UpdateArticleUsecase(sl()));
-      sl.registerLazySingleton(() => SearchArticleUsecase(sl()));
+    // Data Source (Register first)
+    print('Registering ArticleRemoteDatasource...');
+    sl.registerLazySingleton<ArticleRemoteDatasource>(
+        () => ArticleRemoteDataSourceImpl(sl()));
 
-      // Repository
-      sl.registerLazySingleton<ArticleRepository>(
-          () => ArticleRepoImpl(sl(), sl()));
+    // Repository (Register after DataSource)
+    print('Registering ArticleRepository...');
+    sl.registerLazySingleton<ArticleRepository>(
+        () => ArticleRepoImpl(sl(), sl()));
 
-      // Data Source
-      sl.registerLazySingleton<ArticleRemoteDatasource>(
-          () => ArticleRemoteDataSourceImpl(sl()));
+    // Usecases
+    sl.registerLazySingleton(() => GetArticlesUsecase(sl()));
+    sl.registerLazySingleton(() => AddArticleUsecase(sl()));
+    sl.registerLazySingleton(() => DeleteArticleUsecase(sl()));
+    sl.registerLazySingleton(() => UpdateArticleUsecase(sl()));
+    sl.registerLazySingleton(() => SearchArticleUsecase(sl()));
+    sl.registerLazySingleton(() => GetSingleArticleUsecase(sl()));
 
-      print("Dependencies registered successfully");
-    } catch (e) {
-      print("Error registering dependencies: $e");
-    }
+    // Bloc
+    sl.registerFactory(() => ArticleBloc(
+          getArticlesUsecase: sl(),
+          addArticleUsecase: sl(),
+          deleteArticleUsecase: sl(),
+          updateArticleUsecase: sl(),
+          searchArticleUsecase: sl(),
+          getSingleArticleUsecase: sl(),
+        ));
   }
 }

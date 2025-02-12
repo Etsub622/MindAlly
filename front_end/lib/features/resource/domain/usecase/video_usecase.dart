@@ -16,6 +16,21 @@ class GetVideosUSecase extends Usecase<List<VideoEntity>, NoParams> {
   }
 }
 
+class GetSingleVideoUsecase extends Usecase<VideoEntity, GetSingleVideoParams> {
+  final VideoRepository repository;
+  GetSingleVideoUsecase(this.repository);
+
+  @override
+  Future<Either<Failure, VideoEntity>> call(GetSingleVideoParams params) async {
+    return await repository.getSingleVideo(params.id);
+  }
+}
+
+class GetSingleVideoParams {
+  final String id;
+  GetSingleVideoParams(this.id);
+}
+
 class AddVideoUsecase extends Usecase<String, AddVideoParams> {
   final VideoRepository repository;
   AddVideoUsecase(this.repository);

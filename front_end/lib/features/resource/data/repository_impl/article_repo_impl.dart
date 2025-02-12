@@ -18,7 +18,8 @@ class ArticleRepoImpl implements ArticleRepository {
     if (await networkInfo.isConnected) {
       try {
         final newArticle = ArticleModel(
-          id: article.id,
+          id: '',
+          type: 'Article',
           title: article.title,
           content: article.content,
           link: article.link,
@@ -82,7 +83,8 @@ class ArticleRepoImpl implements ArticleRepository {
     if (await networkInfo.isConnected) {
       try {
         final updatedArticle = ArticleModel(
-          id: article.id,
+          id: '',
+          type: 'Article',
           title: article.title,
           content: article.content,
           link: article.link,
@@ -96,5 +98,20 @@ class ArticleRepoImpl implements ArticleRepository {
     } else {
       return Left(NetworkFailure(message: 'you are not connected to the internet'));
     }
+  }
+  
+  @override
+  Future<Either<Failure, ArticleEntity>> getSingleArticle(String id) async{
+    if (await networkInfo.isConnected) {
+      try {
+        final res = await remoteDatasource.getSingleArticle(id);
+        return Right(res);
+      } on ServerException {
+        return Left(ServerFailure(message: 'server failure'));
+      }
+    } else {
+      return Left(NetworkFailure(message: 'you are not connected to the internet'));
+    }
+
   }
 }

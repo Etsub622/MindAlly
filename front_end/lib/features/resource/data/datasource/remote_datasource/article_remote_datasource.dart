@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:front_end/core/error/exception.dart';
 import 'package:front_end/features/resource/data/model/article_model.dart';
 import 'package:http/http.dart' as http;
@@ -10,23 +9,24 @@ abstract class ArticleRemoteDatasource {
   Future<String> updateArticle(ArticleModel article, String id);
   Future<String> deleteArticle(String id);
   Future<List<ArticleModel>> searchArticles(String title);
+  Future<ArticleModel> getSingleArticle(String id);
 }
 
 class ArticleRemoteDataSourceImpl implements ArticleRemoteDatasource {
   final http.Client client;
   ArticleRemoteDataSourceImpl(this.client);
 
-  final baseUrl = 'http://localhost:3000/Article';
+  final baseUrl = 'http://localhost:8000/api/resources';
 
   @override
   Future<String> addArticle(ArticleModel article) async {
     try {
-      var url = Uri.parse('$baseUrl/addArticle');
+      var url = Uri.parse(baseUrl);
       final newArticle =
           await client.post(url, body: jsonEncode(article.toJson()));
       if (newArticle.statusCode == 200) {
-        final decodedResponse = jsonDecode(newArticle.body);
-        return decodedResponse['message'];
+        // final decodedResponse = jsonDecode(newArticle.body);
+        return 'Article added successfully';
       } else {
         throw ServerException(
             message: 'Failed to add article:${newArticle.statusCode}');
@@ -68,7 +68,9 @@ class ArticleRemoteDataSourceImpl implements ArticleRemoteDatasource {
           articles.add(ArticleModel.fromJson(article));
         }
         return articles;
-      } else {
+      } else if(response.statusCode == 404){
+        return [];
+      }else {
         throw ServerException(message: 'Failed to get articles:${response.statusCode}');
       }
     } catch (e) {
@@ -118,4 +120,25 @@ class ArticleRemoteDataSourceImpl implements ArticleRemoteDatasource {
     }
    
   }
+  
+  @override
+  Future<ArticleModel> getSingleArticle(String id)async {
+
+    try {
+      var url = Uri.parse('$baseUrl/getSingleArticle/$id');
+      final response = await client.get(url, headers: {
+        'Content-Type': 'application/json',
+      });
+      if (response.statusCode == 200) {
+        final decodedResponse = jsonDecode(response.body);
+        return ArticleModel.fromJson(decodedResponse);
+      } else {
+        throw ServerException(message: 'Failed to get single article:${response.statusCode}');
+      }
+    } catch (e) {
+      throw ServerException(message: e.toString());
+   
+  }
+}
+
 }

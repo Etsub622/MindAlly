@@ -6,12 +6,14 @@ class ArticleEntity extends Equatable {
   final String content;
   final String link;
   final String logo;
+  final String type;
   ArticleEntity({
     required this.id,
     required this.title,
     required this.content,
     required this.link,
     required this.logo,
+    required this.type,
   });
   @override
   List<Object> get props {
@@ -21,6 +23,7 @@ class ArticleEntity extends Equatable {
       content,
       link,
       logo,
+      type,
     ];
   }
 }

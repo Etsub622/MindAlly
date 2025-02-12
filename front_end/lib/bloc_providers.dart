@@ -1,7 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front_end/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:front_end/features/profile/presentation/bloc/user_profile_bloc.dart';
-import 'package:front_end/features/profile/presentation/bloc/user_profile_bloc.dart';
 import 'package:front_end/features/resource/presentation/bloc/article_bloc/bloc/article_bloc.dart';
 import 'package:front_end/features/resource/presentation/bloc/book_bloc/bloc/book_bloc.dart';
 import 'package:front_end/core/injection/injections.dart';
@@ -25,5 +24,6 @@ class MultiBLOCProvider {
     BlocProvider<UserProfileBloc>(
       create: (_) => sl<UserProfileBloc>()
       ),
+
   ];
 }
