@@ -2,8 +2,10 @@ import mongoose from "mongoose";
 
 const options = { discriminatorKey: "type", timestamps: true };
 
-// Base schema
-const baseResourceSchema = new mongoose.Schema({}, options);
+// Base schema with `categories` array
+const baseResourceSchema = new mongoose.Schema({
+  categories: [{ type: String, required: true }] // Allows multiple categories
+}, options);
 
 const Resource = mongoose.model("Resource", baseResourceSchema);
 
@@ -15,14 +17,12 @@ const ArticleSchema = new mongoose.Schema({
   link: { type: String, required: true },
 });
 
-// Book schema
 const BookSchema = new mongoose.Schema({
   image: { type: String, required: true },
   author: { type: String, required: true },
   title: { type: String, required: true },
 });
 
-// Video schema
 const VideoSchema = new mongoose.Schema({
   image: { type: String, required: true },
   title: { type: String, required: true },
