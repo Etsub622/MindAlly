@@ -18,6 +18,7 @@ const registerTherapist = async (req, res) => {
       AreaofSpecification:specialization,
       Password: hashedPass,
       Certificate: certificate,
+      ProfileImage: profileImage,
       Role: "therapist",
       verified:false
       
@@ -51,6 +52,7 @@ const registerPatient = async (req, res) => {
       Email:email,
       Collage:collage,
       Password: hashpass,
+      ProfileImage: profileImage,
       Role:"patient"
     })
     

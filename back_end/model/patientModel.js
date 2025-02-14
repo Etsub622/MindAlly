@@ -19,6 +19,10 @@ const patientschema = new mongoose.Schema({
         type: String,
     
     },
+    ProfileImage: {
+        type: String,
+        default: ""
+    },
     Role: {
         type: String,
         default:"patient"

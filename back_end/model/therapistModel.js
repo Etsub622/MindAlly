@@ -33,6 +33,10 @@ const therapistschema = new mongoose.Schema({
     // Reviews: {
     //     type:[String]
     // },
+    ProfileImage: {
+        type: String,
+        default: ""
+    },
     Rating: {
         type:Number
         
