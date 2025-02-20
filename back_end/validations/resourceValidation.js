@@ -6,6 +6,7 @@ const articleValidationSchema = Joi.object({
   content: Joi.string().required(),
   logo: Joi.string().required(),
   link: Joi.string().uri().required(),
+  categories: Joi.array().items(Joi.string()).min(1).required() // Validate array of strings
 });
 
 const bookValidationSchema = Joi.object({
@@ -13,6 +14,7 @@ const bookValidationSchema = Joi.object({
   image: Joi.string().required(),
   author: Joi.string().required(),
   title: Joi.string().required(),
+  categories: Joi.array().items(Joi.string()).min(1).required()
 });
 
 const videoValidationSchema = Joi.object({
@@ -22,6 +24,7 @@ const videoValidationSchema = Joi.object({
   link: Joi.string().uri().required(),
   profilePicture: Joi.string().required(),
   name: Joi.string().required(),
+  categories: Joi.array().items(Joi.string()).min(1).required()
 });
 
 export { articleValidationSchema, bookValidationSchema, videoValidationSchema };
