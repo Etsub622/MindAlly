@@ -218,7 +218,6 @@ id,therapist_name,gender,modality,language,available_days,mode,experience_years,
 217,Dr. Yeshiwork Taye,Male,Acceptance and Commitment Therapy (ACT),['Oromo'],"['Friday', 'Saturday', 'Wednesday', 'Tuesday', 'Monday']","['Video', 'Audio']",17,"['Test Anxiety', 'Adjustment Disorders', 'PTSD']"
 218,Dr. Asmamaw Gebre,Female,Integrative Counselling,['Oromo'],"['Saturday', 'Tuesday', 'Thursday', 'Sunday', 'Wednesday']","['Audio', 'Video']",17,"['BPD', 'Self-Esteem Issues', 'BPD']"
 219,Dr. Tigist Alebachew,Male,Solution-Focused Brief Therapy (SFBT),['English'],"['Saturday', 'Monday', 'Thursday', 'Sunday', 'Tuesday']","['Audio', 'Video']",2,"['ADHD', 'Eating Disorders', 'Adjustment Disorders']"
-220,Dr. Zemedkun Bekele,Female,Cognitive Therapy,['Oromo'],"['Saturday', 'Friday', 'Thursday', 'Sunday', 'Monday']","['Audio', 'Video']",7,"['Panic Disorders', 'Social Anxiety', 'Mood Disorders']"
 221,Dr. Haimanot Mekuria,Male,Humanistic Therapy,['Tigrinya'],"['Sunday', 'Monday', 'Tuesday', 'Friday', 'Thursday']","['Video', 'Audio']",9,"['BPD', 'Self-Esteem Issues', 'Trauma']"
 222,Dr. Getahun Tsegaye,Female,Adlerian Therapy,['Tigrinya'],"['Saturday', 'Friday', 'Tuesday', 'Monday', 'Sunday']","['Audio', 'Video']",17,"['Sleep Disorders', 'Academic Burnout', 'Suicidal Ideation']"
 223,Dr. Yemilework Desta,Female,Gestalt Therapy,['Tigrinya'],"['Monday', 'Friday', 'Saturday', 'Tuesday', 'Wednesday']","['Video', 'Audio']",8,"['Adjustment Disorders', 'Adjustment Disorders', 'Eating Disorders']"
