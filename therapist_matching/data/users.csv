@@ -1,0 +1,101 @@
+user_id,name,gender,preferred_modality,preferred_gender,preferred_language,preferred_days,preferred_mode,preferred_specialties,preferred_therapist_id
+5,Chala Teshome,Male,Cognitive Analytic Therapy (CAT),Non-binary,"['Oromo', 'Amharic']","['Saturday', 'Wednesday']","['Audio', 'Video']","['Self-Esteem Issues', 'Test Anxiety', 'Self-Esteem Issues']",346
+327,Yitbarek Desta,Male,Mindfulness-Based Cognitive Therapy (MBCT),Female,['Oromo'],"['Tuesday', 'Monday']","['Audio', 'Video']","['Financial Stress', 'Substance Use', 'Relationships']",54
+46,Saron Negash,Female,Narrative Therapy,Non-binary,"['Oromo', 'English']","['Monday', 'Thursday', 'Tuesday', 'Friday', 'Saturday', 'Wednesday', 'Sunday']",['Video'],"['Suicidal Ideation', 'Grief and Loss', 'Academic Burnout']",44
+335,Getahun Tadesse,Male,Interpersonal Psychotherapy (IPT),Non-binary,"['Tigrinya', 'Amharic']","['Sunday', 'Friday']",['Video'],"['Self-Esteem Issues', 'Academic Burnout', 'Suicidal Ideation']",154
+87,Gebre Hiwot,Male,Transactional Analysis (TA),Non-binary,"['Amharic', 'Oromo']","['Friday', 'Saturday', 'Thursday']","['Audio', 'Video']","['Academic Burnout', 'Family Conflict', 'Mood Disorders']",300
+23,Hiwot Tamiru,Female,Cognitive Analytic Therapy (CAT),Female,"['Oromo', 'English']","['Sunday', 'Tuesday']","['Audio', 'Video']","['Stress', 'Generalized Anxiety Disorder (GAD)', 'Cultural Identity Stress']",4
+283,Yitbarek Tadese,Male,Narrative Therapy,Male,"['English', 'Amharic']","['Saturday', 'Friday', 'Sunday', 'Tuesday', 'Monday', 'Wednesday']",['Audio'],"['Grief and Loss', 'PTSD', 'Stress']",76
+320,Tsehay Bekele,Female,Emotionally Focused Therapy (EFT),Non-binary,['Tigrinya'],"['Saturday', 'Sunday', 'Friday', 'Monday', 'Thursday', 'Tuesday']",['Audio'],"['Depression', 'Stress', 'Trauma']",91
+92,Kebret Mekonnen,Male,Cognitive Behavioral Therapy (CBT),Non-binary,['English'],"['Friday', 'Saturday', 'Monday', 'Thursday', 'Wednesday', 'Sunday', 'Tuesday']","['Video', 'Audio']","['Self-Esteem Issues', 'Family Conflict', 'ADHD']",179
+12,Elshaday Yonas,Female,Gestalt Therapy,Male,['Tigrinya'],"['Monday', 'Friday', 'Saturday', 'Tuesday']","['Audio', 'Video']","['Grief and Loss', 'Adjustment Disorders', 'Depression']",167
+154,Tinsae Berihun,Male,Emotionally Focused Therapy (EFT),Female,['Tigrinya'],"['Tuesday', 'Saturday']",['Video'],"['Stress', 'Trauma', 'PTSD']",353
+112,Hana Tadesse,Male,Gestalt Therapy,Male,['Tigrinya'],"['Wednesday', 'Friday', 'Sunday', 'Saturday', 'Monday']","['Video', 'Audio']","['Panic Disorders', 'Cultural Identity Stress', 'Grief and Loss']",157
+126,Bethelhem Girma,Male,Adlerian Therapy,Non-binary,"['Tigrinya', 'English']","['Monday', 'Sunday', 'Thursday', 'Friday', 'Saturday', 'Wednesday']","['Video', 'Audio']","['Panic Disorders', 'ADHD', 'Trauma']",80
+268,Haimanot Tsegaye,Female,Narrative Therapy,Non-binary,"['Oromo', 'English']","['Friday', 'Monday', 'Wednesday', 'Saturday']",['Video'],"['Anxiety', 'Test Anxiety', 'Anxiety']",226
+338,Azalech Alemu,Female,Psychodynamic Psychotherapy,Non-binary,"['Oromo', 'Amharic']","['Thursday', 'Wednesday']","['Video', 'Audio']","['BPD', 'Substance Use', 'Social Anxiety']",189
+329,Gashaw Bekele,Male,Adlerian Therapy,Non-binary,"['English', 'Oromo']","['Tuesday', 'Friday', 'Sunday', 'Thursday', 'Saturday', 'Monday', 'Wednesday']","['Video', 'Audio']","['OCD', 'Family Conflict', 'Adjustment Disorders']",315
+54,Tarikua Gizachew,Female,Acceptance and Commitment Therapy (ACT),Non-binary,['English'],"['Thursday', 'Wednesday', 'Sunday', 'Monday', 'Saturday']",['Video'],"['Financial Stress', 'Interpersonal Violence', 'Financial Stress']",367
+14,Etenesh Demissie,Female,Humanistic Therapy,Female,['Amharic'],"['Sunday', 'Wednesday', 'Friday', 'Saturday']",['Video'],"['Stress', 'Stress', 'Stress']",11
+259,Mesfin Tadesse,Male,Emotionally Focused Therapy (EFT),Non-binary,"['English', 'Amharic']","['Wednesday', 'Thursday', 'Tuesday', 'Sunday', 'Friday']",['Audio'],"['Suicidal Ideation', 'Suicidal Ideation', 'OCD']",65
+349,Yitbarek Tadese,Male,Acceptance and Commitment Therapy (ACT),Non-binary,"['Tigrinya', 'English']","['Wednesday', 'Sunday', 'Thursday', 'Saturday', 'Friday', 'Tuesday']","['Audio', 'Video']","['Sleep Disorders', 'Trauma', 'Panic Disorders']",367
+228,Azalech Mekonnen,Female,Cognitive Analytic Therapy (CAT),Male,"['Amharic', 'English']","['Tuesday', 'Wednesday', 'Friday', 'Saturday', 'Sunday', 'Monday', 'Thursday']",['Video'],"['Suicidal Ideation', 'Eating Disorders', 'Academic Burnout']",250
+140,Elsabet Woldemariam,Male,Cognitive Behavioral Therapy (CBT),Non-binary,"['English', 'Oromo']","['Sunday', 'Tuesday', 'Friday']",['Video'],"['Financial Stress', 'Social Anxiety', 'Academic Burnout']",200
+90,Hussein Mohammed,Female,Person-Centred Therapy,Non-binary,"['English', 'Tigrinya']","['Sunday', 'Monday', 'Thursday', 'Friday', 'Saturday', 'Wednesday']","['Audio', 'Video']","['Cultural Identity Stress', 'Panic Disorders', 'Suicidal Ideation']",240
+203,Simeon Alemu,Female,Transactional Analysis (TA),Male,"['English', 'Tigrinya']","['Friday', 'Thursday', 'Sunday']","['Video', 'Audio']","['Stress', 'Relationships', 'Mood Disorders']",336
+9,Dirribe Shemsu,Female,Psychoanalysis,Female,"['Oromo', 'Tigrinya']",['Friday'],['Video'],"['Family Conflict', 'Social Anxiety', 'Financial Stress']",174
+278,Belaynesh Tadesse,Female,Adlerian Therapy,Non-binary,"['Amharic', 'Oromo']","['Wednesday', 'Sunday']","['Video', 'Audio']","['Trauma', 'Adjustment Disorders', 'Academic Burnout']",371
+280,Roman Teshome,Female,Transactional Analysis (TA),Male,['English'],"['Monday', 'Sunday', 'Friday', 'Tuesday', 'Thursday', 'Wednesday']",['Video'],"['Test Anxiety', 'Suicidal Ideation', 'Test Anxiety']",210
+367,Tadesse Bekele,Female,Cognitive Analytic Therapy (CAT),Male,['Amharic'],"['Friday', 'Tuesday', 'Thursday', 'Monday']",['Audio'],"['Panic Disorders', 'Relationships', 'Sleep Disorders']",370
+318,Woyinshet Teshome,Female,Psychoanalysis,Female,['Tigrinya'],"['Sunday', 'Thursday', 'Tuesday']","['Audio', 'Video']","['BPD', 'Family Conflict', 'Social Anxiety']",105
+386,Gashaw Mamo,Male,Integrative Counselling,Male,['English'],"['Sunday', 'Thursday', 'Tuesday', 'Friday']",['Video'],"['Panic Disorders', 'Stress', 'Trauma']",259
+338,Azalech Alemu,Female,Psychodynamic Psychotherapy,Non-binary,"['Oromo', 'Amharic']","['Thursday', 'Wednesday']","['Video', 'Audio']","['BPD', 'Substance Use', 'Social Anxiety']",189
+225,Getahun Bekele,Male,Psychodynamic Psychotherapy,Male,"['Amharic', 'English']","['Monday', 'Wednesday', 'Saturday', 'Friday']",['Video'],"['Substance Use', 'Eating Disorders', 'Grief and Loss']",78
+55,Taye Mebratu,Male,Humanistic Therapy,Female,"['English', 'Oromo']","['Tuesday', 'Saturday', 'Sunday', 'Friday', 'Wednesday', 'Monday']",['Video'],"['Somatic Complaints', 'Cultural Identity Stress', 'Sleep Disorders']",229
+164,Yohannes Gebre,Male,Solution-Focused Brief Therapy (SFBT),Non-binary,['Tigrinya'],"['Thursday', 'Wednesday', 'Monday', 'Saturday']",['Audio'],"['Eating Disorders', 'Suicidal Ideation', 'Relationships']",158
+195,Kassahun Teshome,Female,Schema Therapy,Male,['English'],"['Monday', 'Tuesday', 'Sunday', 'Thursday', 'Friday', 'Wednesday']",['Video'],"['Academic Burnout', 'Depression', 'Financial Stress']",267
+259,Mesfin Tadesse,Male,Emotionally Focused Therapy (EFT),Non-binary,"['English', 'Amharic']","['Wednesday', 'Thursday', 'Tuesday', 'Sunday', 'Friday']",['Audio'],"['Suicidal Ideation', 'Suicidal Ideation', 'OCD']",65
+314,Yemilework Berihun,Female,Cognitive Behavioral Therapy (CBT),Female,['Tigrinya'],"['Tuesday', 'Sunday', 'Friday', 'Wednesday', 'Saturday', 'Monday']","['Audio', 'Video']","['Grief and Loss', 'Family Conflict', 'Generalized Anxiety Disorder (GAD)']",114
+206,Azalech Bekele,Female,Person-Centred Therapy,Female,['English'],"['Tuesday', 'Thursday', 'Sunday', 'Friday', 'Saturday', 'Wednesday', 'Monday']",['Video'],"['Grief and Loss', 'Stress', 'Adjustment Disorders']",245
+90,Hussein Mohammed,Female,Person-Centred Therapy,Non-binary,"['English', 'Tigrinya']","['Sunday', 'Monday', 'Thursday', 'Friday', 'Saturday', 'Wednesday']","['Audio', 'Video']","['Cultural Identity Stress', 'Panic Disorders', 'Suicidal Ideation']",240
+187,Girum Alebachew,Female,Transactional Analysis (TA),Non-binary,['Tigrinya'],"['Tuesday', 'Friday', 'Sunday', 'Saturday']","['Audio', 'Video']","['Trauma', 'Financial Stress', 'Social Anxiety']",386
+395,Belaynesh Tsegaye,Female,Humanistic Therapy,Male,['Oromo'],"['Sunday', 'Tuesday', 'Thursday', 'Saturday', 'Monday', 'Wednesday']",['Audio'],"['Social Anxiety', 'Somatic Complaints', 'Interpersonal Violence']",396
+369,Mesfin Gebre,Female,Gestalt Therapy,Female,['Amharic'],"['Monday', 'Thursday', 'Wednesday', 'Friday', 'Tuesday']","['Video', 'Audio']","['Test Anxiety', 'Test Anxiety', 'Family Conflict']",272
+351,Gashaw Mekuria,Male,Existential Psychotherapy,Male,"['Oromo', 'Tigrinya']","['Friday', 'Sunday', 'Monday', 'Saturday', 'Tuesday', 'Thursday', 'Wednesday']",['Audio'],"['Interpersonal Violence', 'Substance Use', 'Trauma']",124
+80,Duresa Gudeta,Female,Transactional Analysis (TA),Male,"['Oromo', 'English']","['Tuesday', 'Sunday', 'Friday', 'Thursday', 'Monday', 'Wednesday']","['Audio', 'Video']","['Sleep Disorders', 'Stress', 'Somatic Complaints']",384
+163,Netsanet Abebe,Female,Psychodynamic Psychotherapy,Male,['English'],"['Wednesday', 'Monday', 'Sunday', 'Saturday', 'Tuesday', 'Friday', 'Thursday']",['Audio'],"['Substance Use', 'Loneliness', 'Trauma']",74
+328,Yeshi Alemu,Female,Mindfulness-Based Cognitive Therapy (MBCT),Female,['English'],"['Thursday', 'Sunday', 'Tuesday']","['Audio', 'Video']","['Anxiety', 'Relationships', 'Somatic Complaints']",54
+24,Jemal Bedilu,Male,Jungian Therapy,Female,['Tigrinya'],"['Sunday', 'Thursday']","['Audio', 'Video']","['Generalized Anxiety Disorder (GAD)', 'Suicidal Ideation', 'Grief and Loss']",163
+238,Tsehaynesh Berihun,Female,Emotionally Focused Therapy (EFT),Female,['Amharic'],"['Saturday', 'Thursday', 'Friday', 'Wednesday']",['Video'],"['Anxiety', 'Substance Use', 'Sleep Disorders']",314
+53,Tamrat Woldegiorgis,Male,Mindfulness-Based Cognitive Therapy (MBCT),Non-binary,['English'],['Saturday'],"['Video', 'Audio']","['Interpersonal Violence', 'Generalized Anxiety Disorder (GAD)', 'Academic Burnout']",260
+297,Mengistu Tadesse,Male,Psychoanalysis,Non-binary,"['Amharic', 'Oromo']","['Wednesday', 'Friday', 'Sunday', 'Thursday', 'Tuesday', 'Saturday', 'Monday']","['Video', 'Audio']","['ADHD', 'Family Conflict', 'Financial Stress']",197
+398,Amanuel Berhanu,Male,Humanistic Therapy,Male,['English'],"['Thursday', 'Tuesday', 'Monday', 'Saturday', 'Sunday', 'Wednesday']",['Video'],"['Substance Use', 'Mood Disorders', 'BPD']",355
+308,Werkinesh Desta,Female,Psychoanalysis,Male,"['English', 'Amharic']","['Saturday', 'Wednesday']","['Video', 'Audio']","['Somatic Complaints', 'Social Anxiety', 'Generalized Anxiety Disorder (GAD)']",265
+176,Birtukan Getachew,Male,Integrative Counselling,Male,['Oromo'],"['Thursday', 'Sunday', 'Saturday', 'Wednesday', 'Friday', 'Monday', 'Tuesday']","['Audio', 'Video']","['OCD', 'OCD', 'Substance Use']",183
+100,Redwan Ahmed,Female,Gestalt Therapy,Male,['English'],['Friday'],"['Video', 'Audio']","['Loneliness', 'Panic Disorders', 'Substance Use']",270
+172,Mahlet Asfaw,Male,Humanistic Therapy,Male,['Oromo'],"['Monday', 'Saturday']","['Audio', 'Video']","['Loneliness', 'Eating Disorders', 'Suicidal Ideation']",71
+333,Zemedkun Berihun,Male,Schema Therapy,Non-binary,['Oromo'],"['Saturday', 'Wednesday', 'Monday', 'Tuesday', 'Thursday', 'Friday']","['Audio', 'Video']","['ADHD', 'Cultural Identity Stress', 'Financial Stress']",344
+6,Dawit Feleke,Male,Cognitive Analytic Therapy (CAT),Non-binary,['Tigrinya'],"['Friday', 'Monday', 'Wednesday', 'Thursday', 'Tuesday', 'Sunday', 'Saturday']",['Audio'],"['Test Anxiety', 'Depression', 'Somatic Complaints']",129
+195,Kassahun Teshome,Female,Schema Therapy,Male,['English'],"['Monday', 'Tuesday', 'Sunday', 'Thursday', 'Friday', 'Wednesday']",['Video'],"['Academic Burnout', 'Depression', 'Financial Stress']",267
+63,Worknesh Tulu,Male,Transactional Analysis (TA),Non-binary,"['English', 'Oromo']","['Wednesday', 'Saturday', 'Friday']",['Audio'],"['Sleep Disorders', 'Trauma', 'Adjustment Disorders']",294
+45,Samrawit Bogale,Female,Cognitive Therapy,Male,"['Tigrinya', 'Oromo']","['Monday', 'Friday', 'Tuesday', 'Thursday']","['Audio', 'Video']","['Social Anxiety', 'Family Conflict', 'Substance Use']",74
+94,Lemlem Aberra,Female,Adlerian Therapy,Female,['Tigrinya'],"['Tuesday', 'Saturday']",['Video'],"['Adjustment Disorders', 'Substance Use', 'OCD']",315
+226,Yemilework Tadese,Female,Emotionally Focused Therapy (EFT),Male,['Oromo'],['Wednesday'],['Video'],"['Financial Stress', 'Stress', 'OCD']",336
+164,Yohannes Gebre,Male,Solution-Focused Brief Therapy (SFBT),Non-binary,['Tigrinya'],"['Thursday', 'Wednesday', 'Monday', 'Saturday']",['Audio'],"['Eating Disorders', 'Suicidal Ideation', 'Relationships']",158
+229,Aklilu Berhanu,Male,Person-Centred Therapy,Non-binary,"['Oromo', 'Tigrinya']","['Tuesday', 'Monday']",['Audio'],"['Generalized Anxiety Disorder (GAD)', 'Mood Disorders', 'ADHD']",339
+32,Maraki Belay,Female,Gestalt Therapy,Non-binary,"['Tigrinya', 'English']","['Friday', 'Tuesday', 'Monday', 'Sunday']",['Audio'],"['Trauma', 'Suicidal Ideation', 'Academic Burnout']",222
+14,Etenesh Demissie,Female,Humanistic Therapy,Female,['Amharic'],"['Sunday', 'Wednesday', 'Friday', 'Saturday']",['Video'],"['Stress', 'Stress', 'Stress']",11
+172,Mahlet Asfaw,Male,Humanistic Therapy,Male,['Oromo'],"['Monday', 'Saturday']","['Audio', 'Video']","['Loneliness', 'Eating Disorders', 'Suicidal Ideation']",71
+62,Wolelaw Tsegaye,Female,Mindfulness-Based Cognitive Therapy (MBCT),Male,['Tigrinya'],"['Thursday', 'Saturday', 'Monday', 'Wednesday']","['Video', 'Audio']","['Self-Esteem Issues', 'BPD', 'Depression']",111
+397,Mahlet Gebre,Female,Dialectical Behavior Therapy (DBT),Male,['Tigrinya'],"['Sunday', 'Friday', 'Thursday', 'Wednesday', 'Saturday', 'Monday']",['Video'],"['Stress', 'Relationships', 'PTSD']",361
+170,Aster Solomon,Male,Gestalt Therapy,Female,"['Oromo', 'Amharic']","['Saturday', 'Sunday', 'Friday', 'Tuesday', 'Wednesday']",['Video'],"['Panic Disorders', 'Eating Disorders', 'Interpersonal Violence']",42
+295,Aklilu Berihun,Male,Jungian Therapy,Non-binary,"['Tigrinya', 'Oromo']","['Wednesday', 'Friday', 'Saturday']",['Video'],"['Stress', 'Anxiety', 'Sleep Disorders']",264
+292,Yemilework Tadese,Female,Solution-Focused Brief Therapy (SFBT),Non-binary,"['Amharic', 'Tigrinya']","['Saturday', 'Sunday']","['Video', 'Audio']","['ADHD', 'Substance Use', 'Adjustment Disorders']",62
+325,Mesfin Tsegaye,Male,Psychoanalysis,Non-binary,"['Tigrinya', 'English']","['Tuesday', 'Saturday', 'Sunday', 'Thursday', 'Wednesday']",['Audio'],"['Loneliness', 'Relationships', 'Anxiety']",79
+329,Gashaw Bekele,Male,Adlerian Therapy,Non-binary,"['English', 'Oromo']","['Tuesday', 'Friday', 'Sunday', 'Thursday', 'Saturday', 'Monday', 'Wednesday']","['Video', 'Audio']","['OCD', 'Family Conflict', 'Adjustment Disorders']",315
+302,Roman Tadese,Female,Transactional Analysis (TA),Non-binary,['Amharic'],"['Thursday', 'Saturday', 'Friday']",['Audio'],"['BPD', 'Depression', 'Financial Stress']",369
+345,Tadesse Alebachew,Male,Psychodynamic Psychotherapy,Male,"['Amharic', 'English']","['Thursday', 'Sunday', 'Friday', 'Monday', 'Tuesday']",['Video'],"['Trauma', 'Adjustment Disorders', 'Self-Esteem Issues']",10
+282,Tsehaynesh Bekele,Female,Integrative Counselling,Male,"['English', 'Amharic']","['Sunday', 'Saturday', 'Tuesday', 'Wednesday']",['Audio'],"['BPD', 'Loneliness', 'Cultural Identity Stress']",259
+389,Eden Alebachew,Female,Transactional Analysis (TA),Non-binary,"['English', 'Oromo']","['Sunday', 'Wednesday', 'Saturday', 'Monday', 'Tuesday', 'Thursday']",['Video'],"['PTSD', 'Depression', 'Test Anxiety']",369
+14,Etenesh Demissie,Female,Humanistic Therapy,Female,['Amharic'],"['Sunday', 'Wednesday', 'Friday', 'Saturday']",['Video'],"['Stress', 'Stress', 'Stress']",11
+343,Nebiyu Berhanu,Male,Interpersonal Psychotherapy (IPT),Male,['Amharic'],"['Wednesday', 'Thursday', 'Saturday']",['Video'],"['Interpersonal Violence', 'Relationships', 'Stress']",68
+367,Tadesse Bekele,Female,Cognitive Analytic Therapy (CAT),Male,['Amharic'],"['Friday', 'Tuesday', 'Thursday', 'Monday']",['Audio'],"['Panic Disorders', 'Relationships', 'Sleep Disorders']",370
+389,Eden Alebachew,Female,Transactional Analysis (TA),Non-binary,"['English', 'Oromo']","['Sunday', 'Wednesday', 'Saturday', 'Monday', 'Tuesday', 'Thursday']",['Video'],"['PTSD', 'Depression', 'Test Anxiety']",369
+95,Melat Abebe,Male,Person-Centred Therapy,Male,['Tigrinya'],"['Friday', 'Wednesday', 'Monday', 'Sunday']",['Video'],"['Adjustment Disorders', 'OCD', 'OCD']",168
+339,Aklilu Bekele,Male,Cognitive Analytic Therapy (CAT),Male,"['Oromo', 'English']",['Sunday'],['Audio'],"['OCD', 'Adjustment Disorders', 'Test Anxiety']",37
+336,Yemilework Gebrekidan,Female,Cognitive Behavioral Therapy (CBT),Male,"['English', 'Tigrinya']",['Thursday'],['Audio'],"['Grief and Loss', 'PTSD', 'Cultural Identity Stress']",393
+216,Tsehaynesh Tadese,Female,Transactional Analysis (TA),Male,"['Tigrinya', 'Amharic']","['Wednesday', 'Friday', 'Monday', 'Thursday', 'Tuesday']",['Video'],"['Grief and Loss', 'Mood Disorders', 'Grief and Loss']",208
+161,Gidey Tsegaye,Female,Transactional Analysis (TA),Non-binary,"['English', 'Amharic']","['Wednesday', 'Monday', 'Thursday', 'Saturday', 'Sunday', 'Tuesday']","['Video', 'Audio']","['Suicidal Ideation', 'Anxiety', 'Suicidal Ideation']",352
+165,Alazar Tewodros,Female,Mindfulness-Based Cognitive Therapy (MBCT),Male,"['Amharic', 'Oromo']",['Friday'],['Audio'],"['Sleep Disorders', 'Self-Esteem Issues', 'Financial Stress']",362
+247,Getahun Mekonnen,Male,Schema Therapy,Female,"['English', 'Amharic']","['Saturday', 'Wednesday', 'Monday']","['Video', 'Audio']","['Financial Stress', 'OCD', 'Generalized Anxiety Disorder (GAD)']",363
+233,Nebiyu Alemu,Male,Psychodynamic Psychotherapy,Non-binary,"['Tigrinya', 'Oromo']",['Sunday'],"['Video', 'Audio']","['Sleep Disorders', 'OCD', 'OCD']",99
+283,Yitbarek Tadese,Male,Narrative Therapy,Male,"['English', 'Amharic']","['Saturday', 'Friday', 'Sunday', 'Tuesday', 'Monday', 'Wednesday']",['Audio'],"['Grief and Loss', 'PTSD', 'Stress']",76
+211,Nebiyu Tsegaye,Male,Jungian Therapy,Female,['English'],['Tuesday'],"['Video', 'Audio']","['Sleep Disorders', 'Panic Disorders', 'Cultural Identity Stress']",86
+392,Sisay Taye,Male,Schema Therapy,Non-binary,['Oromo'],"['Saturday', 'Monday']","['Video', 'Audio']","['ADHD', 'Grief and Loss', 'Adjustment Disorders']",400
+276,Tsehay Berihun,Female,Dialectical Behavior Therapy (DBT),Male,"['Oromo', 'English']","['Friday', 'Tuesday']",['Video'],"['Grief and Loss', 'Stress', 'Grief and Loss']",43
+295,Aklilu Berihun,Male,Jungian Therapy,Non-binary,"['Tigrinya', 'Oromo']","['Wednesday', 'Friday', 'Saturday']",['Video'],"['Stress', 'Anxiety', 'Sleep Disorders']",264
+36,Mihiret Darge,Female,Interpersonal Psychotherapy (IPT),Non-binary,"['Amharic', 'Oromo']",['Thursday'],"['Audio', 'Video']","['Sleep Disorders', 'Substance Use', 'Panic Disorders']",258
+202,Betelhem Tewodros,Male,Psychodynamic Psychotherapy,Female,['Amharic'],"['Monday', 'Sunday', 'Tuesday', 'Saturday', 'Wednesday']","['Audio', 'Video']","['Relationships', 'Loneliness', 'PTSD']",15
+330,Werkinesh Tadese,Female,Cognitive Therapy,Male,['Amharic'],"['Friday', 'Saturday']",['Audio'],"['Cultural Identity Stress', 'BPD', 'Academic Burnout']",302
+341,Mengistu Gebre,Male,Psychoanalysis,Non-binary,"['Oromo', 'Tigrinya']","['Friday', 'Sunday', 'Saturday', 'Thursday', 'Tuesday', 'Monday', 'Wednesday']",['Video'],"['Anxiety', 'Depression', 'Cultural Identity Stress']",104
+155,Taye Lemma,Female,Acceptance and Commitment Therapy (ACT),Non-binary,['English'],"['Thursday', 'Sunday', 'Tuesday']","['Video', 'Audio']","['Test Anxiety', 'Grief and Loss', 'Self-Esteem Issues']",177
