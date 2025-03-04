@@ -3,6 +3,8 @@ import 'package:dartz/dartz.dart';
 import 'package:front_end/core/error/exception.dart';
 import 'package:front_end/core/error/failure.dart';
 import 'package:front_end/core/network/network.dart';
+import 'package:front_end/features/authentication/data/models/student_data_model.dart';
+import 'package:front_end/features/profile/data/datasource/profile_local_datasource.dart';
 import 'package:front_end/features/profile/data/datasource/profile_remote_datasource.dart';
 import 'package:front_end/features/profile/data/models/patient_model.dart';
 import 'package:front_end/features/profile/data/models/therapist_model.dart';
@@ -13,11 +15,12 @@ import 'package:front_end/features/profile/domain/repository/profile_repository.
 
 class ProfileRepositoryImpl extends ProfileRepository {
   final ProfileRemoteDatasource remoteDatasource;
+  final ProfileLocalDataSource localDatasource;
   final NetworkInfo networkInfo;
 
 
   ProfileRepositoryImpl(
-    {required this.remoteDatasource, required this.networkInfo});
+    {required this.remoteDatasource, required this.networkInfo, required this.localDatasource});
 
   @override
   Future<Either<Failure, PatientModel>> getPatient({required String id}) async {
@@ -141,5 +144,16 @@ class ProfileRepositoryImpl extends ProfileRepository {
       }
     }
     return Left(NetworkFailure(message: "No internet connection"));
+  }
+  @override
+  Future<Either<Failure, StudentDataModel>> getUserCredential() async {
+     try {
+       final userCredential = await localDatasource.getUserCredential();
+       return Right(userCredential);
+     } on CacheException catch (e) {
+       return Left(CacheFailure(message: e.message));
+     } catch (e) {
+       return Left(CacheFailure(message: e.toString()));
+     }
   }
 }

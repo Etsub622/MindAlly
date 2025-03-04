@@ -1,3 +1,4 @@
+import 'package:front_end/core/config/config_key.dart';
 import 'package:front_end/features/profile/data/models/patient_model.dart';
 import 'package:front_end/features/profile/data/models/therapist_model.dart';
 import 'package:front_end/features/profile/domain/entities/patient_entity.dart';
@@ -21,7 +22,7 @@ class ProfileRemoteDatasourceImpl extends ProfileRemoteDatasource {
    late final http.Client client;
    
   ProfileRemoteDatasourceImpl({required this.client});
-  final baseUrl = 'http://10.0.2.2:8000/api/user';
+  final baseUrl = '${ConfigKey.baseUrl}/user';
     @override
     Future<PatientModel> getPatient({required String id}) {
         // Implement the logic to get a patient from the remote server

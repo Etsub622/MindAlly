@@ -74,7 +74,7 @@ class UserProfileBloc extends Bloc<UserprofileEvent, UserprofileState> {
   final String authenticationKey = "access_token";
   final String userProfileKey = "user_profile";
   
-  Future<StudentDataModel> getUserCredential() async {
+  Future<Either<Failure, StudentDataModel>> getUserCredential() async {
     final userCredential = await flutterSecureStorage.read(key: userProfileKey);
 
     if (userCredential != null) {
@@ -82,9 +82,9 @@ class UserProfileBloc extends Bloc<UserprofileEvent, UserprofileState> {
 
       final res = StudentDataModel.fromJson(body);
 
-      return res;
+      return Right(res);
     } else {
-      throw CacheException(message: 'User profile not found');
+      return Left(ServerFailure(message: "User not found"));
     }
   }
 
@@ -93,9 +93,14 @@ class UserProfileBloc extends Bloc<UserprofileEvent, UserprofileState> {
     emit(UserprofileInitial());
 
     final response = await getUserCredential();
-
-    emit(UserprofileLoadedState(userEntity: response, status: UserStatus.loaded));
+    response.fold(
+      (failure) => emit(const UserprofileLoadedState(
+        userEntity: null,
+        status: UserStatus.error
+      )), 
+      (response) => emit(UserprofileLoadedState(userEntity: response, status: UserStatus.loaded)));
   }
+
 
 }
 
