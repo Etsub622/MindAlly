@@ -11,12 +11,12 @@ class ArticleInjection {
   init() {
     print('ArticleInjection initialized');
 
-    // Data Source (Register first)
+    // Data Source 
     print('Registering ArticleRemoteDatasource...');
     sl.registerLazySingleton<ArticleRemoteDatasource>(
         () => ArticleRemoteDataSourceImpl(sl()));
 
-    // Repository (Register after DataSource)
+    // Repository 
     print('Registering ArticleRepository...');
     sl.registerLazySingleton<ArticleRepository>(
         () => ArticleRepoImpl(sl(), sl()));

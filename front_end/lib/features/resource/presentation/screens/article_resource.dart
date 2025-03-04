@@ -62,7 +62,7 @@ class _ArticleResourceState extends State<ArticleResource> {
               return Center(child: Text('No articles available.'));
             }
             return GridView.builder(
-              padding: EdgeInsets.all(16), // Add padding around the grid
+              padding: EdgeInsets.all(16), 
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2, // Number of columns
                 crossAxisSpacing: 16, // Horizontal space between items
@@ -90,6 +90,7 @@ class _ArticleResourceState extends State<ArticleResource> {
                                 content: updatedArticleMap['content'] as String,
                                 logo: updatedArticleMap['logo'] as String,
                                 link: updatedArticleMap['link'] as String,
+                                categories: article.categories,
                               );
                               context
                                   .read<ArticleBloc>()

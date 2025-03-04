@@ -9,5 +9,6 @@ abstract interface class BookRepository {
   Future<Either<Failure, String>> deleteBook(String id);
   Future<Either<Failure, List<BookEntity>>> searchBook(String title);
   Future<Either<Failure, BookEntity>> getSingleBook(String id);
+  Future<Either<Failure, List<BookEntity>>> getBookByCategory(String category);
 }
 

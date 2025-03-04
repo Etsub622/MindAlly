@@ -14,6 +14,9 @@ import 'package:front_end/features/resource/presentation/widget/custom_formfield
 import 'package:http/http.dart' as http;
 import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
+import 'package:multi_select_flutter/util/multi_select_item.dart';
+import 'package:multi_select_flutter/chip_display/multi_select_chip_display.dart';
 
 class AddArticle extends StatefulWidget {
   const AddArticle({super.key});
@@ -27,6 +30,16 @@ class _AddArticleState extends State<AddArticle> {
   TextEditingController linkController = TextEditingController();
   TextEditingController titleController = TextEditingController();
   TextEditingController contentController = TextEditingController();
+  List<String> selectedCategories = [];
+
+  List<String> categoryOption = const [
+    'Depression',
+    'Anxiety',
+    'OCD',
+    'General',
+    'Trauma',
+    'SelfLove'
+  ];
 
   // Pick images from the device
   List<File> _imageFiles = [];
@@ -72,6 +85,7 @@ class _AddArticleState extends State<AddArticle> {
       content: contentController.text,
       link: linkController.text,
       logo: _imageUrls[0],
+      categories: selectedCategories,
     );
     context.read<ArticleBloc>().add(AddArticleEvent(uploadedArticle));
   }
@@ -165,6 +179,46 @@ class _AddArticleState extends State<AddArticle> {
             CustomFormField(
               text: 'link',
               controller: linkController,
+            ),
+            SizedBox(
+              height: 15,
+            ),
+             Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: MultiSelectDialogField<String>(
+                items: categoryOption
+                    .map((e) => MultiSelectItem<String>(e, e))
+                    .toList(),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                      color: const Color.fromARGB(255, 215, 214, 214),
+                      width: 1.0),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                buttonText: const Text('Book Category'),
+                title: const Text('Book Category'),
+                selectedColor: Colors.blue,
+                buttonIcon: const Icon(
+                  Icons.arrow_drop_down,
+                  color: Colors.black,
+                ),
+                onConfirm: (List<String> values) {
+                  setState(() {
+                    selectedCategories = values;
+                  });
+                },
+                chipDisplay: MultiSelectChipDisplay<String>(
+                  onTap: (value) {
+                    setState(() {
+                      selectedCategories.remove(value);
+                    });
+                  },
+                  textStyle: const TextStyle(color: Colors.black),
+                  chipColor: Colors.white,
+                ),
+                searchable: true,
+                searchHint: 'Search here...',
+              ),
             ),
             SizedBox(
               height: 40,

@@ -12,6 +12,9 @@ import 'package:front_end/features/resource/presentation/widget/custom_formfield
 import 'package:http/http.dart' as http;
 import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
+import 'package:multi_select_flutter/util/multi_select_item.dart';
+import 'package:multi_select_flutter/chip_display/multi_select_chip_display.dart';
 
 class AddBook extends StatefulWidget {
   const AddBook({super.key});
@@ -24,6 +27,16 @@ class _AddBookState extends State<AddBook> {
   TextEditingController imageController = TextEditingController();
   TextEditingController authorController = TextEditingController();
   TextEditingController titleController = TextEditingController();
+  List<String> selectedCategories = [];
+
+  List<String> categoryOption = const [
+    'Depression',
+    'Anxiety',
+    'OCD',
+    'General',
+    'Trauma',
+    'SelfLove'
+  ];
 
   // Pick images from the device
   File? _imageFile;
@@ -68,8 +81,8 @@ class _AddBookState extends State<AddBook> {
         title: titleController.text,
         type: 'Book',
         author: authorController.text,
-        image:
-            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtx1sz0xpB3i0V8Pj1AAc6LG3rQqAX32qBIg&s');
+        image: _imageUrl!,
+        categories: selectedCategories);
     print(uploadedBook);
 
     context.read<BookBloc>().add(AddBookEvent(uploadedBook));
@@ -123,57 +136,109 @@ class _AddBookState extends State<AddBook> {
           ),
         ]),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          children: [
-            const Text('select images'),
-            SizedBox(
-              height: 10,
-            ),
-            GestureDetector(
-                onTap: () {
-                  _pickImage(ImageSource.gallery);
-                },
-                child: const Padding(
-                  padding: EdgeInsets.only(left: 15.0),
-                  child: Icon(
-                    Icons.add_a_photo,
-                    size: 33,
-                    color: Color(0xff800080),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Column(
+            children: [
+              const Text('select images'),
+              SizedBox(
+                height: 10,
+              ),
+              GestureDetector(
+                  onTap: () {
+                    _pickImage(ImageSource.gallery);
+                  },
+                  child: const Padding(
+                    padding: EdgeInsets.only(left: 15.0),
+                    child: Icon(
+                      Icons.add_a_photo,
+                      size: 33,
+                      color: Color(0xff800080),
+                    ),
+                  )),
+              SizedBox(height: 10),
+              if (_imageFile != null)
+                Container(
+                  height: 200,
+                  width: double.infinity,
+                  child: Image.file(
+                    _imageFile!,
+                    fit: BoxFit.cover,
                   ),
-                )),
-            SizedBox(
-              height: 10,
-            ),
-            SizedBox(
-              height: 7,
-            ),
-            CustomFormField(text: 'title', controller: titleController),
-            SizedBox(
-              height: 15,
-            ),
-            SizedBox(
-              height: 7,
-            ),
-            CustomFormField(text: 'author', controller: authorController),
-            SizedBox(
-              height: 40,
-            ),
-            CustomButton(
-              wdth: double.infinity,
-              rad: 10,
-              hgt: 50,
-              text: "Upload Book",
-              onPressed: () async {
-                if (titleController.text.isNotEmpty &&
-                    authorController.text.isNotEmpty) {
-                  await _uploadImage();
-                  _uploadBook(context);
-                }
-              },
-            ),
-          ],
+                ),
+              SizedBox(
+                height: 10,
+              ),
+              SizedBox(
+                height: 7,
+              ),
+              CustomFormField(text: 'title', controller: titleController),
+              SizedBox(
+                height: 15,
+              ),
+              SizedBox(
+                height: 7,
+              ),
+              CustomFormField(text: 'author', controller: authorController),
+              SizedBox(
+                height: 7,
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: MultiSelectDialogField<String>(
+                  items: categoryOption
+                      .map((e) => MultiSelectItem<String>(e, e))
+                      .toList(),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                        color: const Color.fromARGB(255, 215, 214, 214),
+                        width: 1.0),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  buttonText: const Text('Book Category'),
+                  title: const Text('Book Category'),
+                  selectedColor: Colors.blue,
+                  buttonIcon: const Icon(
+                    Icons.arrow_drop_down,
+                    color: Colors.black,
+                  ),
+                  onConfirm: (List<String> values) {
+                    setState(() {
+                      selectedCategories = values;
+                    });
+                  },
+                  chipDisplay: MultiSelectChipDisplay<String>(
+                    onTap: (value) {
+                      setState(() {
+                        selectedCategories.remove(value);
+                      });
+                    },
+                    textStyle: const TextStyle(color: Colors.black),
+                    chipColor: Colors.white,
+                  ),
+                  searchable: true,
+                  searchHint: 'Search here...',
+                ),
+              ),
+              SizedBox(
+                height: 40,
+              ),
+              CustomButton(
+                wdth: double.infinity,
+                rad: 10,
+                hgt: 50,
+                text: "Upload Book",
+                onPressed: () async {
+                  if (titleController.text.isNotEmpty &&
+                      authorController.text.isNotEmpty) {
+                    await _uploadImage();
+                    _uploadBook(context);
+                  }
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -7,7 +7,8 @@ class ArticleModel extends ArticleEntity {
       required super.content,
       required super.link,
       required super.logo,
-      required super.type});
+      required super.type,
+      required super.categories});
 
   factory ArticleModel.fromJson(Map<String, dynamic> json) {
     return ArticleModel(
@@ -17,6 +18,7 @@ class ArticleModel extends ArticleEntity {
       link: json['link'],
       logo: json['logo'],
       type: json['type'],
+      categories: List<String>.from(json['categories'] as List<dynamic>),
     );
   }
 
@@ -27,7 +29,8 @@ class ArticleModel extends ArticleEntity {
       'content': super.content,
       'link': super.link,
       'logo': super.logo,
-      'type': super.type
+      'type': super.type,
+      'categories': super.categories,
     };
   }
 
@@ -38,6 +41,7 @@ class ArticleModel extends ArticleEntity {
         content: super.content,
         link: super.link,
         logo: super.logo,
-        type: super.type);
+        type: super.type,
+        categories: super.categories);
   }
 }

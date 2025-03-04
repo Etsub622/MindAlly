@@ -23,7 +23,8 @@ class BookRepoImpl implements BookRepository {
             type: 'Book',
             title: book.title,
             author: book.author,
-            image: book.image);
+            image: book.image,
+            categories: book.categories);
         final res = await remoteDatasource.addBook(newBook);
         print(res);
         print(newBook);
@@ -92,7 +93,8 @@ class BookRepoImpl implements BookRepository {
             type: 'Book',
             title: book.title,
             author: book.author,
-            image: book.image);
+            image: book.image,
+            categories: book.categories);
         final res = remoteDatasource.updateBook(updatedBook, id);
         return Right(res as String);
       } on ServerException {
@@ -118,5 +120,11 @@ class BookRepoImpl implements BookRepository {
           NetworkFailure(message: 'you are not connected to the internet.'));
     }
    
+  }
+  
+  @override
+  Future<Either<Failure, List<BookEntity>>> getBookByCategory(String category) {
+    // TODO: implement getBookByCategory
+    throw UnimplementedError();
   }
 }

@@ -14,7 +14,9 @@ abstract class ArticleRemoteDatasource {
 
 class ArticleRemoteDataSourceImpl implements ArticleRemoteDatasource {
   final http.Client client;
-  ArticleRemoteDataSourceImpl(this.client);
+ArticleRemoteDataSourceImpl(this.client){
+  print('ArticleRemoteDataSourceImpl created');
+}
 
   final baseUrl = 'http://localhost:8000/api/resources';
 

@@ -7,6 +7,7 @@ class BookModel extends BookEntity {
     required super.image,
     required super.type,
     required super.id,
+    required super.categories,
   });
 
   factory BookModel.fromJson(Map<String, dynamic> json) {
@@ -16,6 +17,7 @@ class BookModel extends BookEntity {
       image: json['image'],
       type: json['type'],
       id: json['_id'],
+      categories: List<String>.from(json['categories'] as List<dynamic>),
     );
   }
 
@@ -25,6 +27,7 @@ class BookModel extends BookEntity {
       'author': super.author,
       'image': super.image,
       'type': super.type,
+      'categories': super.categories,
     };
   }
 
@@ -35,6 +38,7 @@ class BookModel extends BookEntity {
       author: super.author,
       image: super.image,
       type: super.type,
+      categories: super.categories,
     );
   }
 }

@@ -25,7 +25,8 @@ class VideoRepoImpl implements VideoRepository {
             link: video.link,
             profilePicture: video.profilePicture,
             name: video.name,
-            image: video.image);
+            image: video.image,
+            categories: video.categories);
         final res = await remoteDatasource.addVideo(newVideo);
         print(res);
         return Right(res);
@@ -96,7 +97,8 @@ class VideoRepoImpl implements VideoRepository {
             link: video.link,
             profilePicture: video.profilePicture,
             name: video.name,
-            image: video.image);
+            image: video.image,
+            categories: video.categories);
         final res = await remoteDatasource.updateVideo(updatedVideo, id);
         return Right(res);
       } on ServerException {
@@ -121,5 +123,11 @@ class VideoRepoImpl implements VideoRepository {
       return Left(
           NetworkFailure(message: 'you are not connected to the internet'));
     }
+  }
+  
+  @override
+  Future<Either<Failure, List<VideoEntity>>> getVideoByCategory(String category) {
+    // TODO: implement getVideoByCategory
+    throw UnimplementedError();
   }
 }

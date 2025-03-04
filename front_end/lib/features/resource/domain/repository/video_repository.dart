@@ -9,5 +9,6 @@ abstract class VideoRepository {
   Future<Either<Failure, String>> deleteVideo(String id);
   Future<Either<Failure, List<VideoEntity>>>searchVideo(String title);
   Future<Either<Failure, VideoEntity>> getSingleVideo(String id);
+  Future<Either<Failure, List<VideoEntity>>> getVideoByCategory(String category);
   
 }

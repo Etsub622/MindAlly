@@ -95,6 +95,7 @@ class _VideoResourceState extends State<VideoResource> {
                                 image: updatedVideoMap['imageUrl'] as String,
                                 profilePicture: video.profilePicture,
                                 name: video.name,
+                                categories: video.categories,
 
                               );
                               context

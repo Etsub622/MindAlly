@@ -14,6 +14,9 @@ import 'package:front_end/features/resource/presentation/widget/custom_formfield
 import 'package:http/http.dart' as http;
 import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
+import 'package:multi_select_flutter/util/multi_select_item.dart';
+import 'package:multi_select_flutter/chip_display/multi_select_chip_display.dart';
 
 class AddVideo extends StatefulWidget {
   const AddVideo({super.key});
@@ -28,6 +31,16 @@ class _AddVideoState extends State<AddVideo> {
   TextEditingController titleController = TextEditingController();
   TextEditingController profilePictureController = TextEditingController();
   TextEditingController nameController = TextEditingController();
+  List<String> selectedCategories = [];
+
+  List<String> categoryOption = const [
+    'Depression',
+    'Anxiety',
+    'OCD',
+    'General',
+    'Trauma',
+    'SelfLove'
+  ];
 
   // Pick images from the device
   File? _imageFile;
@@ -74,7 +87,8 @@ class _AddVideoState extends State<AddVideo> {
         link: linkController.text,
         profilePicture: profilePictureController.text,
         name: nameController.text,
-        image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtx1sz0xpB3i0V8Pj1AAc6LG3rQqAX32qBIg&s');
+        image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtx1sz0xpB3i0V8Pj1AAc6LG3rQqAX32qBIg&s',
+        categories: selectedCategories);
     print(uploadedVideo);
 
     context.read<VideoBloc>().add(AddVideoEvent(uploadedVideo));
@@ -170,8 +184,49 @@ class _AddVideoState extends State<AddVideo> {
             ),
             CustomFormField(text: 'name', controller: nameController),
             SizedBox(
+              height: 15,
+            ),
+             Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: MultiSelectDialogField<String>(
+                items: categoryOption
+                    .map((e) => MultiSelectItem<String>(e, e))
+                    .toList(),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                      color: const Color.fromARGB(255, 215, 214, 214),
+                      width: 1.0),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                buttonText: const Text('Book Category'),
+                title: const Text('Book Category'),
+                selectedColor: Colors.blue,
+                buttonIcon: const Icon(
+                  Icons.arrow_drop_down,
+                  color: Colors.black,
+                ),
+                onConfirm: (List<String> values) {
+                  setState(() {
+                    selectedCategories = values;
+                  });
+                },
+                chipDisplay: MultiSelectChipDisplay<String>(
+                  onTap: (value) {
+                    setState(() {
+                      selectedCategories.remove(value);
+                    });
+                  },
+                  textStyle: const TextStyle(color: Colors.black),
+                  chipColor: Colors.white,
+                ),
+                searchable: true,
+                searchHint: 'Search here...',
+              ),
+            ),
+            SizedBox(
               height: 40,
             ),
+            
             CustomButton(
               wdth: double.infinity,
               rad: 10,

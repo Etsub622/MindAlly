@@ -9,4 +9,5 @@ abstract interface class ArticleRepository {
   Future<Either<Failure, String>> deleteArticle(String id);
   Future<Either<Failure, List<ArticleEntity>>> searchArticle(String title);
   Future<Either<Failure, ArticleEntity>> getSingleArticle(String id);
+  Future<Either<Failure, List<ArticleEntity>>> getArticleByCategory(String category);
 }
