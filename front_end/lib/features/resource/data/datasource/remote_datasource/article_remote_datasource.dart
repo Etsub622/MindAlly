@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:front_end/core/config/config_key.dart';
 import 'package:front_end/core/error/exception.dart';
 import 'package:front_end/features/resource/data/model/article_model.dart';
 import 'package:http/http.dart' as http;
@@ -16,7 +17,7 @@ class ArticleRemoteDataSourceImpl implements ArticleRemoteDatasource {
   final http.Client client;
   ArticleRemoteDataSourceImpl(this.client);
 
-  final baseUrl = 'http://localhost:3000/Article';
+  final baseUrl = '${ConfigKey.baseUrl}/Article';
 
   @override
   Future<String> addArticle(ArticleModel article) async {
@@ -57,7 +58,7 @@ class ArticleRemoteDataSourceImpl implements ArticleRemoteDatasource {
   @override
   Future<List<ArticleModel>> getArticles() async{
     try {
-      var url = Uri.parse('baseUrl/getArticles');
+      var url = Uri.parse('$baseUrl/getArticles');
       final response = await client.get(url, headers: {
         'Content-Type': 'application/json',
       });
