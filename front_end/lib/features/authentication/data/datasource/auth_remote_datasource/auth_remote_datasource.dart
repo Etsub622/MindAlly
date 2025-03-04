@@ -1,3 +1,4 @@
+import 'package:front_end/core/config/config_key.dart';
 import 'package:front_end/core/error/exception.dart';
 import 'package:front_end/features/authentication/data/datasource/auth_local_datasource/login_local_datasource.dart';
 import 'package:front_end/features/authentication/data/models/login_model.dart';
@@ -20,7 +21,7 @@ abstract class AuthRemoteDatasource {
 class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   late final http.Client client;
   AuthRemoteDatasourceImpl({required this.client});
-  final baseUrl = 'http://localhost:8000/api';
+  final baseUrl = ConfigKey.baseUrl;
 
   @override
   Future<String> professionalSignUp(
