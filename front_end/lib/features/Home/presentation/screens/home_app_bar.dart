@@ -111,8 +111,6 @@ class _AppbarHomeState extends State<AppbarHome> {
           const SizedBox(
             width: 15,
           ),
-    
-        
         ],
       ),
     );

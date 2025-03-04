@@ -1,4 +1,5 @@
 import 'package:front_end/core/injection/injections.dart';
+import 'package:front_end/features/profile/data/datasource/profile_local_datasource.dart';
 import 'package:front_end/features/profile/data/datasource/profile_remote_datasource.dart';
 import 'package:front_end/features/profile/data/repository_impl/profile_repository_impl.dart';
 import 'package:front_end/features/profile/domain/repository/profile_repository.dart';
@@ -29,12 +30,18 @@ sl.registerLazySingleton<ProfileRepository>(
   () => ProfileRepositoryImpl(
     networkInfo: sl(),
     remoteDatasource: sl(),
+    localDatasource: sl(),
   ),
 );
 
 //! Data Source
 sl.registerLazySingleton<ProfileRemoteDatasource>(
   () => ProfileRemoteDatasourceImpl(client: sl()),
+);
+sl.registerLazySingleton<ProfileLocalDataSource>(
+  () => ProfileLocalDataSourceImpl(
+    flutterSecureStorage: sl(),
+  ),
 );
 
 //! Usecase
