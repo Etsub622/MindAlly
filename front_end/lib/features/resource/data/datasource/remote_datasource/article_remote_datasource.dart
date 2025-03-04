@@ -62,7 +62,6 @@ ArticleRemoteDataSourceImpl(this.client){
   Future<List<ArticleModel>> getArticles() async{
     try {
       var url = Uri.parse('$baseUrl/getArticles');
-      var url = Uri.parse('$baseUrl/getArticles');
       final response = await client.get(url, headers: {
         'Content-Type': 'application/json',
       });
