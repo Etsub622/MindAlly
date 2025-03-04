@@ -11,24 +11,6 @@ class ArticleInjection {
   init() {
     print('ArticleInjection initialized');
 
-    // Data Source 
-    print('Registering ArticleRemoteDatasource...');
-    sl.registerLazySingleton<ArticleRemoteDatasource>(
-        () => ArticleRemoteDataSourceImpl(sl()));
-
-    // Repository 
-    print('Registering ArticleRepository...');
-    sl.registerLazySingleton<ArticleRepository>(
-        () => ArticleRepoImpl(sl(), sl()));
-
-    // Usecases
-    sl.registerLazySingleton(() => GetArticlesUsecase(sl()));
-    sl.registerLazySingleton(() => AddArticleUsecase(sl()));
-    sl.registerLazySingleton(() => DeleteArticleUsecase(sl()));
-    sl.registerLazySingleton(() => UpdateArticleUsecase(sl()));
-    sl.registerLazySingleton(() => SearchArticleUsecase(sl()));
-    sl.registerLazySingleton(() => GetSingleArticleUsecase(sl()));
-
     // Bloc
     sl.registerFactory(() => ArticleBloc(
           getArticlesUsecase: sl(),
@@ -38,5 +20,21 @@ class ArticleInjection {
           searchArticleUsecase: sl(),
           getSingleArticleUsecase: sl(),
         ));
+
+    // Usecases
+    sl.registerLazySingleton(() => GetArticlesUsecase(sl()));
+    sl.registerLazySingleton(() => AddArticleUsecase(sl()));
+    sl.registerLazySingleton(() => DeleteArticleUsecase(sl()));
+    sl.registerLazySingleton(() => UpdateArticleUsecase(sl()));
+    sl.registerLazySingleton(() => SearchArticleUsecase(sl()));
+    sl.registerLazySingleton(() => GetSingleArticleUsecase(sl()));
+
+    // Repository
+    sl.registerLazySingleton<ArticleRepository>(
+        () => ArticleRepoImpl(sl(), sl()));
+
+    // Data Source
+    sl.registerLazySingleton<ArticleRemoteDatasource>(
+        () => ArticleRemoteDataSourceImpl(sl()));
   }
 }

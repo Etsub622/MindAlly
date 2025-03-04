@@ -17,7 +17,7 @@ class VideoRemoteDataSourceImpl implements VideoRemoteDatasource {
   final http.Client client;
   VideoRemoteDataSourceImpl(this.client);
 
-  final baseUrl = 'http://localhost:8000/api/resources';
+  final baseUrl = 'http://192.168.83.216:8000/api/resources';
 
   @override
   Future<String> addVideo(VideoModel video) async {

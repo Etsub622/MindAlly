@@ -13,14 +13,15 @@ class MultiBLOCProvider {
     ),
     BlocProvider<BookBloc>(
       create: (_) => sl<BookBloc>(),
-    ),
-
-    BlocProvider<ArticleBloc>(
-      create: (_) => sl<ArticleBloc>(),
-    ),
+    ),   
      BlocProvider<VideoBloc>(
       create: (_) => sl<VideoBloc>(),
     ),
+
+    BlocProvider<ArticleBloc>(
+      create:(_)=>sl<ArticleBloc>(),
+    ),
+
     BlocProvider<UserProfileBloc>(
       create: (_) => sl<UserProfileBloc>()
       ),

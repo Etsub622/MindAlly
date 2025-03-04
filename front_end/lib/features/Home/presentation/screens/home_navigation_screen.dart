@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:front_end/core/utils/constants.dart';
 import 'package:front_end/features/Home/presentation/screens/home_screen.dart';
 import 'package:front_end/features/chat/presentation/screens/chat_room.dart';
-import 'package:front_end/features/qa/presentation/screens/qa_room.dart';
+import 'package:front_end/features/Q&A/presentation/screens/qa_room.dart';
 import 'package:front_end/features/resource/presentation/screens/resource_room.dart';
 
 class HomeNavigationScreen extends StatefulWidget {

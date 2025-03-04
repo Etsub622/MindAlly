@@ -18,7 +18,7 @@ ArticleRemoteDataSourceImpl(this.client){
   print('ArticleRemoteDataSourceImpl created');
 }
 
-  final baseUrl = 'http://localhost:8000/api/resources';
+  final baseUrl = 'http://192.168.83.216:8000/api/resources';
 
   @override
   Future<String> addArticle(ArticleModel article) async {
@@ -59,7 +59,7 @@ ArticleRemoteDataSourceImpl(this.client){
   @override
   Future<List<ArticleModel>> getArticles() async{
     try {
-      var url = Uri.parse('baseUrl/getArticles');
+      var url = Uri.parse('$baseUrl/getArticles');
       final response = await client.get(url, headers: {
         'Content-Type': 'application/json',
       });

@@ -14,17 +14,16 @@ final sl = GetIt.instance;
 
 
 Future<void> init() async {
-  sl.registerLazySingleton<http.Client>(() => http.Client());
+  
 
   AuthInjection().init();
   BookInjection().init();
   ArticleInjection().init();
   VideoInjection().init();
   ProfileInjection().init();
-  
-  sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl()));
-  print('Registered NetworkInfo: ${sl<NetworkInfo>()}');
 
+  sl.registerLazySingleton<http.Client>(() => http.Client());
+  sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl()));
   sl.registerLazySingleton(() => InternetConnection());
   sl.registerLazySingleton(() => const FlutterSecureStorage());
 

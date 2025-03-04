@@ -87,7 +87,7 @@ class _AddVideoState extends State<AddVideo> {
         link: linkController.text,
         profilePicture: profilePictureController.text,
         name: nameController.text,
-        image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtx1sz0xpB3i0V8Pj1AAc6LG3rQqAX32qBIg&s',
+        image: _imageUrl!,
         categories: selectedCategories);
     print(uploadedVideo);
 
