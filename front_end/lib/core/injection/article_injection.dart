@@ -20,8 +20,8 @@ class ArticleInjection {
       // Repository
       sl.registerLazySingleton<ArticleRepository>(
         () => ArticleRepoImpl(
-          sl<NetworkInfo>(),
           sl<ArticleRemoteDatasource>(),
+          sl<NetworkInfo>(),
         ),
       );
 
