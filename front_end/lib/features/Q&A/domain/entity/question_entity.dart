@@ -7,7 +7,7 @@ class QuestionEntity extends Equatable {
   final String description;
   final String studentName;
   final String studentProfile;
-  final String category;
+  final List<String> category;
   QuestionEntity({
     required this.id,
     required this.title,

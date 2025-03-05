@@ -73,11 +73,13 @@ class BookRemoteDataSourceImpl implements BookRemoteDatasource {
       print(response.statusCode);
       if (response.statusCode == 200) {
         final List<dynamic> bookJson = json.decode(response.body);
-        return bookJson.map((jsonItem) {
-          return BookModel.fromJson(jsonItem as Map<String, dynamic>);
-        }).toList();
-      } else if (response.statusCode == 404) {
-        return [];
+        if (bookJson.isEmpty) {
+          return [];
+        } else {
+          return bookJson.map((jsonItem) {
+            return BookModel.fromJson(jsonItem as Map<String, dynamic>);
+          }).toList();
+        }
       } else {
         throw ServerException(
             message: 'Failed to get books:${response.statusCode}');

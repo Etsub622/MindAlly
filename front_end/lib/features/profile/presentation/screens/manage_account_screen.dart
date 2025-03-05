@@ -4,7 +4,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:front_end/core/routes/routes.dart';
 import 'package:front_end/core/utils/constants.dart';
+import 'package:front_end/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:front_end/features/profile/presentation/bloc/user_profile_bloc.dart';
 import 'package:go_router/go_router.dart';
 
@@ -305,15 +307,7 @@ class ManageAccountScreenState extends State<ManageAccountScreen> {
                                         ?.copyWith(color: Colors.red),
                                   ),
                                   onTap: () {
-                                    // FirebaseAnalytics.instance.logEvent(
-                                    //   name: 'manage_account_clicked',
-                                    //   parameters: <String, dynamic>{
-                                    //     'name': "logout",
-                                    //   },
-                                    // );
-                                    // context
-                                    //     .read<LogoutBloc>()
-                                        // .add(DispatchLogoutEvent());
+                                    _showDialog(context);
                                   },
                                 ),
                                 ListTile(
@@ -354,5 +348,52 @@ class ManageAccountScreenState extends State<ManageAccountScreen> {
             );
         //   })),
         // )
+  }
+
+  void _showDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return BlocConsumer<AuthBloc, AuthState>(
+          listener: (context, state) {
+            if (state is UserLogoutState) {
+              if (state.status == AuthStatus.loaded) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(state.message)),
+                );
+                GoRouter.of(context).go(AppPath.login);
+              } else if (state.status == AuthStatus.error) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(state.message)),
+                );
+              }
+            }
+          },
+          builder: (context, state) {
+            return AlertDialog(
+              title: const Text('Log Out'),
+              content: const Text('Are you sure you want to log out?'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    context.read<AuthBloc>().add(LogoutEvent());
+                  },
+                  child: const Text(
+                    'Log Out',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                )
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 }

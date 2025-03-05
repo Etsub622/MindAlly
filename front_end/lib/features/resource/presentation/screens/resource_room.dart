@@ -28,49 +28,48 @@ class _ResourceRoomState extends State<ResourceRoom> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 12.0, right: 12.0, top: 30),
-              child: TextField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  hintText: 'Search for books, videos, articles',
-                  hintStyle: TextStyle(color: Color(0xff08E0EEA)),
-                  prefixIcon: Icon(Icons.search, color: Colors.grey[700]),
-                  filled: true,
-                  fillColor: Color.fromARGB(255, 226, 225, 225),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30.0),
-                    borderSide: BorderSide.none,
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30.0),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: EdgeInsets.symmetric(vertical: 15.0),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(90),
+        child:  Padding(
+            padding:  EdgeInsets.only(top: MediaQuery.of(context).padding.top, bottom: MediaQuery.of(context).padding.top * 0.3, left: MediaQuery.of(context).size.width * 0.02, right: MediaQuery.of(context).size.width * 0.02),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: 'Search for books, videos, articles',
+                hintStyle: TextStyle(color: Color(0xff08E0EEA)),
+                prefixIcon: Icon(Icons.search, color: Colors.grey[700]),
+                filled: true,
+                fillColor: Color.fromARGB(255, 226, 225, 225),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30.0),
+                  borderSide: BorderSide.none,
                 ),
-                style: TextStyle(color: Colors.black),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30.0),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: EdgeInsets.symmetric(vertical: 15.0),
               ),
+              style: TextStyle(color: Colors.black),
             ),
-            CustomToggleButton(
-              isSelected: isSelected,
-              onToggle: (idx) {
-                setState(() {
-                  for (int i = 0; i < isSelected.length; i++) {
-                    isSelected[i] = i == idx;
-                  }
-                  print('Selected index: $idx');
-                  print('isSelected: $isSelected');
-                });
-              },
-            ),
-            Expanded(
-              child: _getSelectedPage(),
-            ),
-          ],
-        ),
+          ),
+      ), 
+      body: Column(
+        children: [
+          CustomToggleButton(
+            isSelected: isSelected,
+            onToggle: (idx) {
+              setState(() {
+                for (int i = 0; i < isSelected.length; i++) {
+                  isSelected[i] = i == idx;
+                }
+              });
+            },
+          ),
+          Expanded(
+            child: _getSelectedPage(),
+          ),
+        ],
       ),
     );
   }
