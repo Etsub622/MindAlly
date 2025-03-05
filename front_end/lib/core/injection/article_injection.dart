@@ -11,31 +11,52 @@ import 'package:http/http.dart' as http;
 class ArticleInjection {
   void init() {
     print('ArticleInjection initialized');
+    try {
+      // Data Source
+      sl.registerLazySingleton<ArticleRemoteDatasource>(
+        () => ArticleRemoteDataSourceImpl(sl<http.Client>()),
+      );
 
-    // Bloc
-    sl.registerFactory(() => ArticleBloc(
-          getArticlesUsecase: sl(),
-          addArticleUsecase: sl(),
-          deleteArticleUsecase: sl(),
-          updateArticleUsecase: sl(),
-          searchArticleUsecase: sl(),
-          getSingleArticleUsecase: sl(),
-        ));
+      // Repository
+      sl.registerLazySingleton<ArticleRepository>(
+        () => ArticleRepoImpl(
+          sl<NetworkInfo>(),
+          sl<ArticleRemoteDatasource>(),
+        ),
+      );
 
-    // Usecases
-    sl.registerLazySingleton(() => GetArticlesUsecase(sl()));
-    sl.registerLazySingleton(() => AddArticleUsecase(sl()));
-    sl.registerLazySingleton(() => DeleteArticleUsecase(sl()));
-    sl.registerLazySingleton(() => UpdateArticleUsecase(sl()));
-    sl.registerLazySingleton(() => SearchArticleUsecase(sl()));
-    sl.registerLazySingleton(() => GetSingleArticleUsecase(sl()));
+      // Use Cases
+      sl.registerLazySingleton<GetArticlesUsecase>(
+        () => GetArticlesUsecase(sl<ArticleRepository>()),
+      );
+      sl.registerLazySingleton<AddArticleUsecase>(
+        () => AddArticleUsecase(sl<ArticleRepository>()),
+      );
+      sl.registerLazySingleton<DeleteArticleUsecase>(
+        () => DeleteArticleUsecase(sl<ArticleRepository>()),
+      );
+      sl.registerLazySingleton<UpdateArticleUsecase>(
+        () => UpdateArticleUsecase(sl<ArticleRepository>()),
+      );
+      sl.registerLazySingleton<SearchArticleUsecase>(
+        () => SearchArticleUsecase(sl<ArticleRepository>()),
+      );
 
-    // Repository
-    sl.registerLazySingleton<ArticleRepository>(
-        () => ArticleRepoImpl(sl(), sl()));
+      // Bloc
+      sl.registerFactory<ArticleBloc>(
+        () => ArticleBloc(
+          getArticlesUsecase: sl<GetArticlesUsecase>(),
+          addArticleUsecase: sl<AddArticleUsecase>(),
+          deleteArticleUsecase: sl<DeleteArticleUsecase>(),
+          updateArticleUsecase: sl<UpdateArticleUsecase>(),
+          searchArticleUsecase: sl<SearchArticleUsecase>(),
+        ),
+      );
 
-    // Data Source
-    sl.registerLazySingleton<ArticleRemoteDatasource>(
-        () => ArticleRemoteDataSourceImpl(sl()));
+      print("Article dependencies registered successfully");
+    } catch (e) {
+      print("Error registering article dependencies: $e");
+      rethrow; // Optional: for debugging
+    }
   }
 }
