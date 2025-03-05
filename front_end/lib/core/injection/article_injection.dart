@@ -10,35 +10,31 @@ import '../../features/resource/domain/usecase/article_usecase.dart';
 class ArticleInjection {
   init() {
     print('ArticleInjection initialized');
-    // Ensure all dependencies are correctly registered
-    try {
-      // Bloc
-      sl.registerFactory(() => ArticleBloc(
-            getArticlesUsecase: sl(),
-            addArticleUsecase: sl(),
-            deleteArticleUsecase: sl(),
-            updateArticleUsecase: sl(),
-            searchArticleUsecase: sl(),
-          ));
 
-      // Usecase
-      sl.registerLazySingleton(() => GetArticlesUsecase(sl()));
-      sl.registerLazySingleton(() => AddArticleUsecase(sl()));
-      sl.registerLazySingleton(() => DeleteArticleUsecase(sl()));
-      sl.registerLazySingleton(() => UpdateArticleUsecase(sl()));
-      sl.registerLazySingleton(() => SearchArticleUsecase(sl()));
+    // Bloc
+    sl.registerFactory(() => ArticleBloc(
+          getArticlesUsecase: sl(),
+          addArticleUsecase: sl(),
+          deleteArticleUsecase: sl(),
+          updateArticleUsecase: sl(),
+          searchArticleUsecase: sl(),
+          getSingleArticleUsecase: sl(),
+        ));
 
-      // Repository
-      sl.registerLazySingleton<ArticleRepository>(
-          () => ArticleRepoImpl(sl(), sl()));
+    // Usecases
+    sl.registerLazySingleton(() => GetArticlesUsecase(sl()));
+    sl.registerLazySingleton(() => AddArticleUsecase(sl()));
+    sl.registerLazySingleton(() => DeleteArticleUsecase(sl()));
+    sl.registerLazySingleton(() => UpdateArticleUsecase(sl()));
+    sl.registerLazySingleton(() => SearchArticleUsecase(sl()));
+    sl.registerLazySingleton(() => GetSingleArticleUsecase(sl()));
 
-      // Data Source
-      sl.registerLazySingleton<ArticleRemoteDatasource>(
-          () => ArticleRemoteDataSourceImpl(sl()));
+    // Repository
+    sl.registerLazySingleton<ArticleRepository>(
+        () => ArticleRepoImpl(sl(), sl()));
 
-      print("Dependencies registered successfully");
-    } catch (e) {
-      print("Error registering dependencies: $e");
-    }
+    // Data Source
+    sl.registerLazySingleton<ArticleRemoteDatasource>(
+        () => ArticleRemoteDataSourceImpl(sl()));
   }
 }

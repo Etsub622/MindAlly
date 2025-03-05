@@ -30,3 +30,8 @@ class SearchArticleEvent extends ArticleEvent{
   final String title;
   SearchArticleEvent(this.title);
 }
+
+class GetSingleArticleEvent extends ArticleEvent{
+  final String id;
+  GetSingleArticleEvent(this.id);
+}

@@ -12,12 +12,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 final sl = GetIt.instance;
 
+
 Future<void> init() async {
+  
+
   AuthInjection().init();
   BookInjection().init();
   ArticleInjection().init();
   VideoInjection().init();
-  ProfileInjection().init();  
+  ProfileInjection().init();
+
   sl.registerLazySingleton<http.Client>(() => http.Client());
   sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl()));
   sl.registerLazySingleton(() => InternetConnection());

@@ -14,16 +14,21 @@ class VideoRepoImpl implements VideoRepository {
 
   @override
   Future<Either<Failure, String>> addVideo(VideoEntity video) async {
+    print('is in add video before checking network');
     if (await networkInfo.isConnected) {
+      print('is in add video after ');
       try {
         final newVideo = VideoModel(
-            id: video.id,
+            type: "Video",
+            id: '',
             title: video.title,
             link: video.link,
             profilePicture: video.profilePicture,
             name: video.name,
-            image: video.image);
+            image: video.image,
+            categories: video.categories);
         final res = await remoteDatasource.addVideo(newVideo);
+        print(res);
         return Right(res);
       } on ServerException {
         return Left(ServerFailure(message: 'server failure'));
@@ -57,7 +62,7 @@ class VideoRepoImpl implements VideoRepository {
         final videoEntities = res.map((video) => video.toEntity()).toList();
         return Right(videoEntities);
       } on ServerException {
-        return Left(ServerFailure(message: 'server failure'));
+        return Left(ServerFailure(message: 'server failures'));
       }
     } else {
       return Left(
@@ -87,11 +92,13 @@ class VideoRepoImpl implements VideoRepository {
       try {
         final updatedVideo = VideoModel(
             id: video.id,
+            type: 'Video',
             title: video.title,
             link: video.link,
             profilePicture: video.profilePicture,
             name: video.name,
-            image: video.image);
+            image: video.image,
+            categories: video.categories);
         final res = await remoteDatasource.updateVideo(updatedVideo, id);
         return Right(res);
       } on ServerException {
@@ -101,5 +108,26 @@ class VideoRepoImpl implements VideoRepository {
       return Left(
           NetworkFailure(message: 'you are not connected to the internet'));
     }
+  }
+
+  @override
+  Future<Either<Failure, VideoEntity>> getSingleVideo(String id) async {
+    if (await networkInfo.isConnected) {
+      try {
+        final res = await remoteDatasource.getSingleVideo(id);
+        return Right(res);
+      } on ServerException {
+        return Left(ServerFailure(message: 'server failure'));
+      }
+    } else {
+      return Left(
+          NetworkFailure(message: 'you are not connected to the internet'));
+    }
+  }
+  
+  @override
+  Future<Either<Failure, List<VideoEntity>>> getVideoByCategory(String category) {
+    // TODO: implement getVideoByCategory
+    throw UnimplementedError();
   }
 }

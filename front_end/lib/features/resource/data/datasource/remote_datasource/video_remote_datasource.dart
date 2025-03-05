@@ -10,26 +10,31 @@ abstract class VideoRemoteDatasource {
   Future<String> updateVideo(VideoModel video, String id);
   Future<String> deleteVideo(String id);
   Future<List<VideoModel>> searchVideos(String title);
+  Future<VideoModel> getSingleVideo(String id);
 }
 
 class VideoRemoteDataSourceImpl implements VideoRemoteDatasource {
   final http.Client client;
   VideoRemoteDataSourceImpl(this.client);
 
-  final baseUrl = 'http://localhost:3000/Video';
+  final baseUrl = 'http://192.168.83.216:8000/api/resources';
 
   @override
   Future<String> addVideo(VideoModel video) async {
     try {
-      final url =Uri.parse('$baseUrl/addVideo');
+      final url = Uri.parse(baseUrl);
       final newVideo = await client.post(url,
-      body: jsonEncode(video.toJson()));
-
-      if (newVideo.statusCode == 200){
-        final decodedResponse = jsonDecode(newVideo.body);
-        return decodedResponse['message'];
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode(video.toJson()));
+      print(newVideo.body);
+      print(newVideo.statusCode);
+      if (newVideo.statusCode == 201) {
+        return 'Video added successfully';
       } else {
-        throw ServerException(message: 'Failed to add video:${newVideo.statusCode}');
+        throw ServerException(
+            message: 'Failed to add video:${newVideo.statusCode}');
       }
     } catch (e) {
       throw ServerException(message: e.toString());
@@ -37,15 +42,16 @@ class VideoRemoteDataSourceImpl implements VideoRemoteDatasource {
   }
 
   @override
-  Future<String> deleteVideo(String id) async{
-    try{
+  Future<String> deleteVideo(String id) async {
+    try {
       final url = Uri.parse('$baseUrl/deleteVideo/$id');
       final deletedVideo = await client.delete(url);
-      if (deletedVideo.statusCode == 200){
+      if (deletedVideo.statusCode == 200) {
         final decodedResponse = jsonDecode(deletedVideo.body);
         return decodedResponse['message'];
       } else {
-        throw ServerException(message: 'Failed to delete video:${deletedVideo.statusCode}');
+        throw ServerException(
+            message: 'Failed to delete video:${deletedVideo.statusCode}');
       }
     } catch (e) {
       throw ServerException(message: e.toString());
@@ -53,19 +59,25 @@ class VideoRemoteDataSourceImpl implements VideoRemoteDatasource {
   }
 
   @override
-  Future<List<VideoModel>> getVideos()async {
-    try{
-      final url = Uri.parse('$baseUrl/getVideos');
+  Future<List<VideoModel>> getVideos() async {
+    try {
+      final url = Uri.parse('$baseUrl/type/Video');
       final response = await client.get(url, headers: {
         'Content-Type': 'application/json',
       });
-
-      if (response.statusCode == 200){
-        final decodedResponse = jsonDecode(response.body);
-        final videos = decodedResponse['videos'] as List;
-        return videos.map((video) => VideoModel.fromJson(video)).toList();
+      print(url);
+      print(response.body);
+      print(response.statusCode);
+      if (response.statusCode == 200) {
+        final List<dynamic> videoJson = json.decode(response.body);
+        return videoJson.map((jsonItem) {
+          return VideoModel.fromJson(jsonItem as Map<String, dynamic>);
+        }).toList();
+      } else if (response.statusCode == 404) {
+        return [];
       } else {
-        throw ServerException(message: 'Failed to get videos:${response.statusCode}');
+        throw ServerException(
+            message: 'Failed to get videos: ${response.statusCode}');
       }
     } catch (e) {
       throw ServerException(message: e.toString());
@@ -73,42 +85,63 @@ class VideoRemoteDataSourceImpl implements VideoRemoteDatasource {
   }
 
   @override
-  Future<List<VideoModel>> searchVideos(String title)async {
-    try{
+  Future<List<VideoModel>> searchVideos(String title) async {
+    try {
       final url = Uri.parse('$baseUrl/searchVideos/$title');
       final response = await client.get(url, headers: {
         'Content-Type': 'application/json',
       });
 
-      if (response.statusCode == 200){
+      if (response.statusCode == 200) {
         final decodedResponse = jsonDecode(response.body);
         final videos = decodedResponse['videos'] as List;
         return videos.map((video) => VideoModel.fromJson(video)).toList();
       } else {
-        throw ServerException(message: 'Failed to get videos:${response.statusCode}');
+        throw ServerException(
+            message: 'Failed to get videos:${response.statusCode}');
       }
     } catch (e) {
       throw ServerException(message: e.toString());
     }
-    
   }
 
   @override
-  Future<String> updateVideo(VideoModel video, String id) async{
-    try{
+  Future<String> updateVideo(VideoModel video, String id) async {
+    try {
       final url = Uri.parse('$baseUrl/updateVideo/$id');
-      final updatedVideo = await client.put(url,
-      body: jsonEncode(video.toJson()));
+      final updatedVideo =
+          await client.put(url, body: jsonEncode(video.toJson()));
 
-      if (updatedVideo.statusCode == 200){
+      if (updatedVideo.statusCode == 200) {
         final decodedResponse = jsonDecode(updatedVideo.body);
         return decodedResponse['message'];
       } else {
-        throw ServerException(message: 'Failed to update video:${updatedVideo.statusCode}');
+        throw ServerException(
+            message: 'Failed to update video:${updatedVideo.statusCode}');
       }
     } catch (e) {
       throw ServerException(message: e.toString());
     }
-   
+  }
+
+  @override
+  Future<VideoModel> getSingleVideo(String id) async {
+    try {
+      final url = Uri.parse('$baseUrl/getSingleVideo/$id');
+      final response = await client.get(url, headers: {
+        'Content-Type': 'application/json',
+      });
+
+      if (response.statusCode == 200) {
+        final decodedResponse = jsonDecode(response.body);
+        final video = VideoModel.fromJson(decodedResponse['video']);
+        return video;
+      } else {
+        throw ServerException(
+            message: 'Failed to get video:${response.statusCode}');
+      }
+    } catch (e) {
+      throw ServerException(message: e.toString());
+    }
   }
 }

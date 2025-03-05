@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:front_end/features/resource/domain/entity/article_entity.dart';
 
 class ArticleCard extends StatelessWidget {
-  final String title;
-  final String content;
-  final String logo;
-  final String link;
+  final ArticleEntity article;
+  final VoidCallback onUpdate;
+  final VoidCallback onDelete;
   const ArticleCard(
-      {super.key,
-      required this.content,
-      required this.link,
-      required this.logo,
-      required this.title});
+      {super.key, 
+      required this.article,
+      required this.onDelete,
+      required this.onUpdate,
+      });
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +23,7 @@ class ArticleCard extends StatelessWidget {
         child: Column(
           children: [
             Text(
-              title,
+              article.title,
               style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontFamily: 'Poppins',
@@ -33,7 +33,7 @@ class ArticleCard extends StatelessWidget {
               height: 15,
             ),
             Text(
-              content,
+              article.content,
               style: TextStyle(fontFamily: 'Poppins', fontSize: 15),
             ),
             SizedBox(
@@ -43,14 +43,37 @@ class ArticleCard extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 20,
-                  backgroundImage: NetworkImage(logo),
+                  backgroundImage: NetworkImage(article.logo),
                 ),
                 SizedBox(
                   height: 10,
                 ),
-                Text(title),
+                Text(article.title),
               ],
-            )
+            ),
+            SizedBox(
+              width: 15,
+            ),
+            PopupMenuButton<String>(
+              icon: Icon(Icons.more_vert),
+              onSelected: (value) {
+                if (value == 'update') {
+                  onUpdate();
+                } else if (value == 'delete') {
+                  onDelete();
+                }
+              },
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: 'update',
+                  child: Text('Update'),
+                ),
+                PopupMenuItem(
+                  value: 'delete',
+                  child: Text('Delete'),
+                ),
+              ],
+            ),
           ],
         ),
       ),

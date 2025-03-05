@@ -11,18 +11,20 @@ class ArticleRepoImpl implements ArticleRepository {
   final ArticleRemoteDatasource remoteDatasource;
   final NetworkInfo networkInfo;
 
-  ArticleRepoImpl(this.networkInfo, this.remoteDatasource);
+  ArticleRepoImpl( this.remoteDatasource, this.networkInfo);
 
   @override
   Future<Either<Failure, String>> addArticle(ArticleEntity article) async {
     if (await networkInfo.isConnected) {
       try {
         final newArticle = ArticleModel(
-          id: article.id,
+          id: '',
+          type: 'Article',
           title: article.title,
           content: article.content,
           link: article.link,
           logo: article.logo,
+          categories: article.categories,
         );
         final res = await remoteDatasource.addArticle(newArticle);
         return Right(res);
@@ -82,11 +84,13 @@ class ArticleRepoImpl implements ArticleRepository {
     if (await networkInfo.isConnected) {
       try {
         final updatedArticle = ArticleModel(
-          id: article.id,
+          id: '',
+          type: 'Article',
           title: article.title,
           content: article.content,
           link: article.link,
           logo: article.logo,
+          categories: article.categories,
         );
         final res = await remoteDatasource.updateArticle(updatedArticle, id);
         return Right(res);
@@ -96,5 +100,26 @@ class ArticleRepoImpl implements ArticleRepository {
     } else {
       return Left(NetworkFailure(message: 'you are not connected to the internet'));
     }
+  }
+  
+  @override
+  Future<Either<Failure, ArticleEntity>> getSingleArticle(String id) async{
+    if (await networkInfo.isConnected) {
+      try {
+        final res = await remoteDatasource.getSingleArticle(id);
+        return Right(res);
+      } on ServerException {
+        return Left(ServerFailure(message: 'server failure'));
+      }
+    } else {
+      return Left(NetworkFailure(message: 'you are not connected to the internet'));
+    }
+
+  }
+  
+  @override
+  Future<Either<Failure, List<ArticleEntity>>> getArticleByCategory(String category) {
+    // TODO: implement getArticleByCategory
+    throw UnimplementedError();
   }
 }

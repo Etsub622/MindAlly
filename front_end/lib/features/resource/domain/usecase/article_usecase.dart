@@ -16,6 +16,19 @@ class GetArticlesUsecase extends Usecase<List<ArticleEntity>, NoParams> {
   }
 }
 
+class GetSingleArticleUsecase extends Usecase<ArticleEntity, GetSingleArticleParams> {
+  final ArticleRepository repository;
+  GetSingleArticleUsecase(this.repository);
+
+  @override
+  Future<Either<Failure, ArticleEntity>> call(GetSingleArticleParams params) async {
+    return await repository.getSingleArticle(params.id);
+  }
+}
+class GetSingleArticleParams {
+  final String id;
+  GetSingleArticleParams(this.id);
+}
 
 
 class AddArticleUsecase extends Usecase<String, AddArticleParams> {

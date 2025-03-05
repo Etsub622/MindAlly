@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:front_end/core/usecase/usecase.dart';
 import 'package:front_end/features/resource/domain/entity/video_entity.dart';
-import 'package:front_end/features/resource/domain/usecase/video.dart';
+import 'package:front_end/features/resource/domain/usecase/video_usecase.dart';
 import 'package:meta/meta.dart';
 
 part 'video_event.dart';
@@ -13,12 +13,14 @@ class VideoBloc extends Bloc<VideoEvent, VideoState> {
   final UpdateVideoUsecase updateVideoUsecase;
   final DeleteVideoUsecase deleteVideoUsecase;
   final SearchVideoUsecase searchVideoUsecase;
+  final GetSingleVideoUsecase getSingleVideoUsecase;
   VideoBloc({
     required this.addVideoUsecase,
     required this.deleteVideoUsecase,
     required this.getVideosUsecase,
     required this.searchVideoUsecase,
     required this.updateVideoUsecase,
+    required this.getSingleVideoUsecase,
   }) : super(VideoInitial()) {
     on<AddVideoEvent>((event, emit) async {
       emit(VideoLoading());
@@ -73,6 +75,18 @@ class VideoBloc extends Bloc<VideoEvent, VideoState> {
         emit(VideoError(l.message));
       }, (video) {
         emit(SearchVideoLoaded(video));
+      });
+    });
+
+    on<GetSingleVideoEvent>((event, emit) async {
+      emit(VideoLoading());
+      final result =
+          await getSingleVideoUsecase(GetSingleVideoParams(event.id));
+
+      result.fold((l) {
+        emit(VideoError(l.message));
+      }, (video) {
+        emit(SingleVideoLoaded(video));
       });
     });
   }

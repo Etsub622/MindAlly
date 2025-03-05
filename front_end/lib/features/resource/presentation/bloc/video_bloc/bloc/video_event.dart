@@ -14,6 +14,10 @@ class AddVideoEvent extends VideoEvent {
 class GetVideoEvent extends VideoEvent {
   const GetVideoEvent();
 }
+class GetSingleVideoEvent extends VideoEvent {
+  final String id;
+  GetSingleVideoEvent(this.id);
+}
 
 class UpdateVideoEvent extends VideoEvent {
   final VideoEntity videoEntity;

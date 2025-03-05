@@ -90,6 +90,7 @@ class _BookResourceState extends State<BookResource> {
                                 title: updatedBookMap['title'] as String,
                                 author: updatedBookMap['author'] as String,
                                 image: updatedBookMap['imageUrl'] as String,
+                                categories: book.categories,
                               );
                               context
                                   .read<BookBloc>()

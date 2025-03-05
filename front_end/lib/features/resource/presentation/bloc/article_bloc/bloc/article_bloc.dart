@@ -13,12 +13,14 @@ class ArticleBloc extends Bloc<ArticleEvent, ArticleState> {
   final DeleteArticleUsecase deleteArticleUsecase;
   final SearchArticleUsecase searchArticleUsecase;
   final UpdateArticleUsecase updateArticleUsecase;
+  final GetSingleArticleUsecase getSingleArticleUsecase;
   ArticleBloc({
     required this.addArticleUsecase,
     required this.deleteArticleUsecase,
     required this.getArticlesUsecase,
     required this.searchArticleUsecase,
     required this.updateArticleUsecase,
+    required this.getSingleArticleUsecase,
   }) : super(ArticleInitial()) {
     on<AddArticleEvent>((event, emit) async {
       emit(ArticleLoading());
@@ -35,7 +37,9 @@ class ArticleBloc extends Bloc<ArticleEvent, ArticleState> {
 
     on<GetArticleEvent>((event, emit) async {
       emit(ArticleLoading());
-      final article = await getArticlesUsecase(NoParams());
+      final article = await getArticlesUsecase(NoParams(
+        
+      ));
       article.fold((l) {
         emit(ArticleError(l.message));
       }, (books) {
@@ -75,6 +79,16 @@ class ArticleBloc extends Bloc<ArticleEvent, ArticleState> {
         emit(ArticleError(l.message));
       }, (articles) {
         emit(SearchArticleLoaded(articles));
+      });
+    });
+    on<GetSingleArticleEvent>((event, emit) async {
+      emit(ArticleLoading());
+      final result = await getSingleArticleUsecase(GetSingleArticleParams(event.id));
+
+      result.fold((l) {
+        emit(ArticleError(l.message));
+      }, (article) {
+        emit(SingleArticleLoaded(article));
       });
     });
   }

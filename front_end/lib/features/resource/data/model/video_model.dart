@@ -8,27 +8,33 @@ class VideoModel extends VideoEntity {
     required super.profilePicture,
     required super.name,
     required super.image,
+    required super.type,
+    required super.categories,
   });
 
   factory VideoModel.fromJson(Map<String, dynamic> json) {
     return VideoModel(
-      id: json['id'],
+      id: json['_id'],
       title: json['title'],
       link: json['link'],
       profilePicture: json['profilePicture'],
       name: json['name'],
       image: json['image'],
+      type: json['type'],
+      categories: List<String>.from(json['categories'] as List<dynamic>),
+
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'id': super.id,
       'title': super.title,
       'link': super.link,
       'profilePicture': super.profilePicture,
       'name': super.name,
       'image': super.image,
+      'type': super.type,
+      'categories': super.categories,
     };
   }
 
@@ -40,6 +46,8 @@ class VideoModel extends VideoEntity {
       profilePicture: super.profilePicture,
       name: super.name,
       image: super.image,
+      type: super.type,
+      categories: super.categories,
     );
   }
 }

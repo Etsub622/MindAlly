@@ -17,7 +17,7 @@ class BookRemoteDataSourceImpl implements BookRemoteDatasource {
   final http.Client client;
   BookRemoteDataSourceImpl(this.client);
 
-  final baseUrl = 'http://10.0.2.2:8000/api/resources';
+  final baseUrl = 'http://192.168.83.216:8000/api/resources';
 
   @override
   Future<String> addBook(BookModel book) async {
@@ -64,10 +64,13 @@ class BookRemoteDataSourceImpl implements BookRemoteDatasource {
   @override
   Future<List<BookModel>> getBooks() async {
     try {
-      var url = Uri.parse(baseUrl);
+      var url = Uri.parse('$baseUrl/type/Book');
+      print(url);
       final response = await client.get(url, headers: {
         'Content-Type': 'application/json',
       });
+      print(response.body);
+      print(response.statusCode);
       if (response.statusCode == 200) {
         final List<dynamic> bookJson = json.decode(response.body);
         if (bookJson.isEmpty) {
