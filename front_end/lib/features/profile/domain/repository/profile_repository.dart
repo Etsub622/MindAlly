@@ -2,6 +2,7 @@
 
 import 'package:dartz/dartz.dart';
 import 'package:front_end/core/error/failure.dart';
+import 'package:front_end/features/authentication/data/models/student_data_model.dart';
 import 'package:front_end/features/profile/data/models/patient_model.dart';
 import 'package:front_end/features/profile/data/models/therapist_model.dart';
 import 'package:front_end/features/profile/domain/entities/patient_entity.dart';
@@ -18,5 +19,7 @@ abstract class ProfileRepository {
   Future<Either<Failure, TherapistModel>> createTherapist({required TherapistEntity therapist});
   Future<Either<Failure, TherapistModel>> updateTherapist({required TherapistEntity therapist});
   Future<Either<Failure, Null>> deleteTherapist({required String id});
+
+  Future<Either<Failure, StudentDataModel>> getUserCredential();
 
 }

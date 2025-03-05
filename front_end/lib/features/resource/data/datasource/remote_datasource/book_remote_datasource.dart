@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:front_end/core/config/config_key.dart';
 import 'package:front_end/core/error/exception.dart';
 import 'package:front_end/features/resource/data/model/book_model.dart';
 import 'package:http/http.dart' as http;
@@ -17,7 +18,7 @@ class BookRemoteDataSourceImpl implements BookRemoteDatasource {
   final http.Client client;
   BookRemoteDataSourceImpl(this.client);
 
-  final baseUrl = 'http://192.168.83.216:8000/api/resources';
+  final baseUrl = '${ConfigKey.baseUrl}/resources';
 
   @override
   Future<String> addBook(BookModel book) async {
