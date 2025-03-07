@@ -37,7 +37,6 @@ class BookRemoteDataSourceImpl implements BookRemoteDatasource {
             message: 'Failed to add book:${newBook.statusCode}');
       }
     } catch (e) {
-      print(e.toString());
       throw ServerException(message: e.toString());
     }
   }
