@@ -9,6 +9,9 @@ import 'package:front_end/features/authentication/presentation/screens/professio
 import 'package:front_end/features/authentication/presentation/screens/reset_password.dart';
 import 'package:front_end/features/authentication/presentation/screens/role_selection.dart';
 import 'package:front_end/features/authentication/presentation/screens/student_signUp.dart';
+import 'package:front_end/features/chat/domain/entities/chats_entity.dart';
+import 'package:front_end/features/chat/presentation/screens/chat_detail_screen.dart';
+import 'package:front_end/features/chat/presentation/screens/chat_room.dart';
 import 'package:front_end/features/resource/presentation/screens/book_resource.dart';
 
 import 'package:go_router/go_router.dart';
@@ -52,7 +55,19 @@ final routes = <GoRoute>[
         return OtpVerification(email: email);
       }),
 
-
+  GoRoute(
+    name: 'chat',
+    path: AppPath.chat,
+    builder: (BuildContext context, GoRouterState state) => const ChatRoom(),
+  ),
+  GoRoute(
+    name: 'chatDetails',
+    path: AppPath.chatDetails,
+    builder: (BuildContext context, GoRouterState state) => ChatDetailScreen(
+      chatInfo: state.uri.queryParameters['chatInfo'] as ChatsEntity,
+      chatId: state.uri.queryParameters['chatId'] as String,
+    ),
+  )
 ];
 
 GoRouter routerConfig() {
@@ -60,6 +75,7 @@ GoRouter routerConfig() {
     initialLocation: AppPath.home,
     routes: routes,
   );
+
 }
 
 class AppRouter extends StatelessWidget {
