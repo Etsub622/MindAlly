@@ -5,6 +5,6 @@ const router = express.Router()
 
 router.post("/therapistSignup", registerTherapist)
 router.post("/Login", Login)
-router.post("/PatientSignup",registerPatient )
+router.post("/PatientSignup",registerPatient)
 
 export default router;
