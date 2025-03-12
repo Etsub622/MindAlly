@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front_end/features/authentication/presentation/bloc/auth_bloc.dart';
-import 'package:front_end/features/chat/presentation/bloc/chat_bloc.dart';
+import 'package:front_end/features/chat/presentation/bloc/chat/chat_bloc.dart';
+import 'package:front_end/features/chat/presentation/bloc/chat_list/chat_list_bloc.dart';
 import 'package:front_end/features/profile/presentation/bloc/user_profile_bloc.dart';
 import 'package:front_end/features/resource/presentation/bloc/article_bloc/bloc/article_bloc.dart';
 import 'package:front_end/features/resource/presentation/bloc/book_bloc/bloc/book_bloc.dart';
@@ -29,6 +30,9 @@ class MultiBLOCProvider {
 
     BlocProvider<ChatBloc>(
       create: (_) => sl<ChatBloc>()
+    ),
+    BlocProvider<ChatListBloc>(
+      create: (_) => sl<ChatListBloc>()
     )
 
   ];

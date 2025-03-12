@@ -1,7 +1,10 @@
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:front_end/features/profile/presentation/bloc/user_profile_bloc.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:front_end/features/profile/presentation/screens/update_profile_screen.dart';
@@ -18,12 +21,31 @@ class AppbarHome extends StatefulWidget implements PreferredSizeWidget {
 }
 
 class _AppbarHomeState extends State<AppbarHome> {
+  final _storage = const FlutterSecureStorage();
+  String role = "";
+
+  
 
  @override
  initState() {
     super.initState();
     context.read<UserProfileBloc>().add(GetUserProfileEvent());
+    getRole();
   }
+
+  void getRole() async {
+    final userCredential = await _storage.read(key: "user_profile");
+
+    if (userCredential != null) {
+      final body = await json.decode(userCredential);
+     role = body["_id"].toString();
+     
+      setState(() {
+        role = role;
+      });
+
+  }
+}
   String cutUsername(String username) {
     if (username.length > 10) {
       username = '${username.substring(0, 10)}...';
@@ -115,6 +137,7 @@ class _AppbarHomeState extends State<AppbarHome> {
       ),
     );
   }
+  
 
   // Future<dynamic> ShareBottomSheet(BuildContext context) {
   //   // String selectedAvatarUrl = widget.avatarUrl;

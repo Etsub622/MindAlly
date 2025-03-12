@@ -1,51 +1,52 @@
-import 'package:front_end/features/chat/domain/entities/single_chat_entity.dart';
-import 'package:front_end/features/chat/domain/entities/single_chat_entity.dart';
+import 'package:front_end/features/chat/domain/entities/message_entity.dart';
 
-class SingleChatModel extends SingleChatEntity {
-  const SingleChatModel({
+
+class MessageModel extends MessageEntity {
+  const MessageModel({
+    required super.chatId,
     required super.message,
-    required super.messageId,
-    required super.dataType,
-    required super.dataUrl,
     required super.senderId,
     required super.timestamp,
+    required super.isRead, 
+    required super.receiverId,
   });
 
-  factory SingleChatModel.fromJson(Map<String, dynamic> json) {
-    return SingleChatModel(
+  factory MessageModel.fromJson(Map<String, dynamic> json) {
+    return MessageModel(
+      chatId: json["chatId"],
       message: json["message"],
-      messageId: json["messageId"],
-      dataType: json["dataType"],
-      dataUrl: json["dataUrl"],
       senderId: json["senderId"],
-      timestamp: json["timestamp"],
+      receiverId: json["receiverId"],
+      timestamp: json["timestamp"] != null ? DateTime.parse(json["timestamp"]) : DateTime.now(),
+      isRead: json["isRead"],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
+      "chatId": chatId,
       "message": message,
-      "messageId": messageId,
-      "dataType": dataType,
-      "dataUrl": dataUrl,
       "senderId": senderId,
-      "timestamp": timestamp,
+      "receiverId": receiverId,
+      "isRead": isRead,
+      "timestamp": timestamp.toIso8601String(),
     };
   }
 
-  SingleChatModel copyWith({
+  MessageModel copyWith({
+    String? chatId,
     String? message,
-    String? messageId,
-    String? dataType,
-    String? dataUrl,
     String? senderId,
-    String? timestamp,
+    String? receiverId,
+    bool? isRead,
+    DateTime? timestamp,
+
   }) {
-    return SingleChatModel(
+    return MessageModel(
+      chatId: chatId ?? this.chatId,
       message: message ?? this.message,
-      messageId: messageId ?? this.messageId,
-      dataType: dataType ?? this.dataType,
-      dataUrl: dataUrl ?? this.dataUrl,
+      receiverId: receiverId ?? this.receiverId,
+      isRead: isRead ?? this.isRead,
       senderId: senderId ?? this.senderId,
       timestamp: timestamp ?? this.timestamp,
     );
