@@ -60,14 +60,15 @@ final routes = <GoRoute>[
     path: AppPath.chat,
     builder: (BuildContext context, GoRouterState state) => const ChatRoom(),
   ),
-  GoRoute(
-    name: 'chatDetails',
-    path: AppPath.chatDetails,
-    builder: (BuildContext context, GoRouterState state) => ChatDetailScreen(
-      chatInfo: state.uri.queryParameters['chatInfo'] as ChatsEntity,
-      chatId: state.uri.queryParameters['chatId'] as String,
-    ),
-  )
+  // GoRoute(
+  //   name: 'chatDetails',
+  //   path: AppPath.chatDetails,
+  //   builder: (BuildContext context, GoRouterState state) => ChatDetailScreen(
+  //     chatInfo: state.uri.queryParameters['chatInfo'] as ChatsEntity,
+  //     chatId: state.uri.queryParameters['chatId'] as String,
+  //     userId: state.uri.queryParameters['userId'] as String,
+  //   ),
+  // )
 ];
 
 GoRouter routerConfig() {

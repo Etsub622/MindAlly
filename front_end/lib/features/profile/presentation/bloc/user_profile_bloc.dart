@@ -12,6 +12,7 @@ import 'package:front_end/features/profile/data/models/patient_model.dart';
 import 'package:front_end/features/profile/data/models/therapist_model.dart';
 import 'package:front_end/features/profile/domain/usecases/patient/get_patient_usecase.dart';
 import 'package:front_end/features/profile/domain/usecases/therapist/get_therapist_usecase.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 part 'user_profile_event.dart';
 part 'user_profile_state.dart';
@@ -76,6 +77,8 @@ class UserProfileBloc extends Bloc<UserprofileEvent, UserprofileState> {
   
   Future<Either<Failure, StudentDataModel>> getUserCredential() async {
     final userCredential = await flutterSecureStorage.read(key: userProfileKey);
+    final   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+
 
     if (userCredential != null) {
       final body = await json.decode(userCredential);
@@ -84,7 +87,8 @@ class UserProfileBloc extends Bloc<UserprofileEvent, UserprofileState> {
 
       return Right(res);
     } else {
-      return Left(ServerFailure(message: "User not found"));
+      sharedPreferences.remove("token_key");
+      return Left(ServerFailure(message: "No user data found"));
     }
   }
 

@@ -35,8 +35,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       if (user.statusCode == 200) {
         final jsonResponse = jsonDecode(user.body);
         final token = jsonResponse['token'];
-
-        // Save the token to SharedPreferences
+         // Save the token to SharedPreferences
         final sharedPreferences = await SharedPreferences.getInstance();
         await sharedPreferences.setString('token_key', token);
 

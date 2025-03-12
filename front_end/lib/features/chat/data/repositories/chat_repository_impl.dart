@@ -2,8 +2,9 @@ import 'package:dartz/dartz.dart';
 import 'package:front_end/core/error/failure.dart';
 import 'package:front_end/core/network/network.dart';
 import 'package:front_end/features/chat/data/data_sources/chat_remote_data_source.dart';
-import 'package:front_end/features/chat/domain/entities/chats_entity.dart';
-import 'package:front_end/features/chat/domain/entities/single_chat_entity.dart';
+import 'package:front_end/features/chat/data/models/single_chat_model.dart';
+import 'package:front_end/features/chat/domain/entities/list_chats_entity.dart';
+import 'package:front_end/features/chat/domain/entities/message_entity.dart';
 import 'package:front_end/features/chat/domain/repositories/chat_repository.dart';
 
 class ChatRepositoryImpl extends ChatRepository {
@@ -14,11 +15,10 @@ class ChatRepositoryImpl extends ChatRepository {
       {required this.remoteDataSource, required this.networkInfo});
 
   @override
-  Future<Either<Failure, List<ChatsEntity>>> getAllChats(
-      {required String senderId}) async {
+  Future<Either<Failure, ListChatsEntity>> getAllChats() async {
     // if (await networkInfo.isConnected) {
       try {
-        final result = await remoteDataSource.getAllChats(senderId: senderId);
+        final result = await remoteDataSource.getAllChats();
         return Right(result);
       } catch (e) {
         return Left(ServerFailure(message: e.toString()));
@@ -29,39 +29,33 @@ class ChatRepositoryImpl extends ChatRepository {
   }
 
   @override
-  Future<Either<Failure, List<SingleChatEntity>>> getSingleChat(
+  Future<Either<Failure, List<MessageEntity>>> fetchMessages(
       {required String chatId}) async {
-    // if (await networkInfo.isConnected) {
+    if (await networkInfo.isConnected) {
       try {
-        final result = await remoteDataSource.getSingleChat(chatId: chatId);
+        final result = await remoteDataSource.fetchMessages(chatId: chatId);
         return Right(result);
       } catch (e) {
         return Left(ServerFailure(message: e.toString()));
       }
-    // } else {
-    //   return Left(ServerFailure(message: "No Internet Connection"));
-    // }
+    } else {
+      return Left(ServerFailure(message: "No Internet Connection"));
+    }
   }
 
   @override
   Future<Either<Failure, void>> sendMessage(
-      {required String message,
-      required String senderId,
-      required String chatId,
-      required String receiverId}) async {
-    // if (await networkInfo.isConnected) {
+      {required MessageModel messageModel}) async {
+    if (await networkInfo.isConnected) {
       try {
-        remoteDataSource.sendMessage(
-            message: message,
-            senderId: senderId,
-            receiverId: receiverId,
-            chatId: chatId);
+        remoteDataSource.sendMessage(messageModel: messageModel);
+        
         return const Right(null);
       } catch (e) {
         return Left(ServerFailure(message: e.toString()));
       }
-    // } else {
-    //   return Left(ServerFailure(message: "No Internet Connection"));
-    // }
+    } else {
+      return Left(ServerFailure(message: "No Internet Connection"));
+    }
   }
 }

@@ -1,33 +1,32 @@
 import 'package:equatable/equatable.dart';
-import 'package:front_end/core/mock_data/chat_data.dart';
+import 'package:front_end/features/profile/domain/entities/user_entity.dart';
 
 class ChatsEntity extends Equatable {
   final String chatId;
-  final String chatName;
-  final List<String> participantDetails;
+  final String receiverId;
+  final String senderId;
+  final int unReadCount;
   final String lastMessage;
   final String lastMessageTime;
-  final ChatType chatType;
-  final bool isRead;
+  final UserEntity receiver;
 
   const ChatsEntity({
     required this.chatId,
-    required this.chatName,
-    required this.participantDetails,
+    required this.senderId,
+    required this.receiverId,
+    required this.unReadCount,
     required this.lastMessage,
+    required this.receiver,
     required this.lastMessageTime,
-    required this.chatType,
-    required this.isRead,
   });
 
   @override
   List<Object?> get props => [
         chatId,
-        chatName,
-        participantDetails,
+        senderId,
+        unReadCount,
         lastMessage,
         lastMessageTime,
-        isRead,
-        chatType
+        receiver,
       ];
 }
