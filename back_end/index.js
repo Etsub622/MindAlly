@@ -13,7 +13,9 @@ import therapistRoutes from "./routes/profile/therapist.js";
 // import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 
 import { resourceRoutes } from "./routes/resource/resourceRoutes.js";
-
+import answerRoutes from "./routes/qanda/answerRoutes.js";
+import questionRoutes from "./routes/qanda/questionRoutes.js";
+// import answerRoutes from "./routes/q&a/answerRoutes.js";
 
 
  
@@ -102,6 +104,9 @@ app.use("/api/patients", patientRoutes);
 app.use("/api/therapists", therapistRoutes);
 
 app.use("/api/resources", resourceRoutes);
+
+app.use("/api/questions", questionRoutes);
+app.use("/api/answers", answerRoutes);
 
 app.listen(process.env.PORT, () => {
     console.log(   `server is running on port ${process.env.PORT}`)
