@@ -1,36 +1,67 @@
 import express from "express";
-import mongoose from "mongoose";
-import cors from "cors";
 import dotenv from "dotenv";
 import bodyParser from "body-parser";
-import userRoutes from "./routes/authenticaionRoutes/userAuth.js"
-import otpRoutes from "./routes/authenticaionRoutes/otpRoutes.js"
-import googleRoutes from "./routes/authenticaionRoutes/loginwithGoogle.js"
+import cors from "cors";
+import { createServer } from "http";
+import { initializeSocket } from "./socket.js";
+import { connectDB } from "./db.js";
+import userRoutes from "./routes/authenticaionRoutes/userAuth.js";
+import otpRoutes from "./routes/authenticaionRoutes/otpRoutes.js";
+import googleRoutes from "./routes/authenticaionRoutes/loginwithGoogle.js";
 import patientRoutes from "./routes/profile/profile.js";
 import therapistRoutes from "./routes/profile/therapist.js";
-// import session from "express-session";
-// import passport from "passport";
-// import { Strategy as GoogleStrategy } from "passport-google-oauth20";
-
+import chatRoutes from "./routes/chat/chatRoutes.js";
 import { resourceRoutes } from "./routes/resource/resourceRoutes.js";
+import { setIo } from "./controller/chat/chatController.js";
+
+dotenv.config();
 import answerRoutes from "./routes/qanda/answerRoutes.js";
 import questionRoutes from "./routes/qanda/questionRoutes.js";
 // import answerRoutes from "./routes/q&a/answerRoutes.js";
 
-
- 
-
-
-dotenv.config();
 const app = express();
+const httpServer = createServer(app);
+
+// Middleware
 app.use(bodyParser.json());
+app.use(cors({
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type"],
+  credentials: true,
+}));
+
+// Root route
+app.get("/", (req, res) => {
+  res.send("<a href='/api/google/authgoogle'> login with google </a>");
+});
+
+// Routes
+app.use("/api/user", userRoutes);
+app.use("/api/otp", otpRoutes);
+app.use("/api/google", googleRoutes);
+
+app.use("/api/patients", patientRoutes);
+app.use("/api/therapists", therapistRoutes);
+
+app.use("/api/resources", resourceRoutes);
+
+app.use("/api/chat", chatRoutes);
+
+app.use("/api/questions", questionRoutes);
+app.use("/api/answers", answerRoutes);
+
+// Initialize database and Socket.IO
+connectDB();
+const io = initializeSocket(httpServer);
+setIo(io); // Pass io to chat controller
+
+// Start server
+const PORT = process.env.PORT || 3000;
+httpServer.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
 
 
-mongoose
-    .connect(process.env.Mongo_url)
-    .then(() => {
-        console.log("Database connected succesfully")
-    })
 
 // app.use(session({
 //     secret: "secret",
@@ -54,11 +85,6 @@ mongoose
 // passport.serializeUser((user, done) => done(null, user));
 // passport.deserializeUser((user, done) => done(null, user));
 
-
-
-app.get('/', (req, res) => {
-    res.send("<a href='/api/google/authgoogle'> login with google </a>")
-})
 // app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 // app.get('/auth/google/callback', passport.authenticate('google'), (req, res) => {
@@ -75,40 +101,3 @@ app.get('/', (req, res) => {
 //         user: req.user,
 //     });
 // });
-
-
-
-
-
-
-
-
-
-
-
-
-
-app.use(cors({
- 
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type'],
-  credentials:true
-}));
-
-
-app.use("/api/user", userRoutes)
-app.use("/api/otp", otpRoutes)
-app.use("/api/google",googleRoutes)
-
-app.use("/api/patients", patientRoutes);
-app.use("/api/therapists", therapistRoutes);
-
-app.use("/api/resources", resourceRoutes);
-
-app.use("/api/questions", questionRoutes);
-app.use("/api/answers", answerRoutes);
-
-app.listen(process.env.PORT, () => {
-    console.log(   `server is running on port ${process.env.PORT}`)
-})
-
