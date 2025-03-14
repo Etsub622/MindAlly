@@ -15,6 +15,9 @@ import { resourceRoutes } from "./routes/resource/resourceRoutes.js";
 import { setIo } from "./controller/chat/chatController.js";
 
 dotenv.config();
+import answerRoutes from "./routes/qanda/answerRoutes.js";
+import questionRoutes from "./routes/qanda/questionRoutes.js";
+// import answerRoutes from "./routes/q&a/answerRoutes.js";
 
 const app = express();
 const httpServer = createServer(app);
@@ -36,10 +39,16 @@ app.get("/", (req, res) => {
 app.use("/api/user", userRoutes);
 app.use("/api/otp", otpRoutes);
 app.use("/api/google", googleRoutes);
+
 app.use("/api/patients", patientRoutes);
 app.use("/api/therapists", therapistRoutes);
+
 app.use("/api/resources", resourceRoutes);
+
 app.use("/api/chat", chatRoutes);
+
+app.use("/api/questions", questionRoutes);
+app.use("/api/answers", answerRoutes);
 
 // Initialize database and Socket.IO
 connectDB();
@@ -92,15 +101,3 @@ httpServer.listen(PORT, () => {
 //         user: req.user,
 //     });
 // });
-
-
-
-
-
-
-
-
-
-
-
-
