@@ -28,4 +28,19 @@ export const getQuestionsByCategory = async (req, res) => {
       res.status(500).json({ message: error.message });
     }
   };
+
+  export const getQuestionById = async (req,res) => {
+    try {
+      const { id } = req.params;
+      const question = await Question.findById(id);
+
+      if (!question) {
+        return res.status(404).json({ message: "Question not found" });
+      }
+
+      res.status(200).json(question);
+    } catch (error) {
+      res.status(500).json({ message: "Error retrieving the question", error: error.message });
+    }
+  };
   
