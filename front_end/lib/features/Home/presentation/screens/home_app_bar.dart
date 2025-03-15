@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:front_end/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:front_end/features/profile/presentation/bloc/user_profile_bloc.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:front_end/features/profile/presentation/screens/update_profile_screen.dart';
@@ -68,68 +69,71 @@ class _AppbarHomeState extends State<AppbarHome> {
         children: [
           Expanded(
             child: 
-            BlocBuilder<UserProfileBloc, UserprofileState>(
-                builder: (context, state) {
-              
-              if (state is UserprofileLoadedState && state.status == UserStatus.loaded){
-                  String userName = state.userEntity!.fullName;
-                  String profilePicture = state.userEntity!.profileImage;
-                  String hasPassword = state.userEntity?.password != null ? 'true' : 'false';
-                  String email = state.userEntity!.email;
-                return 
-                Row(
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => UpdateProfileNew(
-                                    username: userName,
-                                    profilePicture: profilePicture,
-                                    hasPassword: hasPassword,
-                                    email: email)
-                                    )
-                                    );
-                      },
-                      child: CircleAvatar(
-                        backgroundColor:
-                            Theme.of(context).brightness != Brightness.dark
-                                ? const Color(0xeEBEEF55)
-                                : Colors.black,
-                        backgroundImage: CachedNetworkImageProvider(
-                            profilePicture,
-                            errorListener: (context) {
-                          const Icon(
-                            Icons.error,
-                            color: Colors.red,
-                          );
-                        }),
-                        radius: 25,
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Text('👋',
-                            style: Theme.of(context).textTheme.bodySmall),
-                        Text('Hello, $userName',
-                            style: Theme.of(context).textTheme.bodySmall),
-                      ],
-                    ),
-                  ],
-                );
-              
-              } else {
-                return Container();
-              }
-            }),
+           BlocBuilder<UserProfileBloc, UserprofileState>(
+  builder: (context, state) {
+    if (state is UserprofileLoadedState && state.status == UserStatus.loaded) {
+      String userName = state.userEntity!.fullName;
+      String profilePicture = state.userEntity!.profileImage;
+      String hasPassword = state.userEntity?.password != null ? 'true' : 'false';
+      String email = state.userEntity!.email;
+
+      return Row(
+        children: [
+          InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => UpdateProfileNew(
+                    username: userName,
+                    profilePicture: profilePicture,
+                    hasPassword: hasPassword,
+                    email: email,
+                  ),
+                ),
+              );
+            },
+            child: CircleAvatar(
+              backgroundColor: Theme.of(context).brightness != Brightness.dark
+                  ? const Color(0xeEBEEF55)
+                  : Colors.black,
+              backgroundImage: CachedNetworkImageProvider(
+                profilePicture,
+                errorListener: (context) {
+                  const Icon(
+                    Icons.error,
+                    color: Colors.red,
+                  );
+                },
+              ),
+              radius: 25,
+            ),
           ),
+          const SizedBox(width: 10),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 10),
+              Text('👋', style: Theme.of(context).textTheme.bodySmall),
+              Text('Hello, $userName', style: Theme.of(context).textTheme.bodySmall),
+            ],
+          ),
+        ],
+      );
+    } else if (state is UserprofileLoadedState && state.status == UserStatus.error) {
+      // Trigger logout when an error occurs
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.read<AuthBloc>().add(LogoutEvent());
+      });
+
+      return const SizedBox();
+    } else {
+      return const SizedBox();
+    }
+  },
+),
+ ),
           const SizedBox(
             width: 15,
           ),

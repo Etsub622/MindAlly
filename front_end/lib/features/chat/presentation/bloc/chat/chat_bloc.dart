@@ -44,11 +44,18 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
           _messages.clear();
           _messages.addAll(chats);
           emit(ChatLoadedState(messages: chats));
-          _socketService.socket.emit('joinConversation', event.chatId);
+          _socketService.socket.emit('joinChat', event.chatId);
 
           _socketService.socket.on("newMessage", (data) => {
             print("step 1 - revieve $data"),
-            add(ReceiveChatEvent(message: data))
+            add(ReceiveChatEvent(message: MessageEntity(
+      message: data["message"],
+      receiverId: data["receiverId"],
+      senderId: data["senderId"],
+      timestamp: DateTime.parse(data["timestamp"]),
+      chatId: event.chatId,
+      isRead: false
+    )))
           });
 
         });

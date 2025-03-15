@@ -6,6 +6,7 @@ import 'package:front_end/core/routes/route_matcher.dart';
 import 'package:front_end/core/routes/router_config.dart';
 import 'package:front_end/core/injection/injections.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final router = GoRouter(
   redirect: ((context, state) =>
@@ -21,6 +22,12 @@ FutureOr<String?> redirector(
     GoRouterState state, Object object,
 ) async {
   var isLoggedIn = true;
+  final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+  final userCredential = sharedPreferences.getString('user_profile');
+  
+  if(userCredential == null){
+    isLoggedIn = false;
+  }
  
   if (publicRoutes.contains(state.uri.toString())) {
     return state.uri.toString();
