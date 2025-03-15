@@ -33,13 +33,9 @@ FutureOr<String?> redirector(
     return state.uri.toString();
   }
 
-  final isAuthRoute = authRouterMatcher.match(state.uri.toString());
-
   if (isLoggedIn) {
     // if the user is trying to access an auth route redirect to home page
-    if (isAuthRoute != null) {
-      return AppPath.home;
-    }
-    return AppPath.login;
+    return AppPath.home;  
 } 
+return AppPath.login;
 }
