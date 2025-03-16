@@ -3,6 +3,7 @@ import 'package:front_end/core/injection/answer_injection.dart';
 import 'package:front_end/core/injection/article_injection.dart';
 import 'package:front_end/core/injection/auth_injection.dart';
 import 'package:front_end/core/injection/book_injection.dart';
+import 'package:front_end/core/injection/chat_injection.dart';
 import 'package:front_end/core/injection/profile_injection.dart';
 import 'package:front_end/core/injection/question_injection.dart';
 import 'package:front_end/core/injection/video_injection.dart';
@@ -20,8 +21,7 @@ Future<void> init() async {
   ArticleInjection().init();
   VideoInjection().init();
   ProfileInjection().init();
-  QuestionInjection().init();
-  AnswerInjection().init();
+  ChatInjection().init();
 
   sl.registerLazySingleton<http.Client>(() => http.Client());
   sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl()));

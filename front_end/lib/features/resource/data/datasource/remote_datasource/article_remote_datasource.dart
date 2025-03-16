@@ -1,4 +1,6 @@
 import 'dart:convert';
+
+import 'package:front_end/core/config/config_key.dart';
 import 'package:front_end/core/error/exception.dart';
 import 'package:front_end/features/resource/data/model/article_model.dart';
 import 'package:http/http.dart' as http;
@@ -18,7 +20,7 @@ ArticleRemoteDataSourceImpl(this.client){
   print('ArticleRemoteDataSourceImpl created');
 }
 
-  final baseUrl = 'http://192.168.83.216:8000/api/resources';
+  final baseUrl = '${ConfigKey.baseUrl}/Article';
 
   @override
   Future<String> addArticle(ArticleModel article) async {

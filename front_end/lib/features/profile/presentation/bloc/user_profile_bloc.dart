@@ -12,6 +12,7 @@ import 'package:front_end/features/profile/data/models/patient_model.dart';
 import 'package:front_end/features/profile/data/models/therapist_model.dart';
 import 'package:front_end/features/profile/domain/usecases/patient/get_patient_usecase.dart';
 import 'package:front_end/features/profile/domain/usecases/therapist/get_therapist_usecase.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 part 'user_profile_event.dart';
 part 'user_profile_state.dart';
@@ -74,17 +75,20 @@ class UserProfileBloc extends Bloc<UserprofileEvent, UserprofileState> {
   final String authenticationKey = "access_token";
   final String userProfileKey = "user_profile";
   
-  Future<StudentDataModel> getUserCredential() async {
+  Future<Either<Failure, StudentDataModel>> getUserCredential() async {
     final userCredential = await flutterSecureStorage.read(key: userProfileKey);
+    final   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+
 
     if (userCredential != null) {
       final body = await json.decode(userCredential);
 
       final res = StudentDataModel.fromJson(body);
 
-      return res;
+      return Right(res);
     } else {
-      throw CacheException(message: 'User profile not found');
+      sharedPreferences.remove("token_key");
+      return Left(ServerFailure(message: "No user data found"));
     }
   }
 
@@ -93,9 +97,14 @@ class UserProfileBloc extends Bloc<UserprofileEvent, UserprofileState> {
     emit(UserprofileInitial());
 
     final response = await getUserCredential();
-
-    emit(UserprofileLoadedState(userEntity: response, status: UserStatus.loaded));
+    response.fold(
+      (failure) => emit(const UserprofileLoadedState(
+        userEntity: null,
+        status: UserStatus.error
+      )), 
+      (response) => emit(UserprofileLoadedState(userEntity: response, status: UserStatus.loaded)));
   }
+
 
 }
 

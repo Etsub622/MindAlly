@@ -15,6 +15,8 @@ class AppPath {
   static const String resetPassword = '/resetPassword';
   static const String otp = '/otp';
   static String bookResource ='bookResource';
+  static const String chat = '/chat';
+  static const String chatDetails = '/chatDetails';
 }
 
 const List<String> publicRoutes = [
@@ -28,4 +30,6 @@ const List<String> authRoutes = [
 
 const List<String> protectedRoutes = [
   AppPath.home,
+  AppPath.chat,
+  AppPath.chatDetails,
 ];

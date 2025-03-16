@@ -30,16 +30,17 @@ class HomeScreen extends StatelessWidget {
   void _showChatBot(BuildContext context) {
     showModalBottomSheet(
       context: context,
+      isDismissible:false,
       isScrollControlled: true, 
       backgroundColor: Colors.transparent,
       builder: (context) {
         return Container(
-          height: MediaQuery.of(context).size.height * 0.8,
+          height: MediaQuery.of(context).size.height * 0.9,
           decoration: const BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
           ),
-          child: ChatBotScreen(),
+          child: const ChatBotScreen(),
         );
       },
     );
