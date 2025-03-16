@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:front_end/core/routes/app_path.dart';
 import 'package:front_end/features/resource/domain/entity/book_entity.dart';
 import 'package:front_end/features/resource/presentation/bloc/book_bloc/bloc/book_bloc.dart';
 import 'package:front_end/features/resource/presentation/screens/add_book.dart';
 import 'package:front_end/features/resource/presentation/screens/update_book.dart';
 import 'package:front_end/features/resource/presentation/widget/book_card.dart';
-import 'package:go_router/go_router.dart';
 
 class BookResource extends StatefulWidget {
   const BookResource({super.key});
@@ -28,7 +26,7 @@ class _BookResourceState extends State<BookResource> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color.fromARGB(235, 246, 238, 252),
-        title: Center(
+        title:const Center(
             child: Text('Books: your passport to endless adventures',
                 style: TextStyle(
                   color: Color(0xff800080),
@@ -40,7 +38,7 @@ class _BookResourceState extends State<BookResource> {
           Padding(
             padding: const EdgeInsets.only(left: 10.0),
             child: IconButton(
-              icon: Icon(
+              icon:const Icon(
                 Icons.refresh,
                 color: Color.fromARGB(239, 130, 5, 220),
                 size: 25,
@@ -64,8 +62,8 @@ class _BookResourceState extends State<BookResource> {
               return Center(child: Text('No books available.'));
             }
             return GridView.builder(
-              padding: EdgeInsets.all(16), // Add padding around the grid
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              padding:const EdgeInsets.all(16), // Add padding around the grid
+              gridDelegate:const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2, // Number of columns
                 crossAxisSpacing: 16, // Horizontal space between items
                 mainAxisSpacing: 16, // Vertical space between items
