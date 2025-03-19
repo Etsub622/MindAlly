@@ -14,6 +14,22 @@ class StudentResponseModel extends StudentDataResponse {
       studentData: StudentDataModel.fromJson(json["user"]),
     );
   }
+
+  Map<String, dynamic> toJson(){
+    return {
+      '_id': studentData.id,
+      'FullName': studentData.fullName,
+      'Email': studentData.email,
+      'Password': studentData.password,
+      'Bio': studentData.bio,
+      'PhoneNumber': studentData.phoneNumber,
+      'Gender': studentData.gender,
+      'ProfileImage': studentData.profileImage,
+      'Role': studentData.role,
+      'token':token,
+      'message':message
+  };
+  }
 }
 
 class StudentDataModel extends StudentUserEntity {

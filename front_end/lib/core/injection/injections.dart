@@ -15,7 +15,13 @@ final sl = GetIt.instance;
 
 
 Future<void> init() async {
-  
+  sl.registerLazySingleton<http.Client>(() => http.Client());
+  sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl()));
+  sl.registerLazySingleton(() => InternetConnection());
+  sl.registerLazySingleton(() => const FlutterSecureStorage());
+
+  final sharedPref = await SharedPreferences.getInstance();
+  sl.registerLazySingleton(() => sharedPref);
 
   AuthInjection().init();
   BookInjection().init();
@@ -24,11 +30,5 @@ Future<void> init() async {
   ProfileInjection().init();
   ChatInjection().init();
 
-  sl.registerLazySingleton<http.Client>(() => http.Client());
-  sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl()));
-  sl.registerLazySingleton(() => InternetConnection());
-  sl.registerLazySingleton(() => const FlutterSecureStorage());
-
-  final sharedPref = await SharedPreferences.getInstance();
-  sl.registerLazySingleton(() => sharedPref);
+  
 }

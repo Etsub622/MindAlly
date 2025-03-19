@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:front_end/core/common_widget.dart/circular_indicator.dart';
 import 'package:front_end/core/common_widget.dart/snack_bar.dart';
 import 'package:front_end/core/routes/app_path.dart';
@@ -81,7 +80,7 @@ class _StudentSignUpState extends State<StudentSignUp> {
     return Scaffold(
       body: BlocConsumer<AuthBloc, AuthState>(builder: (context, state) {
         if (state is AuthLoading) {
-          return CircularIndicator();
+          return const CircularIndicator();
         } else {
           return _buildForm(context);
         }
@@ -116,10 +115,10 @@ class _StudentSignUpState extends State<StudentSignUp> {
                   height: 100,
                   width: 100,
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 30,
                 ),
-                Text(
+                const Text(
                   'Create your account',
                   style: TextStyle(
                     fontFamily: 'Poppins',
@@ -128,7 +127,7 @@ class _StudentSignUpState extends State<StudentSignUp> {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 30,
                 ),
                 CustomTextField(
@@ -141,7 +140,7 @@ class _StudentSignUpState extends State<StudentSignUp> {
                     return null;
                   },
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 CustomTextField(
@@ -149,7 +148,7 @@ class _StudentSignUpState extends State<StudentSignUp> {
                   controller: emailController,
                   validator: _validateEmail,
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 CustomTextField(
@@ -158,7 +157,7 @@ class _StudentSignUpState extends State<StudentSignUp> {
                   isPassword: true,
                   validator: _validatePassword,
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 CustomTextField(
                   text: "confirm password",
                   controller: confirmPasswordController,
@@ -170,7 +169,7 @@ class _StudentSignUpState extends State<StudentSignUp> {
                     return null;
                   },
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 CustomTextField(
@@ -183,7 +182,7 @@ class _StudentSignUpState extends State<StudentSignUp> {
                     return null;
                   },
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 CustomTextField(
@@ -196,7 +195,7 @@ class _StudentSignUpState extends State<StudentSignUp> {
                     return null;
                   },
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 40,
                 ),
                 CustomButton(
@@ -217,17 +216,17 @@ class _StudentSignUpState extends State<StudentSignUp> {
                     }
                   },
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 15,
                 ),
                 Align(
                   alignment: Alignment.bottomRight,
                   child: GestureDetector(
                     onTap: () {
-                      context.go(AppPath.login);
+                      context.go(AppPath.patientOnboard);
                     },
                     child: RichText(
-                      text: TextSpan(
+                      text: const TextSpan(
                         text: 'Already have an account? ',
                         style: TextStyle(
                           color: Colors.black,

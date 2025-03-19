@@ -1,3 +1,4 @@
+import 'package:front_end/core/common_widget.dart/empty_list.dart';
 import 'package:front_end/features/chat/domain/entities/chats_entity.dart';
 import 'package:front_end/features/chat/domain/entities/list_chats_entity.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +16,7 @@ class ChatRoom extends StatefulWidget {
 class _ChatRoomState extends State<ChatRoom> {
   String formateTimeStamp(String timeStamp) {
     DateTime parsedDate = DateTime.parse(timeStamp).toUtc();
-    return DateFormat('hh:mm a').format(parsedDate);
+    return DateFormat('hh:mm').format(parsedDate);
   }
 
   @override
@@ -38,6 +39,16 @@ class _ChatRoomState extends State<ChatRoom> {
             } else if (state.status == ChatStatus.success) {
               ListChatsEntity chatsList = state.chats;
               List<ChatsEntity> chats = chatsList.chats;
+
+              if (chats.isEmpty) {
+                return const ImageDescriptionTemplate(
+                              imageUrl: "asset/image/no_chat_history.png",
+                              title: Text("No chat history",
+                                  ),
+                              description:
+                                  "It seems you haven't had any conversations yet",
+                              haveButton: false);
+              }
 
               return ListView.builder(
                 itemCount: chats.length,

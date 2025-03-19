@@ -7,8 +7,9 @@ import 'package:front_end/features/resource/presentation/screens/resource_room.d
 
 class HomeNavigationScreen extends StatefulWidget {
   final int index;
+  final String role;
 
-  const HomeNavigationScreen({super.key, required this.index});
+  const HomeNavigationScreen({super.key, required this.index, required this.role});
 
   @override
   State<StatefulWidget> createState() => _HomeNavigationScreenState();
@@ -37,8 +38,8 @@ class _HomeNavigationScreenState extends State<HomeNavigationScreen> {
           currentIndex: index,
           unselectedItemColor: Colors.white,
           selectedItemColor: Colors.white,
-          unselectedLabelStyle: TextStyle(color: Colors.white),
-          selectedLabelStyle: TextStyle(color: Colors.white),
+          unselectedLabelStyle: const TextStyle(color: Colors.white),
+          selectedLabelStyle: const TextStyle(color: Colors.white),
           type: BottomNavigationBarType.fixed,
           onTap: (int index) {
             setState(() {

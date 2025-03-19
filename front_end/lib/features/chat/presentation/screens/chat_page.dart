@@ -5,7 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:front_end/features/chat/presentation/bloc/chat/chat_bloc.dart';
 import 'package:front_end/features/chat/data/models/single_chat_model.dart';
 import 'package:front_end/features/chat/domain/entities/message_entity.dart';
-import 'package:front_end/features/profile/domain/entities/user_entity.dart';
+import 'package:front_end/features/profile_patient/domain/entities/user_entity.dart';
 
 class ChatPage extends StatefulWidget {
   final String chatId;

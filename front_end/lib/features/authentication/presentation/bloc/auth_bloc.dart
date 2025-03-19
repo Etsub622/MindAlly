@@ -1,5 +1,5 @@
-import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front_end/core/usecase/usecase.dart';
 import 'package:front_end/features/authentication/data/models/student_data_model.dart';
 import 'package:front_end/features/authentication/domain/entities/login_entity.dart';
@@ -14,8 +14,6 @@ import 'package:front_end/features/authentication/domain/usecase/otp_usecase.dar
 import 'package:front_end/features/authentication/domain/usecase/professional_signup_usecase.dart';
 import 'package:front_end/features/authentication/domain/usecase/resetPassword_usecase.dart';
 import 'package:front_end/features/authentication/domain/usecase/student_signup_usecase.dart';
-import 'package:front_end/features/authentication/presentation/screens/reset_password.dart';
-import 'package:meta/meta.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';

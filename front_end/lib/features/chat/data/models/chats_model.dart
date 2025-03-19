@@ -1,7 +1,7 @@
 
 import 'package:front_end/features/chat/domain/entities/chats_entity.dart';
-import 'package:front_end/features/profile/data/models/user_model.dart';
-import 'package:front_end/features/profile/domain/entities/user_entity.dart';
+import 'package:front_end/features/profile_patient/data/models/user_model.dart';
+import 'package:front_end/features/profile_patient/domain/entities/user_entity.dart';
 
 class ChatsModel extends ChatsEntity {
   const ChatsModel({
