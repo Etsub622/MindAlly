@@ -25,15 +25,6 @@ class _ArticleResourceState extends State<ArticleResource> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(235, 246, 238, 252),
-        title: Center(
-            child: Text('Books: your passport to endless adventures',
-                style: TextStyle(
-                  color: Color(0xff800080),
-                  fontWeight: FontWeight.w300,
-                  fontSize: 19,
-                  fontFamily: 'Poppins',
-                ))),
         actions: [
           Padding(
             padding: const EdgeInsets.only(left: 10.0),

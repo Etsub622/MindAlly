@@ -72,7 +72,7 @@ class BookRemoteDataSourceImpl implements BookRemoteDatasource {
       print(response.body);
       print(response.statusCode);
       if (response.statusCode == 200) {
-        final List<dynamic> bookJson = json.decode(response.body);
+        final List<String> bookJson = json.decode(response.body);
         if (bookJson.isEmpty) {
           return [];
         } else {

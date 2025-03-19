@@ -30,75 +30,73 @@ class _AnswerCardState extends State<AnswerCard> {
     return Material(
       elevation: _isExpanded ? 8 : 0,
       borderRadius: BorderRadius.circular(8),
-      child: Container(
-        width: double.infinity,
-        padding: EdgeInsets.all(16),
-        margin: EdgeInsets.symmetric(vertical: 8),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                CircleAvatar(
-                  backgroundImage: NetworkImage(widget.therapistProfile),
-                  radius: 20,
-                ),
-                SizedBox(width: 10),
-                Text(
-                  widget.therapistName,
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            SizedBox(height: 8),
-            Text(
-              widget.answer,
-              maxLines: _isExpanded ? null : 3,
-              overflow: _isExpanded ? null : TextOverflow.ellipsis,
-            ),
-            SizedBox(height: 8),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  _isExpanded = !_isExpanded;
-                });
-              },
-              child: Text(
-                _isExpanded ? 'Read less' : 'Read more',
-                style: TextStyle(color: Colors.blue),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+          margin: EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  CircleAvatar(
+                    backgroundImage: NetworkImage(widget.therapistProfile),
+                    radius: 20,
+                  ),
+                  SizedBox(width: 10),
+                  Text(
+                    widget.therapistName,
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  // Spacer(),
+                  // PopupMenuButton<String>(
+                  //   icon: Icon(Icons.more_vert),
+                  //   onSelected: (value) {
+                  //     if (value == 'update') {
+                  //       widget.onUpdate();
+                  //     } else if (value == 'delete') {
+                  //       widget.onDelete();
+                  //     }
+                  //   },
+                  //   itemBuilder: (context) => [
+                  //     const PopupMenuItem(
+                  //       value: 'update',
+                  //       child: Text('Update'),
+                  //     ),
+                  //     const PopupMenuItem(
+                  //       value: 'delete',
+                  //       child: Text('Delete'),
+                  //     ),
+                  //   ],
+                  // ),
+                ],
               ),
-            ),
-            SizedBox(height: 12),
-            InkWell(
-              onTap: widget.onPressed,
-              child: const Icon(Icons.message, color: Colors.blue, size: 28),
-            ),
-            SizedBox(height: 8),
-            PopupMenuButton<String>(
-              icon: Icon(Icons.more_vert),
-              onSelected: (value) {
-                if (value == 'update') {
-                  widget.onUpdate();
-                } else if (value == 'delete') {
-                  widget.onDelete();
-                }
-              },
-              itemBuilder: (context) => [
-                const PopupMenuItem(
-                  value: 'update',
-                  child: Text('Update'),
+              SizedBox(height: 8),
+              Text(
+                widget.answer,
+                maxLines: _isExpanded ? null : 3,
+                overflow: _isExpanded ? null : TextOverflow.ellipsis,
+              ),
+              SizedBox(height: 8),
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _isExpanded = !_isExpanded;
+                  });
+                },
+                child: Text(
+                  _isExpanded ? 'Read less' : 'Read more',
+                  style: TextStyle(color: Colors.blue),
                 ),
-                const PopupMenuItem(
-                  value: 'delete',
-                  child: Text('Delete'),
-                ),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );

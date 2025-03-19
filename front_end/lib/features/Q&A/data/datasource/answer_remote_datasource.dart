@@ -1,10 +1,11 @@
 import 'dart:convert';
+import 'package:front_end/core/config/config_key.dart';
 import 'package:front_end/core/error/exception.dart';
 import 'package:front_end/features/Q&A/data/model/answer_model.dart';
 import 'package:http/http.dart' as http;
 
 abstract class AnswerRemoteDatasource {
-  Future<List<AnswerModel>> getAnswers();
+  Future<List<AnswerModel>> getAnswers(String questionId);
   Future<String> addAnswer(AnswerModel answer);
   Future<String> updateAnswer(AnswerModel answer, String id);
   Future<String> deleteAnswer(String id);
@@ -14,12 +15,12 @@ class AnswerRemoteDataSourceImpl implements AnswerRemoteDatasource {
   final http.Client client;
   AnswerRemoteDataSourceImpl(this.client);
 
-  final baseUrl = 'http://192.168.83.216:8000/api/forum';
+  final baseUrl = ConfigKey.baseUrl;
 
   @override
   Future<String> addAnswer(AnswerModel answer) async {
     try {
-      var url = Uri.parse('$baseUrl/createAnswer');
+      var url = Uri.parse('$baseUrl/answers');
       final newAnswer = await client.post(url,
           headers: {
             'Content-Type': 'application/json',
@@ -38,9 +39,9 @@ class AnswerRemoteDataSourceImpl implements AnswerRemoteDatasource {
   }
 
   @override
-  Future<String> deleteAnswer(String id) async{
+  Future<String> deleteAnswer(String id) async {
     try {
-      var url = Uri.parse('$baseUrl/deleteAnswer/$id');
+      var url = Uri.parse('$baseUrl/answers/$id');
       final deletedAnswer = await client.delete(url);
       if (deletedAnswer.statusCode == 200) {
         final decodedResponse = jsonDecode(deletedAnswer.body);
@@ -55,11 +56,14 @@ class AnswerRemoteDataSourceImpl implements AnswerRemoteDatasource {
   }
 
   @override
-  Future<List<AnswerModel>> getAnswers()async {
+  Future<List<AnswerModel>> getAnswers(String questionId) async {
     try {
-      var url = Uri.parse('$baseUrl/getAnswers');
+      var url = Uri.parse('$baseUrl/answers/$questionId');
+      print(url);
       final response = await client.get(url);
-     if (response.statusCode == 200) {
+      print(response.statusCode);
+      print(url);
+      if (response.statusCode == 200) {
         final List<dynamic> answerJson = json.decode(response.body);
         if (answerJson.isEmpty) {
           return [];
@@ -69,16 +73,16 @@ class AnswerRemoteDataSourceImpl implements AnswerRemoteDatasource {
           }).toList();
         }
       } else {
-        throw ServerException(message: 'Failed to get answers:${response.statusCode}');
+        throw ServerException(
+            message: 'Failed to get answers:${response.statusCode}');
       }
     } catch (e) {
       throw ServerException(message: e.toString());
     }
-
   }
 
   @override
-  Future<String> updateAnswer(AnswerModel answer, String id)async {
+  Future<String> updateAnswer(AnswerModel answer, String id) async {
     try {
       var url = Uri.parse('$baseUrl/updateAnswer/$id');
       final updatedAnswer = await client.put(url,
@@ -95,8 +99,6 @@ class AnswerRemoteDataSourceImpl implements AnswerRemoteDatasource {
       }
     } catch (e) {
       throw ServerException(message: e.toString());
-
+    }
   }
-}
-
 }

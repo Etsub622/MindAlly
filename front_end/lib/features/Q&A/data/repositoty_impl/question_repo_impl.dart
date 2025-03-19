@@ -25,6 +25,7 @@ class QuestionRepoImpl implements QuestionRepository {
           title: question.title,
         );
         final res = await remoteDatasource.addQuestion(newQuestion);
+        print(res);
         return right(res);
       } on Exception {
         return (Left(ServerFailure(message: 'server failure')));
@@ -56,6 +57,7 @@ class QuestionRepoImpl implements QuestionRepository {
       try {
         final res = await remoteDatasource.getQuestions();
         final questionEntity = res.map((book) => book.toEntity()).toList();
+        print(questionEntity);
         return Right(questionEntity);
       } on Exception {
         return Left(ServerFailure(message: 'server failure'));
@@ -67,7 +69,7 @@ class QuestionRepoImpl implements QuestionRepository {
   }
 
   @override
- Future<Either<Failure, List<QuestionEntity>>> getQuestionsByCategory(
+  Future<Either<Failure, List<QuestionEntity>>> getQuestionsByCategory(
       String category) async {
     if (await networkInfo.isConnected) {
       try {

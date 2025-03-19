@@ -22,6 +22,8 @@ Future<void> init() async {
   VideoInjection().init();
   ProfileInjection().init();
   ChatInjection().init();
+  QuestionInjection().init();
+  AnswerInjection().init();
 
   sl.registerLazySingleton<http.Client>(() => http.Client());
   sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl()));

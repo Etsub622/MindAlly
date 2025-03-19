@@ -6,5 +6,5 @@ abstract interface class AnswerRepository {
   Future<Either<Failure, String>> createAnswer(AnswerEntity answer);
   Future<Either<Failure, String>> updateAnswer(AnswerEntity answer, String id);
   Future<Either<Failure, String>> deleteAnswer(String id);
-  Future<Either<Failure, List<AnswerEntity>>> getAnswers();
+  Future<Either<Failure, List<AnswerEntity>>> getAnswers(String questionId);
 }

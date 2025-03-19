@@ -27,11 +27,17 @@ class _ResourceRoomState extends State<ResourceRoom> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(90),
-        child:  Padding(
-            padding:  EdgeInsets.only(top: MediaQuery.of(context).padding.top, bottom: MediaQuery.of(context).padding.top * 0.3, left: MediaQuery.of(context).size.width * 0.02, right: MediaQuery.of(context).size.width * 0.02),
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Scaffold(
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(90),
+          child: Padding(
+            padding: EdgeInsets.only(
+                top: MediaQuery.of(context).padding.top,
+                bottom: MediaQuery.of(context).padding.top * 0.3,
+                left: MediaQuery.of(context).size.width * 0.02,
+                right: MediaQuery.of(context).size.width * 0.02),
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
@@ -53,23 +59,24 @@ class _ResourceRoomState extends State<ResourceRoom> {
               style: TextStyle(color: Colors.black),
             ),
           ),
-      ), 
-      body: Column(
-        children: [
-          CustomToggleButton(
-            isSelected: isSelected,
-            onToggle: (idx) {
-              setState(() {
-                for (int i = 0; i < isSelected.length; i++) {
-                  isSelected[i] = i == idx;
-                }
-              });
-            },
-          ),
-          Expanded(
-            child: _getSelectedPage(),
-          ),
-        ],
+        ),
+        body: Column(
+          children: [
+            CustomToggleButton(
+              isSelected: isSelected,
+              onToggle: (idx) {
+                setState(() {
+                  for (int i = 0; i < isSelected.length; i++) {
+                    isSelected[i] = i == idx;
+                  }
+                });
+              },
+            ),
+            Expanded(
+              child: _getSelectedPage(),
+            ),
+          ],
+        ),
       ),
     );
   }

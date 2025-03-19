@@ -24,17 +24,11 @@ class MultiBLOCProvider {
     BlocProvider<ArticleBloc>(
       create: (_) => sl<ArticleBloc>(),
     ),
-
-    BlocProvider<UserProfileBloc>(
-      create: (_) => sl<UserProfileBloc>()
-      ),
-
-    BlocProvider<ChatBloc>(
-      create: (_) => sl<ChatBloc>()
-    ),
-    BlocProvider<ChatListBloc>(
-      create: (_) => sl<ChatListBloc>()
-    )
-
+    BlocProvider<UserProfileBloc>(create: (_) => sl<UserProfileBloc>()),
+    BlocProvider<ChatBloc>(create: (_) => sl<ChatBloc>()),
+    BlocProvider<ChatListBloc>(create: (_) => sl<ChatListBloc>()),
+    BlocProvider<ChatBloc>(create: (_) => sl<ChatBloc>()),
+    BlocProvider<QuestionBloc>(create: (_) => sl<QuestionBloc>()),
+    BlocProvider<AnswerBloc>(create: (_) => sl<AnswerBloc>()),
   ];
 }

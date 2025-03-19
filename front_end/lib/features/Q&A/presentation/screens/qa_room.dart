@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:front_end/features/Q&A/presentation/bloc/bloc/answer_bloc.dart';
 import 'package:front_end/features/Q&A/presentation/bloc/bloc/question_bloc.dart';
+import 'package:front_end/features/Q&A/presentation/screens/answer_creation.dart';
+import 'package:front_end/features/Q&A/presentation/screens/comment_room.dart';
 import 'package:front_end/features/Q&A/presentation/screens/question_creation.dart';
 import 'package:front_end/features/Q&A/presentation/screens/update_question.dart';
 import 'package:front_end/features/Q&A/presentation/widget/question_card.dart';
@@ -14,6 +17,12 @@ class QARoom extends StatefulWidget {
 }
 
 class _QARoomState extends State<QARoom> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<QuestionBloc>().add(GetQuestionEvent());
+  }
+
   final TextEditingController _searchController = TextEditingController();
 
   @override
@@ -24,7 +33,9 @@ class _QARoomState extends State<QARoom> {
           SearchInputField(
             controller: _searchController,
           ),
-          SizedBox(height: 10,),
+          SizedBox(
+            height: 10,
+          ),
           ElevatedButton(
             onPressed: () {
               showModalBottomSheet(
@@ -36,10 +47,7 @@ class _QARoomState extends State<QARoom> {
             },
             child: Text('Add Question'),
           ),
-
-          
           Expanded(
-            // Use Expanded to fill available space
             child: BlocBuilder<QuestionBloc, QuestionState>(
               builder: (context, state) {
                 if (state is QuestionLoading) {
@@ -52,8 +60,7 @@ class _QARoomState extends State<QARoom> {
                     return Center(child: Text('No question available.'));
                   }
                   return ListView.builder(
-                    padding:
-                        const EdgeInsets.all(16), 
+                    padding: const EdgeInsets.all(16),
                     itemCount: questions.length,
                     itemBuilder: (context, index) {
                       final question = questions[index];
@@ -64,20 +71,24 @@ class _QARoomState extends State<QARoom> {
                         category: question.category,
                         profileImage: question.studentProfile,
                         onPressed: () {
-
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  CommentRoom(questionId: question.id),
+                            ),
+                          );
                         },
                         onUpdate: () {
                           showModalBottomSheet(
                             context: context,
                             builder: (context) {
                               return UpdateQuestionBottomSheet(
-                                questionEntity:
-                                    question, 
+                                questionEntity: question,
                                 onUpdate: (updatedQuestion) {
-                                  
-                                  context
-                                      .read<QuestionBloc>()
-                                      .add(UpdateQuestionEvent(question,question.id));
+                                  context.read<QuestionBloc>().add(
+                                      UpdateQuestionEvent(
+                                          question, question.id));
                                 },
                               );
                             },

@@ -11,7 +11,8 @@ class AddAnswerEvent extends AnswerEvent {
 }
 
 class GetAnswerEvent extends AnswerEvent {
-  const GetAnswerEvent();
+  final String questionId;
+  const GetAnswerEvent( this.questionId);
 }
 
 class DeleteAnswerEvent extends AnswerEvent {
@@ -24,8 +25,3 @@ class UpdateAnswerEvent extends AnswerEvent {
   final String id;
   UpdateAnswerEvent(this.answerEntity, this.id);
 }
-
-
-
-
-

@@ -32,7 +32,7 @@ class AnswerBloc extends Bloc<AnswerEvent, AnswerState> {
 
     on<GetAnswerEvent>((event, emit) async {
       emit(AnswerLoading());
-      final answer = await getAnswersUsecase(NoParams());
+      final answer = await getAnswersUsecase(GetAnswerParams(event.questionId));
       answer.fold((l) {
         emit(AnswerError(l.message));
       }, (answers) {

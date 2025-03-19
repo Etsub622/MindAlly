@@ -25,20 +25,11 @@ class _BookResourceState extends State<BookResource> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(235, 246, 238, 252),
-        title:const Center(
-            child: Text('Books: your passport to endless adventures',
-                style: TextStyle(
-                  color: Color(0xff800080),
-                  fontWeight: FontWeight.w300,
-                  fontSize: 19,
-                  fontFamily: 'Poppins',
-                ))),
         actions: [
           Padding(
             padding: const EdgeInsets.only(left: 10.0),
             child: IconButton(
-              icon:const Icon(
+              icon: const Icon(
                 Icons.refresh,
                 color: Color.fromARGB(239, 130, 5, 220),
                 size: 25,
@@ -62,8 +53,9 @@ class _BookResourceState extends State<BookResource> {
               return Center(child: Text('No books available.'));
             }
             return GridView.builder(
-              padding:const EdgeInsets.all(16), // Add padding around the grid
-              gridDelegate:const SliverGridDelegateWithFixedCrossAxisCount(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 16), // Add padding around the grid
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2, // Number of columns
                 crossAxisSpacing: 16, // Horizontal space between items
                 mainAxisSpacing: 16, // Vertical space between items
@@ -81,6 +73,7 @@ class _BookResourceState extends State<BookResource> {
                             title: book.title,
                             author: book.author,
                             imageUrl: book.image,
+                            categories: book.categories,
                             onUpdate: (updatedBookMap) {
                               final updatedBook = BookEntity(
                                 type: book.type,

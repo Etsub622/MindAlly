@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:front_end/core/config/config_key.dart';
 import 'package:front_end/core/error/exception.dart';
 import 'package:front_end/features/Q&A/data/model/question_model.dart';
 import 'package:http/http.dart' as http;
@@ -15,18 +16,19 @@ class QuestionRemoteDataSourceImpl implements QuestionRemoteDatasource {
   final http.Client client;
   QuestionRemoteDataSourceImpl(this.client);
 
-  final baseUrl = 'http://192.168.83.216:8000/api/forum';
+  final baseUrl = ConfigKey.baseUrl;
 
   @override
   Future<String> addQuestion(QuestionModel question) async {
     try {
-      var url = Uri.parse('$baseUrl/createQuestion');
+      var url = Uri.parse('$baseUrl/questions');
       final newQuestion = await client.post(url,
           headers: {
             'Content-Type': 'application/json',
           },
           body: jsonEncode(question.toJson()));
-
+      print(newQuestion.statusCode);
+      print(newQuestion.body);
       if (newQuestion.statusCode == 201) {
         return 'Question added successfully';
       } else {
@@ -75,8 +77,10 @@ class QuestionRemoteDataSourceImpl implements QuestionRemoteDatasource {
   @override
   Future<List<QuestionModel>> getQuestions() async {
     try {
-      var url = Uri.parse('$baseUrl/getQuestions');
+      var url = Uri.parse('$baseUrl/questions');
       final response = await client.get(url);
+      print(response.body);
+      print(response.statusCode);
       if (response.statusCode == 200) {
         final List<dynamic> questionJson = json.decode(response.body);
         if (questionJson.isEmpty) {

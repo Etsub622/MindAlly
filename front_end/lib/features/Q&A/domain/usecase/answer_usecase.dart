@@ -4,15 +4,21 @@ import 'package:front_end/core/usecase/usecase.dart';
 import 'package:front_end/features/Q&A/domain/entity/answer_entity.dart';
 import 'package:front_end/features/Q&A/domain/repository/answer_repository.dart';
 
-class GetAnswersUsecase extends Usecase<List<AnswerEntity>, NoParams> {
+class GetAnswersUsecase extends Usecase<List<AnswerEntity>, GetAnswerParams> {
   final AnswerRepository repository;
 
   GetAnswersUsecase(this.repository);
 
   @override
-  Future<Either<Failure, List<AnswerEntity>>> call(NoParams params) async {
-    return await repository.getAnswers();
+  Future<Either<Failure, List<AnswerEntity>>> call(GetAnswerParams params) async {
+    return await repository.getAnswers(params.questionId);
   }
+}
+
+class GetAnswerParams{
+  final String questionId;
+  GetAnswerParams(this.questionId);
+
 }
 class AddAnswerUsecase extends Usecase<String, AddAnswerParams> {
   final AnswerRepository repository;

@@ -17,13 +17,12 @@ class QuestionModel extends QuestionEntity {
       description: json['description'],
       studentName: json['studentName'],
       studentProfile: json['studentProfile'],
-      category: json['category'],
+      category: List<String>.from(json['category']),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'id': super.id,
       'title': super.title,
       'description': super.description,
       'studentName': super.studentName,

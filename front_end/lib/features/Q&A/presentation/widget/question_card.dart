@@ -10,7 +10,6 @@ class QuestionCard extends StatefulWidget {
   final VoidCallback onUpdate;
   final VoidCallback onDelete;
 
-
   const QuestionCard({
     required this.name,
     required this.title,
@@ -33,7 +32,7 @@ class _QuestionCardState extends State<QuestionCard> {
   @override
   Widget build(BuildContext context) {
     return Material(
-      elevation: _isExpanded ? 8 : 0, 
+      elevation: _isExpanded ? 8 : 0,
       borderRadius: BorderRadius.circular(8),
       child: Container(
         width: double.infinity,
@@ -56,6 +55,27 @@ class _QuestionCardState extends State<QuestionCard> {
                 Text(
                   widget.name,
                   style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Spacer(),
+                PopupMenuButton<String>(
+                  icon: Icon(Icons.more_vert),
+                  onSelected: (value) {
+                    if (value == 'update') {
+                      widget.onUpdate();
+                    } else if (value == 'delete') {
+                      widget.onDelete();
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(
+                      value: 'update',
+                      child: Text('Update'),
+                    ),
+                    const PopupMenuItem(
+                      value: 'delete',
+                      child: Text('Delete'),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -85,37 +105,26 @@ class _QuestionCardState extends State<QuestionCard> {
             SizedBox(height: 8),
             Wrap(
               spacing: 6,
+              runSpacing: 4,
               children: widget.category.map((cat) {
                 return Chip(
-                  label: Text(cat),
+                  label: Text(
+                    cat,
+                    style: TextStyle(
+                      fontSize: 12, // Reduce font size
+                    ),
+                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 );
               }).toList(),
             ),
             SizedBox(height: 12),
             InkWell(
               onTap: widget.onPressed,
-              child:const Icon(Icons.message, color: Colors.blue, size: 28),
+              child: const Icon(Icons.message, color: Colors.blue, size: 28),
             ),
-            SizedBox(height: 8,),
-             PopupMenuButton<String>(
-              icon: Icon(Icons.more_vert),
-              onSelected: (value) {
-                if (value == 'update') {
-                  widget.onUpdate();
-                } else if (value == 'delete') {
-                widget.onDelete();
-                }
-              },
-              itemBuilder: (context) => [
-                const PopupMenuItem(
-                  value: 'update',
-                  child: Text('Update'),
-                ),
-                const PopupMenuItem(
-                  value: 'delete',
-                  child: Text('Delete'),
-                ),
-              ],
+            SizedBox(
+              height: 8,
             ),
           ],
         ),

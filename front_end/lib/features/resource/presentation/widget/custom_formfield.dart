@@ -20,14 +20,14 @@ class CustomFormField extends StatelessWidget {
         hintText: text,
         hintStyle: TextStyle(color: Colors.grey),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(15),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(15),
           borderSide: BorderSide(color: Colors.grey),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(15),
           borderSide: BorderSide(color: Colors.grey),
         ),
       ),
