@@ -5,6 +5,11 @@ import {
 } from "../validations/resourceValidation.js";
 
 export const validateResource = (req, res, next) => {
+  // If it's an update (PUT request), allow partial validation
+  if (req.method === "PUT") {
+    return next();
+  }
+
   const { type } = req.body;
   let schema;
 

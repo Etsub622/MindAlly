@@ -47,29 +47,33 @@ export const getResourceById = async (req, res) => {
 
 export const updateResource = async (req, res) => {
   try {
-    
+    console.log("Received update request for ID:", req.params.id);
+    console.log("Request body:", req.body);
 
     let resource = await Resource.findById(req.params.id);
 
     if (!resource) {
-     
+      console.log("Resource not found!");
       return res.status(404).json({ error: "Resource not found" });
     }
 
-   
-    Object.assign(resource, req.body);
-    
-   
+    // Merge only provided fields (skip undefined fields)
+    Object.keys(req.body).forEach((key) => {
+      if (req.body[key] !== undefined) {
+        resource[key] = req.body[key];
+      }
+    });
+
+    // Save the updated resource
     const updatedResource = await resource.save();
 
-    
+    console.log("Updated Resource:", updatedResource);
     res.status(200).json(updatedResource);
   } catch (error) {
-   
+    console.log("Error updating resource:", error.message);
     res.status(400).json({ error: error.message });
   }
 };
-
 
 export const deleteResource = async (req, res) => {
   try {
