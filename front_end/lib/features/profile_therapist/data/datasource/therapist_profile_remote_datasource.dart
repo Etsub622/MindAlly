@@ -70,20 +70,21 @@ class TherapistProfileRemoteDatasourceImpl extends TherapistProfileRemoteDatasou
         final token = await getToken();
         final therapistId = userData?['_id'];
         try{
-          final reqBody = json.encode(therapist.toJson());
+          final Data = therapist.toJson();
+          final reqBody = json.encode(Data);
             final response = await client.put(
               Uri.parse('$baseUrl/$therapistId'),
               body: reqBody,
                headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },);
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer $token',
+              },);
 
             if(response.statusCode == 200){
                final responceData = json.decode(response.body);
                 return UpdateTherapistModel.fromJson(responceData);
             }else{
-                throw Exception('Failed to load therapist');
+                throw ServerException(message:'Failed to load therapist');
             }
         } catch(e){
             throw ServerException(message: 'Failed to load therapist');
@@ -91,9 +92,24 @@ class TherapistProfileRemoteDatasourceImpl extends TherapistProfileRemoteDatasou
     }
 
     @override
-    Future<Null> deleteTherapist({required String id}) {
-        // Implement the logic to delete a therapist
-        throw UnimplementedError();
+    Future<Null> deleteTherapist({required String id}) async {
+        try{
+            final token = await getToken();
+            final response = await client.delete(
+              Uri.parse('$baseUrl/$id'),
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer $token',
+              },);
+
+            if( response.statusCode == 200){
+              return Future.value(null);
+            }else{
+                throw Exception('Failed to delete account');
+            }
+        } catch(e){
+            throw ServerException(message: 'Failed to load therapist');
+        }
     }
     
 }
