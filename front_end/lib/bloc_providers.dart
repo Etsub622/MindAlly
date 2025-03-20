@@ -8,6 +8,7 @@ import 'package:front_end/features/resource/presentation/bloc/book_bloc/bloc/boo
 import 'package:front_end/core/injection/injections.dart';
 import 'package:front_end/features/resource/presentation/bloc/video_bloc/bloc/video_bloc.dart';
 
+
 class MultiBLOCProvider {
   static final blocProvider = [
     BlocProvider<AuthBloc>(
