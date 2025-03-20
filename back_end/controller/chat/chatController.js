@@ -40,7 +40,7 @@ export const getAllChatsHistoryByUserId = async (req, res) => {
               const secondUserId = chat.senderId == userId ? chat.receiverId : chat.senderId;
               console.log(chat.senderId, chat.receiverId == userId, chat.senderId == userId, secondUserId)
               const secondUser = await getSecondUser(secondUserId);
-
+              
               return {
                   chatId: chat.chatId,
                   senderId: chat.senderId,

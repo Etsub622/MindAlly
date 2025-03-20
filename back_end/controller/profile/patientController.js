@@ -52,7 +52,7 @@ export const updatePatient = async (req, res) => {
     preferred_mode,
     preferred_specialties 
   } = req.body;
-
+  console.log(req.body);
   try {
     const updates = {};
     
@@ -61,25 +61,22 @@ export const updatePatient = async (req, res) => {
     if (Collage) updates.Collage = Collage;
     if (Password) updates.Password = await bcrypt.hash(Password, 10);
 
-    if (gender !== undefined) updates.gender = gender;
-    if (preferred_modality !== undefined) updates.preferred_modality = preferred_modality;
-    if (preferred_gender !== undefined) updates.preferred_gender = preferred_gender;
-    if (preferred_language !== undefined) updates.preferred_language = preferred_language;
-    if (preferred_days !== undefined) updates.preferred_days = preferred_days;
-    if (preferred_mode !== undefined) updates.preferred_mode = preferred_mode;
-    if (preferred_specialties !== undefined) updates.preferred_specialties = preferred_specialties;
+    if (gender !== undefined) if(gender) updates.gender = gender;
+    if (preferred_modality !== undefined) if(preferred_modality) updates.preferred_modality = preferred;
+    if (preferred_gender !== undefined)  if(preferred_gender) updates.preferred_gender = preferred_gender;
+    if (preferred_language !== undefined) if(preferred_language) updates.preferred_language = preferred_language;
+    if (preferred_days !== undefined) if(preferred_days) updates.preferred_days = preferred_days;
+    if (preferred_mode !== undefined) if(preferred_mode) updates.preferred_mode = preferred_mode;
+    if (preferred_specialties !== undefined) if(preferred_specialties) updates.preferred_specialties = preferred_specialties;
 
     const patient = await Patient.findByIdAndUpdate(
       req.params.patient_id, 
       updates, 
       { 
-        new: true,
+        new:true,
         runValidators: true
       }
     );
-
-    print(patient);
-    print(`update data: ${updates}`);
 
     if (!patient) return res.status(404).json({ message: "Patient not found" });
 
@@ -87,7 +84,7 @@ export const updatePatient = async (req, res) => {
       message: "Patient updated successfully",
       patient
     });
-    print(patient);
+    console.log(patient);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
