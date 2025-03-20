@@ -18,6 +18,7 @@ class QuestionModel extends QuestionEntity {
       studentName: json['studentName'],
       studentProfile: json['studentProfile'],
       category: List<String>.from(json['category']),
+      
     );
   }
 

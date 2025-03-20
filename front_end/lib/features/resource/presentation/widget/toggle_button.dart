@@ -4,8 +4,7 @@ class CustomToggleButton extends StatefulWidget {
   final List<bool> isSelected;
   final Function(int) onToggle;
 
-  const CustomToggleButton({
-    super.key,
+ const CustomToggleButton({super.key, 
     required this.isSelected,
     required this.onToggle,
   });

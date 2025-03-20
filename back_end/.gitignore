@@ -24,3 +24,6 @@ logs
 
 # Environment variables
 .env*
+
+# files
+front_end/lib/core/config/config_key.dart

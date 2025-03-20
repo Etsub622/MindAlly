@@ -20,18 +20,16 @@ class QuestionBloc extends Bloc<QuestionEvent, QuestionState> {
     required this.deleteQuestionUsecase,
     required this.getQuestionByCategoryUsecase,
   }) : super(QuestionInitial()) {
-
-    on<AddQuestionEvent>((event, emit)async {
-      emit (QuestionLoading());
-      final question = await createQuestionUsecase(CreateQuestionParams(event.questionEntity));
+    on<AddQuestionEvent>((event, emit) async {
+      emit(QuestionLoading());
+      final question = await createQuestionUsecase(
+          CreateQuestionParams(event.questionEntity));
       question.fold((l) {
         emit(QuestionError(l.message));
       }, (r) {
         emit(QuestionAdded(r));
       });
-
     });
-
 
     on<GetQuestionEvent>((event, emit) async {
       emit(QuestionLoading());
@@ -44,9 +42,10 @@ class QuestionBloc extends Bloc<QuestionEvent, QuestionState> {
     });
 
     on<UpdateQuestionEvent>((event, emit) async {
+      print('📥 Data received in Bloc: ${event.questionEntity}');
       emit(QuestionLoading());
-      final result = await updateQuestionUsecase(UpdateQuestionParams(event.questionEntity, event.id));
-
+      final result = await updateQuestionUsecase(
+          UpdateQuestionParams(event.questionEntity, event.id));
       result.fold((l) {
         emit(QuestionError(l.message));
       }, (successMessage) {
@@ -56,7 +55,8 @@ class QuestionBloc extends Bloc<QuestionEvent, QuestionState> {
 
     on<DeleteQuestionEvent>((event, emit) async {
       emit(QuestionLoading());
-      final result = await deleteQuestionUsecase(DeleteQuestionParams(event.id));
+      final result =
+          await deleteQuestionUsecase(DeleteQuestionParams(event.id));
 
       result.fold((l) {
         emit(QuestionError(l.message));
@@ -67,7 +67,8 @@ class QuestionBloc extends Bloc<QuestionEvent, QuestionState> {
 
     on<SearchQuestionEvent>((event, emit) async {
       emit(QuestionLoading());
-      final question = await getQuestionByCategoryUsecase(GetQuestionByCategoryParams(event.title));
+      final question = await getQuestionByCategoryUsecase(
+          GetQuestionByCategoryParams(event.title));
       question.fold((l) {
         emit(QuestionError(l.message));
       }, (questions) {

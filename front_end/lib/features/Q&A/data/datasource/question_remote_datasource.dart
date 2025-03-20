@@ -43,7 +43,7 @@ class QuestionRemoteDataSourceImpl implements QuestionRemoteDatasource {
   @override
   Future<String> deleteQuestion(String id) async {
     try {
-      var url = Uri.parse('$baseUrl/deleteQuestion/$id');
+      var url = Uri.parse('$baseUrl/questions/$id');
       final deletedQuestion = await client.delete(url);
       if (deletedQuestion.statusCode == 200) {
         final decodedResponse = jsonDecode(deletedQuestion.body);
@@ -79,8 +79,6 @@ class QuestionRemoteDataSourceImpl implements QuestionRemoteDatasource {
     try {
       var url = Uri.parse('$baseUrl/questions');
       final response = await client.get(url);
-      print(response.body);
-      print(response.statusCode);
       if (response.statusCode == 200) {
         final List<dynamic> questionJson = json.decode(response.body);
         if (questionJson.isEmpty) {
@@ -102,13 +100,12 @@ class QuestionRemoteDataSourceImpl implements QuestionRemoteDatasource {
   @override
   Future<String> updateQuestion(QuestionModel question, String id) async {
     try {
-      var url = Uri.parse('$baseUrl/updateQuestion/$id');
+      var url = Uri.parse('$baseUrl/questions/$id');
       final updatedQuestion = await client.put(url,
           headers: {
             'Content-Type': 'application/json',
           },
           body: jsonEncode(question.toJson()));
-
       if (updatedQuestion.statusCode == 200) {
         return 'Question updated successfully';
       } else {

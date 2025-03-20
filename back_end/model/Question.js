@@ -6,7 +6,8 @@ const questionSchema = new mongoose.Schema({
   studentName: { type: String, required: true },
   studentProfile: { type: String, required: true },
   category: { type: [String], required: true },
-});
+},
+{ timestamps: true });
 
 const Question = mongoose.model("Question", questionSchema);
 
