@@ -7,7 +7,7 @@ import { generateJWT, hashedPassword } from "../../utils/authUtils.js";
 const registerTherapist = async (req, res) => {
     try {
 
-        const { fullName, email, password, specialization , certificate} = req.body
+        const { fullName, email, password, specialization , certificate } = req.body
         
     
     const hashedPass= await hashedPassword(password)
@@ -15,7 +15,7 @@ const registerTherapist = async (req, res) => {
     const therapist = new Therapist({
       FullName:fullName,
       Email:email,
-      AreaofSpecification:specialization,
+      modality:specialization,
       Password: hashedPass,
       Certificate: certificate,
       Role: "therapist",

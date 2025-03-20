@@ -3,7 +3,8 @@ import bcrypt from "bcrypt";
 
 // Create a new therapist
 export const createTherapist = async (req, res) => {
-  const { FullName, Email, Password, AreaofSpecification, Certificate, Bio, Fee, Rating, verified } = req.body;
+  const { FullName, Email, Password, modality, Certificate, Bio, Fee, Rating, verified } = req.body;
+  print(req.body);
 
   try {
     const existingTherapist = await Therapist.findOne({ Email });
@@ -15,7 +16,7 @@ export const createTherapist = async (req, res) => {
       FullName,
       Email,
       Password: hashedPassword,
-      AreaofSpecification,
+      modality,
       Certificate,
       Bio,
       Fee,
@@ -23,7 +24,10 @@ export const createTherapist = async (req, res) => {
       verified,
     });
 
+    print(newTherapist);
+
     await newTherapist.save();
+    
     res.status(201).json({ message: "Therapist created successfully", newTherapist });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -44,13 +48,16 @@ export const getTherapist = async (req, res) => {
 
 // Update a therapist's details
 export const updateTherapist = async (req, res) => {
-  const { FullName, Email, Password, AreaofSpecification, Bio, Fee, Rating, verified } = req.body;
+  const { FullName, Email, Password, modality, Bio, Fee, Rating, verified, gender, experianceYears} = req.body;
+
+  console.log(req.body);
+  console.log(FullName, Email, Password, modality, Bio, Fee, Rating, experience_years);
 
   try {
-    const updates = { FullName, Email, AreaofSpecification, Bio, Fee, Rating, verified };
+    const updates = { FullName, Email, modality, Bio, Fee, Rating, verified, gender };
     if (Password) updates.Password = await bcrypt.hash(Password, 10);
 
-    const therapist = await Therapist.findByIdAndUpdate(req.params.therapist_id, updates, { new: true });
+    const therapist = await Therapist.findByIdAndUpdate(req.params.therapist_id, updates);
     if (!therapist) return res.status(404).json({ message: "Therapist not found" });
 
     res.json(therapist);

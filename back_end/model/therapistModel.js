@@ -15,10 +15,9 @@ const therapistschema = new mongoose.Schema({
         type: String,
         required:true
     },
-    AreaofSpecification: {
+    modality: {
         type: String,
         required: true
-    
     },
     Certificate: {
         type: String,
@@ -37,14 +36,32 @@ const therapistschema = new mongoose.Schema({
         type:Number
         
     },
+    gender: {
+        type: String,
+    },
     Role: {
         type: String,
         default:"therapist"
     },
     verified: {
         type:Boolean
+    },
+    specialities: {
+        type: Array
+    },
+    available_days: {
+        type: Array
+    },
+    language:{
+        type: Array
+    },
+    mode: {
+        type: Array
+    },
+    experience_years:{
+        type: Number,
+        default: 0,
     }
-
 })
 
 
