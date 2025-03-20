@@ -77,14 +77,6 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     };
      
     _socketService.socket.emit('sendMessage', newMessage);
-    _messages.add(MessageEntity(
-      chatId: event.messageModel.chatId,
-      message: event.messageModel.message,
-      receiverId: event.messageModel.receiverId,
-      senderId: userId,
-      timestamp: event.messageModel.timestamp,
-      isRead: false
-    ));
     emit(ChatLoadedState(messages: List.from(_messages)));
   }
 
