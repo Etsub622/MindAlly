@@ -84,7 +84,7 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
     return Scaffold(
       body: BlocConsumer<AuthBloc, AuthState>(builder: (context, state) {
         if (state is AuthLoading) {
-          return CircularIndicator();
+          return const CircularIndicator();
         } else {
           return _build(context);
         }
@@ -94,7 +94,7 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
           ScaffoldMessenger.of(context).showSnackBar(snack);
 
           Future.delayed(const Duration(seconds: 2), () {
-            context.go(AppPath.login);
+            context.go(AppPath.therapistOnboard);
           });
         } else if (state is AuthError) {
           final snack = errorsnackBar('Try again later');
@@ -119,10 +119,10 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
                   height: 100,
                   width: 100,
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 30,
                 ),
-                Text(
+                const Text(
                   'Create your account',
                   style: TextStyle(
                     fontFamily: 'Poppins',
@@ -131,7 +131,7 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 30,
                 ),
                 CustomTextField(
@@ -144,31 +144,31 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
                     return null;
                   },
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 CustomTextField(
                     text: "email",
                     controller: emailController,
                     validator: _validateEmail),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 CustomTextField(
                     text: "password",
-                    sign: Icon(Icons.remove_red_eye),
+                    sign: const Icon(Icons.remove_red_eye),
                     controller: passwordController,
                     isPassword: true,
                     validator: _validatePassword),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 CustomTextField(
                     text: "confirm password",
-                    sign: Icon(Icons.remove_red_eye),
+                    sign: const Icon(Icons.remove_red_eye),
                     controller: confirmPasswordController,
                     isPassword: true),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 CustomTextField(
@@ -181,7 +181,7 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
                     return null;
                   },
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 CustomTextField(
@@ -194,12 +194,12 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
                     return null;
                   },
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 CustomTextField(
                     text: "Certified document", controller: documentController),
-                SizedBox(
+                const SizedBox(
                   height: 40,
                 ),
                 CustomButton(
@@ -219,7 +219,7 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
                     }
                   },
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 15,
                 ),
                 Align(
@@ -229,7 +229,7 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
                       context.go(AppPath.login);
                     },
                     child: RichText(
-                      text: TextSpan(
+                      text: const TextSpan(
                         text: 'Already have an account? ',
                         style: TextStyle(
                           color: Colors.black,

@@ -1,18 +1,16 @@
 import 'package:front_end/core/config/config_key.dart';
 import 'package:front_end/core/error/exception.dart';
-import 'package:front_end/features/authentication/data/datasource/auth_local_datasource/login_local_datasource.dart';
 import 'package:front_end/features/authentication/data/models/login_model.dart';
 import 'package:front_end/features/authentication/data/models/professional_signup_model.dart';
 import 'package:front_end/features/authentication/data/models/student_data_model.dart';
 import 'package:front_end/features/authentication/data/models/student_signup_model.dart';
 import 'package:http/http.dart' as http;
-import 'package:jwt_decoder/jwt_decoder.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class AuthRemoteDatasource {
-  Future<String> studentSignUp(StudentSignupModel studentModel);
-  Future<String> professionalSignUp(ProfessionalSignupModel professionalModel);
+  Future<Map<String, dynamic>> studentSignUp(StudentSignupModel studentModel);
+  Future<Map<String, dynamic>> professionalSignUp(ProfessionalSignupModel professionalModel);
   Future<StudentResponseModel> logIn(LoginModel loginModel);
   Future<String> sendOtp(String email);
   Future<String> verifyOtp(String otp, String email);
@@ -24,14 +22,14 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   final baseUrl = ConfigKey.baseUrl;
 
   @override
-  Future<String> professionalSignUp(
+  Future<Map<String, dynamic>> professionalSignUp(
       ProfessionalSignupModel professionalModel) async {
     try {
       var url = Uri.parse('$baseUrl/user/therapistSignup');
       final user = await client.post(url,
           body: jsonEncode(professionalModel.toJson()),
           headers: {'Content-Type': 'application/json'});
-      print(user.body);
+     
       if (user.statusCode == 200) {
         final jsonResponse = jsonDecode(user.body);
         final token = jsonResponse['token'];
@@ -39,7 +37,15 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
         final sharedPreferences = await SharedPreferences.getInstance();
         await sharedPreferences.setString('token_key', token);
 
-        return token;
+        if (jsonResponse['user'] == null) {
+          throw ServerException(message: 'User data is null');
+        }
+
+        final res = {
+          'token': token,
+          'user': jsonResponse['user'],
+        };
+        return res;
       } else {
         throw ServerException(message: 'Failed to sign up');
       }
@@ -50,15 +56,14 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   }
 
   @override
-  Future<String> studentSignUp(StudentSignupModel studentModel) async {
+  Future<Map<String, dynamic>> studentSignUp(StudentSignupModel studentModel) async {
     try {
       var url = Uri.parse('$baseUrl/user/PatientSignup');
 
       final user = await client.post(url,
           body: jsonEncode(studentModel.toJson()),
           headers: {'Content-Type': 'application/json'});
-      print(user.body);
-      print(user.statusCode);
+      
       if (user.statusCode == 200) {
         final jsonResponse = jsonDecode(user.body);
         final token = jsonResponse['token'];
@@ -66,8 +71,14 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
         // Save the token to SharedPreferences
         final sharedPreferences = await SharedPreferences.getInstance();
         await sharedPreferences.setString('token_key', token);
-
-        return token;
+        if (jsonResponse['user'] == null) {
+          throw ServerException(message: 'User data is null');
+        }
+        final res = {
+          'token': token,
+          'user': json.decode(jsonResponse['user']),
+        };
+        return res;
       } else {
         throw ServerException(message: 'Failed to sign up');
       }
@@ -99,8 +110,9 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       // } else {
       //   url = '';
       // }
-      print(url);
-      final user = await client.post(url,
+    
+      final user = await client.post(
+          url,
           body: jsonEncode(loginModel.toJson()),
           headers: {'Content-Type': 'application/json'});
 
@@ -112,10 +124,10 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
         }
 
         final studentResponse = StudentResponseModel.fromJson(responseJson);
-        print(studentResponse);
         return studentResponse;
       } else {
-        throw ServerException(message: 'Failed to sign up');
+        final errorMessage = jsonDecode(user.body);
+        throw ServerException(message: errorMessage?['error']);
       }
     } catch (e) {
       throw ServerException(
@@ -149,7 +161,6 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       final res = await client.post(url,
           body: jsonEncode({'otp': otp, 'email': email}),
           headers: {'Content-Type': 'application/json; charset=UTF-8'});
-      print(res.body);
       if (res.statusCode == 200) {
         return jsonDecode(res.body)['resetToken'];
       } else {

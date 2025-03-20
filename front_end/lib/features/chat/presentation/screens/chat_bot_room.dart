@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:front_end/core/util/chat_bot_service.dart';
+import 'package:front_end/core/service/chat_bot_service.dart';
 
 class ChatBotScreen extends StatefulWidget {
   const ChatBotScreen({super.key});
 
   @override
   _ChatBotScreenState createState() => _ChatBotScreenState();
-  }
+}
 
 class _ChatBotScreenState extends State<ChatBotScreen> {
   final TextEditingController _controller = TextEditingController();
@@ -33,9 +33,25 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Dr. MindAlly"),
-        backgroundColor: Colors.teal,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(70),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(20),
+          ),
+          child: AppBar(
+            title: const Text(
+              "Dr. MindAlly",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 22,
+              ),
+            ),
+            backgroundColor: Colors.purple[200],
+            elevation: 4, // Adds a subtle shadow
+            centerTitle: true, // Centers the title
+          ),
+        ),
       ),
       body: Column(
         children: [
@@ -58,7 +74,11 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
                           const Text(
                             "Hello! I’m here to support users with mental health concerns, 24/7.",
                             textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 16, color: Colors.black87),
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.black87,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ],
                       ),
@@ -74,12 +94,19 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
                             : Alignment.centerLeft,
                         child: Container(
                           margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                          padding: const EdgeInsets.all(10),
+                          padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
                             color: message["role"] == "user"
-                                ? Colors.teal
-                                : Colors.grey[200],
-                            borderRadius: BorderRadius.circular(10),
+                                ? Colors.purple[200] // Darker teal for user messages
+                                : Colors.purple[50],
+                            borderRadius: BorderRadius.circular(15), // Slightly rounder corners
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
                           ),
                           child: SelectableText(
                             message["content"]!,
@@ -87,8 +114,8 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
                               color: message["role"] == "user"
                                   ? Colors.white
                                   : Colors.black87,
+                              fontSize: 15,
                             ),
-                            // Optional: Customize selection toolbar
                             toolbarOptions: const ToolbarOptions(
                               copy: true,
                               selectAll: true,
@@ -102,21 +129,62 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
                   ),
           ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
             child: Row(
               children: [
                 Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    decoration: const InputDecoration(
-                      hintText: "How can I assist you today?",
-                      border: OutlineInputBorder(),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(30), // Fully rounded input box
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.2),
+                          blurRadius: 6,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: TextField(
+                      controller: _controller,
+                      decoration: InputDecoration(
+                        hintText: "How can I assist you today?",
+                        hintStyle: TextStyle(color: Colors.grey[500]),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: BorderSide.none, // No visible border
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
                     ),
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.send, color: Colors.teal),
-                  onPressed: _sendMessage,
+                const SizedBox(width: 8),
+                Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      colors: [Colors.purple[200]!, Colors.purple[400]!],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.purple.withOpacity(0.3),
+                        blurRadius: 6,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: IconButton(
+                    icon: const Icon(Icons.send, color: Colors.white),
+                    onPressed: _sendMessage,
+                  ),
                 ),
               ],
             ),
@@ -126,4 +194,3 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
     );
   }
 }
-

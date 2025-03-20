@@ -2,7 +2,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front_end/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:front_end/features/chat/presentation/bloc/chat/chat_bloc.dart';
 import 'package:front_end/features/chat/presentation/bloc/chat_list/chat_list_bloc.dart';
-import 'package:front_end/features/profile/presentation/bloc/user_profile_bloc.dart';
+import 'package:front_end/features/profile_patient/presentation/bloc/get_patient_bloc/get_patient_bloc.dart';
+import 'package:front_end/features/profile_patient/presentation/bloc/update_patient_bloc/update_patient_bloc.dart';
+import 'package:front_end/features/profile_therapist/presentation/bloc/get_therapist_bloc/get_therapist_bloc.dart';
+import 'package:front_end/features/profile_therapist/presentation/bloc/update_therapist_bloc/update_therapist_bloc.dart';
 import 'package:front_end/features/resource/presentation/bloc/article_bloc/bloc/article_bloc.dart';
 import 'package:front_end/features/resource/presentation/bloc/book_bloc/bloc/book_bloc.dart';
 import 'package:front_end/core/injection/injections.dart';
@@ -24,8 +27,17 @@ class MultiBLOCProvider {
       create:(_)=>sl<ArticleBloc>(),
     ),
 
-    BlocProvider<UserProfileBloc>(
-      create: (_) => sl<UserProfileBloc>()
+    BlocProvider<PatientProfileBloc>(
+      create: (_) => sl<PatientProfileBloc>()
+      ),
+    BlocProvider<TherapistProfileBloc>(
+      create: (_) => sl<TherapistProfileBloc>()
+      ),
+    BlocProvider<UpdatePatientBloc>(
+      create: (_) => sl<UpdatePatientBloc>()
+      ),
+    BlocProvider<UpdateTherapistBloc>(
+      create: (_) => sl<UpdateTherapistBloc>()
       ),
 
     BlocProvider<ChatBloc>(

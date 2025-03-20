@@ -3,14 +3,13 @@ import 'package:front_end/core/routes/app_path.dart';
 import 'package:front_end/features/Home/presentation/screens/home_navigation_screen.dart';
 import 'package:front_end/features/authentication/presentation/screens/forgot_password.dart';
 import 'package:front_end/features/authentication/presentation/screens/login.dart';
-import 'package:front_end/features/authentication/presentation/screens/onboard_one.dart';
 import 'package:front_end/features/authentication/presentation/screens/otp.dart';
+import 'package:front_end/features/authentication/presentation/screens/patient_onboarding.dart';
 import 'package:front_end/features/authentication/presentation/screens/professional_signUp.dart';
 import 'package:front_end/features/authentication/presentation/screens/reset_password.dart';
 import 'package:front_end/features/authentication/presentation/screens/role_selection.dart';
 import 'package:front_end/features/authentication/presentation/screens/student_signUp.dart';
-import 'package:front_end/features/chat/domain/entities/chats_entity.dart';
-import 'package:front_end/features/chat/presentation/screens/chat_detail_screen.dart';
+import 'package:front_end/features/authentication/presentation/screens/therapist_onboarding.dart';
 import 'package:front_end/features/chat/presentation/screens/chat_room.dart';
 import 'package:front_end/features/resource/presentation/screens/book_resource.dart';
 
@@ -20,11 +19,16 @@ final routes = <GoRoute>[
   GoRoute(
       name: 'home',
       path: AppPath.home,
-      builder: (context, state) => const HomeNavigationScreen(index: 0)),
+      builder: (context, state) => HomeNavigationScreen(index: 0, role: state.uri.queryParameters['role'] ?? 'patient')),
   GoRoute(
-    name: 'auth_onboarding',
-    path: AppPath.authOnboarding,
-    builder: (BuildContext context, GoRouterState state) => const OnboardOne(),
+    name: 'therapist_onboard',
+    path: AppPath.therapistOnboard,
+    builder: (BuildContext context, GoRouterState state) => const TherapistOnboardingScreen(),
+  ),
+  GoRoute(
+    name: 'patient_onboard',
+    path: AppPath.patientOnboard,
+    builder: (BuildContext context, GoRouterState state) => const PatientOnboardingSreen(),
   ),
   GoRoute(
       path: AppPath.role, builder: (context, state) => const RoleSelection()),
@@ -81,6 +85,12 @@ GoRouter routerConfig() {
 
 class AppRouter extends StatelessWidget {
   final GoRouter router;
+
+   void popUntil(bool Function(String) predicate) {
+    while (!predicate(router.routerDelegate.currentConfiguration.fullPath)) {
+      router.pop();
+    }
+  }
 
   late String title;
   late String image;
