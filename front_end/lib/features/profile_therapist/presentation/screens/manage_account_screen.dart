@@ -7,6 +7,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:front_end/core/routes/routes.dart';
 import 'package:front_end/core/utils/constants.dart';
 import 'package:front_end/features/authentication/presentation/bloc/auth_bloc.dart';
+import 'package:front_end/features/profile_therapist/presentation/bloc/delete_therapist_bloc/delete_therapist_bloc.dart';
 import 'package:front_end/features/profile_therapist/presentation/bloc/get_therapist_bloc/get_therapist_bloc.dart';
 import 'package:go_router/go_router.dart';
 
@@ -284,7 +285,7 @@ class ManageTherapistScreenState extends State<ManageTherapistScreen> {
                                   },
                                 ),
                                 ListTile(
-                                  trailing: Icon(
+                                  trailing: const Icon(
                                     Icons.delete_forever,
                                     color: Colors.red,
                                   ),
@@ -301,14 +302,7 @@ class ManageTherapistScreenState extends State<ManageTherapistScreen> {
                                         ?.copyWith(color: Colors.red),
                                   ),
                                   onTap: () {
-                                    // FirebaseAnalytics.instance.logEvent(
-                                    //   name: 'manage_account_clicked',
-                                    //   parameters: <String, dynamic>{
-                                    //     'name': "Delete Account",
-                                    //   },
-                                    // );
-                                    // showAccountDeleteConfirmationDialog(
-                                    //     context);
+                                    _showDeleteAccountDialog(context);
                                   },
                                 ),
                               ],
@@ -319,8 +313,51 @@ class ManageTherapistScreenState extends State<ManageTherapistScreen> {
                     ),
                   )),
             );
-        //   })),
-        // )
+
+  }
+
+
+void _showDeleteAccountDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return BlocConsumer<DeleteTherapistBloc, DeleteTherapistState>(
+          listener: (context, state) {
+            if (state is DeleteTherapistLoaded) {
+                GoRouter.of(context).go(AppPath.login);
+              } else if (state is DeleteTherapistError) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(state.message)),
+                );
+                Navigator.of(context).pop();
+              }
+          },
+          builder: (context, state) {
+            return AlertDialog(
+              title: const Text('Delete Account'),
+              content: const Text('Are you sure you want to delete your account?'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    context.read<DeleteTherapistBloc>().add(DeleteTherapistLoadEvent(therapistId: widget.therapistId));
+                  },
+                  child: const Text(
+                    'Delete Account',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                )
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   void _showDialog(BuildContext context) {

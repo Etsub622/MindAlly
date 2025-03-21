@@ -22,7 +22,6 @@ abstract class ChatRemoteDataSource {
   Future<List<MessageEntity>> fetchMessages({
     required String chatId
   });
-
   Future<ListChatsEntity> getAllChats();
 }
 

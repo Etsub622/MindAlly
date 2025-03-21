@@ -31,7 +31,8 @@ class UpdatePatientEntity extends Equatable {
   this.preferredDays, 
   this.preferredMode, 
   this.profilePicture,
-  this.preferredSpecialties});
+  this.preferredSpecialties
+  });
 
   @override
   List<Object?> get props => [name, email, hasPassword, role, collage];

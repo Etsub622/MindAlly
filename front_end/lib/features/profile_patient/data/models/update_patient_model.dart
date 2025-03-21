@@ -17,18 +17,24 @@ class UpdatePatientModel extends UpdatePatientEntity{
   });
       factory UpdatePatientModel.fromJson(Map<String, dynamic> json) {
         return UpdatePatientModel(
-          name: json['name'],
-          email: json['email'],
-          hasPassword: json['hasPassword'],
-          role: json['role'],
-          collage: json['collage'],
+          name: json['FullName'],
+          email: json['Email'],
+          hasPassword: json['Password'] != null,
+          role: json['Role'],
+          collage: json['Collage'],
           gender: json['gender'],
-          preferredModality: json['preferredModality'],
-          preferredGender: json['preferredGender'],
-          preferredLanguage: json['preferredLanguage'],
-          preferredDays: json['preferredDays'],
-          preferredMode: json['preferredMode'],
-          preferredSpecialties: json['preferredSpecialties'],
+          preferredModality: json['preferred_modality'],
+          preferredGender: json['preferred_gender'],
+          preferredLanguage: json['preferred_language'] != null
+            ? (json['preferred_language'] as List<dynamic>).map((e) => e.toString()).toList()
+            : null,
+          preferredDays:json['preferred_days'] != null
+            ? (json['preferred_days'] as List<dynamic>).map((e) => e.toString()).toList()
+            : null,
+          preferredMode: json['preferred_mode'],
+          preferredSpecialties: json['preferred_specialties'] != null
+              ? (json['preferred_specialties'] as List<dynamic>).map((e) => e.toString()).toList()
+              : null,
         );
       }
 
@@ -40,12 +46,12 @@ class UpdatePatientModel extends UpdatePatientEntity{
           'role': role,
           'collage': collage,
           'gender': gender,
-          'preferredModality': preferredModality,
-          'preferredGender': preferredGender,
-          'preferredLanguage': preferredLanguage,
-          'preferredDays': preferredDays,
-          'preferredMode': preferredMode,
-          'preferredSpecialties': preferredSpecialties,
+          'preferred_modality': preferredModality,
+          'preferred_gender': preferredGender,
+          'preferred_language': preferredLanguage,
+          'preferred_days': preferredDays,
+          'preferred_mode': preferredMode,
+          'preferred_specialties': preferredSpecialties,
         };
       }
 
