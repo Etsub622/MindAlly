@@ -4,10 +4,10 @@ import 'package:front_end/features/Q&A/presentation/bloc/bloc/question_bloc.dart
 import 'package:front_end/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:front_end/features/chat/presentation/bloc/chat/chat_bloc.dart';
 import 'package:front_end/features/chat/presentation/bloc/chat_list/chat_list_bloc.dart';
-import 'package:front_end/features/chat/presentation/bloc/chat/chat_bloc.dart';
-import 'package:front_end/features/chat/presentation/bloc/chat_list/chat_list_bloc.dart';
+import 'package:front_end/features/profile_patient/presentation/bloc/delete_patient_bloc/delete_patient_bloc.dart';
 import 'package:front_end/features/profile_patient/presentation/bloc/get_patient_bloc/get_patient_bloc.dart';
 import 'package:front_end/features/profile_patient/presentation/bloc/update_patient_bloc/update_patient_bloc.dart';
+import 'package:front_end/features/profile_therapist/presentation/bloc/delete_therapist_bloc/delete_therapist_bloc.dart';
 import 'package:front_end/features/profile_therapist/presentation/bloc/get_therapist_bloc/get_therapist_bloc.dart';
 import 'package:front_end/features/profile_therapist/presentation/bloc/update_therapist_bloc/update_therapist_bloc.dart';
 import 'package:front_end/features/resource/presentation/bloc/article_bloc/bloc/article_bloc.dart';
@@ -38,5 +38,12 @@ class MultiBLOCProvider {
     BlocProvider<ChatListBloc>(create: (_) => sl<ChatListBloc>()),
     BlocProvider<QuestionBloc>(create: (_) => sl<QuestionBloc>()),
     BlocProvider<AnswerBloc>(create: (_) => sl<AnswerBloc>()),
+    BlocProvider<DeletePatientBloc>(
+      create: (_) => sl<DeletePatientBloc>()
+    ),
+    BlocProvider<DeleteTherapistBloc>(
+      create: (_) => sl<DeleteTherapistBloc>()
+    ),
+
   ];
 }

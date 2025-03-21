@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:front_end/core/routes/app_path.dart';
 import 'package:front_end/core/utils/constants.dart';
+import 'package:go_router/go_router.dart';
 
 
 enum LangugeModel { english, amharic}
@@ -153,6 +155,7 @@ class ProfilePageGeneralInfoWidget extends StatelessWidget {
             )
           ,ListTile(
             onTap: () {
+              context.push(AppPath.patientOnboard);
             },
             leading: Icon(
               Icons.filter_list,

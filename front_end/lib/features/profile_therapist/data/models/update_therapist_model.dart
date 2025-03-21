@@ -33,29 +33,37 @@ class UpdateTherapistModel  extends UpdateTherapistEntity{
       rating: json['rating'] ?? 0.0,
       gender: json['gender'],
       verified: json['verified'] ?? false,
-      specialities: json['specialities'] ?? List<String>.from(json['specialities'] ?? []),
-      availableDays: json['availableDays'] ?? List<String>.from(json['availableDays'] ?? []),
+      specialities: json['specialities'] != null
+            ? (json['specialities'] as List<dynamic>).map((e) => e.toString()).toList()
+            : null,
+      availableDays: json['available_days'] != null
+            ? (json['available_days'] as List<dynamic>).map((e) => e.toString()).toList()
+            : null,
       profilePicture: json['profilePicture'] ?? "",
-      language: json['language'] ?? List<String>.from(json['language'] ?? []),
-      mode: json['mode'] ?? List<String>.from(json['mode'] ?? []),
+      language: json['language'] != null
+            ? (json['language'] as List<dynamic>).map((e) => e.toString()).toList()
+            : null,
+      mode: json['mode'] != null
+            ? (json['mode'] as List<dynamic>).map((e) => e.toString()).toList()
+            : null,
       experienceYears:json['experience_years'] ?? 0,
     );
     }
 
     Map<String, dynamic> toJson() {
     return {
-      'id': id,
-      'name': name,
-      'email': email,
+      '_id': id,
+      'FullName': name,
+      'Email': email,
       'modality': modality,
-      'certificate': certificate,
-      'bio': bio,
+      'Certificate': certificate,
+      'Bio': bio,
       'fee': fee,
       'rating': rating,
       'gender': gender,
       'verified': verified,
       'specialities': specialities,
-      'availableDays': availableDays,
+      'available_days': availableDays,
       'profilePicture': profilePicture,
       'language': language,
       'mode': mode,

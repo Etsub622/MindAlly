@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:front_end/core/config/config_key.dart';
 import 'package:front_end/core/error/exception.dart';
+import 'package:front_end/core/util/get_token.dart';
+import 'package:front_end/core/util/get_user_credential.dart';
 import 'package:front_end/features/profile_patient/data/models/patient_model.dart';
 import 'package:front_end/features/profile_patient/data/models/update_patient_model.dart';
 import 'package:http/http.dart' as http;
@@ -41,10 +43,25 @@ class PatientProfileRemoteDatasourceImpl extends PatientProfileRemoteDatasource 
 
     @override
     Future<UpdatePatientModel> updatePatient({required UpdatePatientModel patient}) async {
+        final userData = await getUserCredential();
+        final token = await getToken();
+        final patientId = userData?['_id'];
+
         try{
-          final response = await client.put(Uri.parse('$baseUrl'));
-          final responseData = json.decode(response.body);
-          return UpdatePatientModel.fromJson(responseData);
+          final reqBody = json.encode(patient.toJson());
+          final response = await client.put(
+              Uri.parse('$baseUrl/$patientId'),
+              body: reqBody,
+               headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },);
+          if(response.statusCode == 200){
+               final responceData = json.decode(response.body);
+                return UpdatePatientModel.fromJson(responceData['patient']);
+            }else{
+                throw ServerException(message:'Failed to update patient');
+            }
           
         }catch(e){
           throw ServerException(message: "Error fetching patient");
@@ -54,8 +71,18 @@ class PatientProfileRemoteDatasourceImpl extends PatientProfileRemoteDatasource 
    
       @override
       Future<Null> deletePatient({required String id}) async {
-    try{
-          final response = await client.get(Uri.parse('$baseUrl'));
+        final userData = await getUserCredential();
+        final token = await getToken();
+        final patientId = userData?['_id'];
+       try{
+          await client.delete(
+            Uri.parse('$baseUrl/$patientId'),
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $token',
+            }
+            );
+
         }catch(e){
           throw ServerException(message: "Error fetching patient");
 

@@ -3,7 +3,6 @@ import 'package:dartz/dartz.dart';
 import 'package:front_end/core/error/exception.dart';
 import 'package:front_end/core/error/failure.dart';
 import 'package:front_end/core/network/network.dart';
-import 'package:front_end/features/authentication/data/models/student_data_model.dart';
 import 'package:front_end/features/profile_patient/data/datasource/profile_local_datasource.dart';
 import 'package:front_end/features/profile_therapist/data/datasource/therapist_profile_remote_datasource.dart';
 import 'package:front_end/features/profile_therapist/data/models/therapist_model.dart';
@@ -52,7 +51,7 @@ class TherapistProfileRepositoryImpl extends TherapistProfileRepository {
 
   @override
   Future<Either<Failure, UpdateTherapistModel>> updateTherapist({required UpdateTherapistModel therapist}) async {
-    // if (await networkInfo.isConnected) {
+    if (await networkInfo.isConnected) {
       try {
         final updatedTherapist = await remoteDatasource.updateTherapist(therapist: therapist);
         return Right(updatedTherapist);
@@ -61,8 +60,8 @@ class TherapistProfileRepositoryImpl extends TherapistProfileRepository {
       } catch (e) {
         return Left(ServerFailure(message: "Something went wrong"));
       }
-    // }
-    // return Left(NetworkFailure(message: "No internet connection"));
+    }
+    return Left(NetworkFailure(message: "No internet connection"));
    
   }
 
@@ -80,15 +79,5 @@ class TherapistProfileRepositoryImpl extends TherapistProfileRepository {
     }
     return Left(NetworkFailure(message: "No internet connection"));
   }
-  @override
-  Future<Either<Failure, StudentDataModel>> getUserCredential() async {
-     try {
-       final userCredential = await localDatasource.getUserCredential();
-       return Right(userCredential);
-     } on CacheException catch (e) {
-       return Left(CacheFailure(message: e.message));
-     } catch (e) {
-       return Left(CacheFailure(message: e.toString()));
-     }
-  }
+
 }

@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front_end/core/routes/app_path.dart';
+import 'package:front_end/features/profile_patient/data/models/update_patient_model.dart';
+import 'package:front_end/features/profile_patient/presentation/bloc/update_patient_bloc/update_patient_bloc.dart';
+import 'package:front_end/features/profile_therapist/presentation/bloc/update_therapist_bloc/update_therapist_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 class PatientOnboardingSreen extends StatefulWidget {
@@ -18,7 +22,7 @@ class _PatientOnboardingSreenState extends State<PatientOnboardingSreen> {
   String? gender;
   String? preferredModality;
   String? preferredGender;
-  String? preferredLanguage;
+  String preferredLanguage = 'English';
   List<String> preferredDays = [];
   String? preferredMode;
   List<String> preferredSpecialties = [];
@@ -81,6 +85,16 @@ class _PatientOnboardingSreenState extends State<PatientOnboardingSreen> {
 
 
   void _submit() {
+     BlocProvider.of<UpdatePatientBloc>(context).add(UpdatePatientLoadEvent(patient: UpdatePatientModel(
+      gender: gender,
+      preferredModality: preferredModality,
+      preferredGender: preferredGender,
+      preferredLanguage: [ preferredLanguage ?? ""],
+      preferredDays: preferredDays,
+      preferredMode: preferredMode,
+      preferredSpecialties: preferredSpecialties,
+    )));
+
     final onboardingData = {
       'gender': gender,
       'preferred_modality': preferredModality,
@@ -138,7 +152,7 @@ class _PatientOnboardingSreenState extends State<PatientOnboardingSreen> {
                       decoration: const InputDecoration(labelText: 'Preferred Language'),
                       value: preferredLanguage,
                       items: languageOptions.map((l) => DropdownMenuItem(value: l, child: Text(l))).toList(),
-                      onChanged: (value) => setState(() => preferredLanguage = value),
+                      onChanged: (value) => setState(() => preferredLanguage = value ?? "English"),
                     ),
                   ),
                   _buildStep(
