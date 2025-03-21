@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:front_end/features/authentication/data/models/student_data_model.dart';
-import 'package:front_end/features/profile/data/models/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class LoginLocalDataSource {
@@ -11,7 +10,7 @@ abstract class LoginLocalDataSource {
   Future<void> deleteUser();
   Future<String> getToken();
   Future<void> setStudentUser(StudentDataModel studentDataModel);
-  Future<void> cacheUserData({required StudentDataModel userCredentialModel});
+  Future<void> cacheUserData({required Map<String, dynamic> userCredentialModel});
 }
 
 const token_key = 'token_key';
@@ -30,11 +29,11 @@ class LoginLocalDataSourceImpl implements LoginLocalDataSource {
 
    @override
   Future<void> cacheUserData({
-    required StudentDataModel userCredentialModel,
+    required Map<String, dynamic> userCredentialModel,
   }) {
     return flutterSecureStorage.write(
       key: userProfileKey,
-      value: json.encode(userCredentialModel.toJson()),
+      value: json.encode(userCredentialModel),
     );
   }
 
@@ -55,6 +54,7 @@ class LoginLocalDataSourceImpl implements LoginLocalDataSource {
 
   @override
   Future<void> deleteUser() {
+    flutterSecureStorage.delete(key: userProfileKey);
     return sharedPreferences.remove(token_key);
   }
 

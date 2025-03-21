@@ -1,7 +1,5 @@
 import 'package:front_end/features/chat/domain/entities/chats_entity.dart';
 import 'package:front_end/features/chat/domain/entities/single_chat_entity.dart';
-import 'package:front_end/features/profile/domain/entities/user_entity.dart';
-
 enum ChatType { single, group, channel }
 
 class ChatsList {

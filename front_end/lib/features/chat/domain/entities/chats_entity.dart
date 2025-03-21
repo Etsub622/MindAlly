@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:front_end/features/profile/domain/entities/user_entity.dart';
+import 'package:front_end/features/profile_patient/domain/entities/user_entity.dart';
 
 class ChatsEntity extends Equatable {
   final String chatId;

@@ -25,8 +25,6 @@ const getSecondUser = async (userId) => {
   return secondUser;
 }
 
-      
-
 export const getAllChatsHistoryByUserId = async (req, res) => {
     const query  = req.query;
 

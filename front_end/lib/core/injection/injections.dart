@@ -17,15 +17,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 final sl = GetIt.instance;
 
 Future<void> init() async {
-  AuthInjection().init();
-  BookInjection().init();
-  ArticleInjection().init();
-  VideoInjection().init();
-  ProfileInjection().init();
-  ChatInjection().init();
-  QuestionInjection().init();
-  AnswerInjection().init();
-
   sl.registerLazySingleton<http.Client>(() => http.Client());
   sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl()));
   sl.registerLazySingleton(() => InternetConnection());
@@ -33,4 +24,13 @@ Future<void> init() async {
 
   final sharedPref = await SharedPreferences.getInstance();
   sl.registerLazySingleton(() => sharedPref);
+
+  AuthInjection().init();
+  BookInjection().init();
+  ArticleInjection().init();
+  VideoInjection().init();
+  ProfileInjection().init();
+  ChatInjection().init();
+  QuestionInjection().init();
+  AnswerInjection().init(); 
 }
