@@ -19,7 +19,7 @@ class PatientModel extends PatientEntity {
       email: json['Email'],
       role: json['Role'],
       hasPassword: json['Password'] != null,
-      collage: json[' Collage'],
+      collage: json['Collage'],
     );
   }
   Map<String, dynamic> toJson() {
