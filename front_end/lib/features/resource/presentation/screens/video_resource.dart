@@ -7,7 +7,6 @@ import 'package:front_end/features/resource/presentation/screens/add_video.dart'
 import 'package:front_end/features/resource/presentation/screens/update_video.dart';
 import 'package:front_end/features/resource/presentation/widget/video_card.dart';
 
-
 class VideoResource extends StatefulWidget {
   const VideoResource({super.key});
 
@@ -27,20 +26,11 @@ class _VideoResourceState extends State<VideoResource> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(235, 246, 238, 252),
-        title: Center(
-            child: Text('Videos: help you to learn',
-                style: TextStyle(
-                  color: Color(0xff800080),
-                  fontWeight: FontWeight.w300,
-                  fontSize: 19,
-                  fontFamily: 'Poppins',
-                ))),
         actions: [
           Padding(
             padding: const EdgeInsets.only(left: 10.0),
             child: IconButton(
-              icon: Icon(
+              icon:const Icon(
                 Icons.refresh,
                 color: Color.fromARGB(239, 130, 5, 220),
                 size: 25,
@@ -64,11 +54,11 @@ class _VideoResourceState extends State<VideoResource> {
               return Center(child: Text('No Videos available.'));
             }
             return GridView.builder(
-              padding:const EdgeInsets.all(16), 
-              gridDelegate:const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2, 
-                crossAxisSpacing: 16, 
-                mainAxisSpacing: 16, 
+              padding: const EdgeInsets.all(16),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
                 childAspectRatio: 0.75,
               ),
               itemCount: videos.length,
@@ -85,7 +75,6 @@ class _VideoResourceState extends State<VideoResource> {
                             image: video.image,
                             profilePicture: video.profilePicture,
                             name: video.name,
-
                             onUpdate: (updatedVideoMap) {
                               final updatedBook = VideoEntity(
                                 type: video.type,
@@ -96,7 +85,6 @@ class _VideoResourceState extends State<VideoResource> {
                                 profilePicture: video.profilePicture,
                                 name: video.name,
                                 categories: video.categories,
-
                               );
                               context
                                   .read<VideoBloc>()

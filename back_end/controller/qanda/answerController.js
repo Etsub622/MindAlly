@@ -12,7 +12,7 @@ export const createAnswer = async (req, res) => {
 
 export const getAnswersByQuestion = async (req, res) => {
   try {
-    const answers = await Answer.find({ questionId: req.params.id });
+    const answers = await Answer.find({ questionId: req.params.id }).sort({ createdAt: -1 });
     res.status(200).json(answers);
   } catch (error) {
     res.status(500).json({ message: error.message });

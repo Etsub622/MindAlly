@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:front_end/core/common_widget.dart/circular_indicator.dart';
 import 'package:front_end/core/common_widget.dart/snack_bar.dart';
 import 'package:front_end/features/authentication/presentation/widget/custom_button.dart';
@@ -10,12 +9,15 @@ import 'package:front_end/features/resource/presentation/bloc/book_bloc/bloc/boo
 import 'package:front_end/features/resource/presentation/widget/custom_formfield.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:multi_select_flutter/chip_display/multi_select_chip_display.dart';
+import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
+import 'package:multi_select_flutter/util/multi_select_item.dart';
 
 class UpdateBook extends StatefulWidget {
   final String title;
   final String author;
   final String imageUrl;
-
+  final List<String> categories;
   final Function(Map<String, Object>) onUpdate;
 
   const UpdateBook({
@@ -24,6 +26,7 @@ class UpdateBook extends StatefulWidget {
     required this.imageUrl,
     required this.title,
     required this.onUpdate,
+    required this.categories,
   });
 
   @override
@@ -33,8 +36,8 @@ class UpdateBook extends StatefulWidget {
 class _UpdateBookState extends State<UpdateBook> {
   late TextEditingController titleController;
   late TextEditingController authorController;
-
   late TextEditingController imageController;
+  List<String> selectedCategories = [];
 
   @override
   void initState() {
@@ -43,16 +46,28 @@ class _UpdateBookState extends State<UpdateBook> {
     authorController = TextEditingController(text: widget.author);
 
     imageController = TextEditingController(text: widget.imageUrl);
+    selectedCategories = widget.categories;
   }
 
-  void UpdateBook() async {
+  List<String> categoryOption = const [
+    'Depression',
+    'Anxiety',
+    'OCD',
+    'General',
+    'Trauma',
+    'SelfLove'
+  ];
+
+  void updateBook() async {
     await _uploadImage();
     final Map<String, Object> updatedbook = {
       'title': titleController.text,
       'author': authorController.text,
+      'categories': selectedCategories,
       'imageUrl':
           _imageUrl?.isNotEmpty == true ? _imageUrl! : imageController.text,
     };
+    print('updateBook:$updatedbook');
     widget.onUpdate(updatedbook);
   }
 
@@ -67,7 +82,7 @@ class _UpdateBookState extends State<UpdateBook> {
     setState(() {
       if (pickedFile != null) {
         _imageFile = File(pickedFile.path);
-       
+        _imageUrl = '';
       }
     });
   }
@@ -186,7 +201,7 @@ class _UpdateBookState extends State<UpdateBook> {
                 Container(
                   height: 100,
                   width: 100,
-                  child: _imageUrl != null && _imageUrl!.isEmpty
+                  child: _imageUrl != null
                       ? Image.file(
                           _imageFile!,
                           fit: BoxFit.cover,
@@ -210,6 +225,48 @@ class _UpdateBookState extends State<UpdateBook> {
                 ),
                 CustomFormField(text: 'author', controller: authorController),
                 const SizedBox(
+                  height: 20,
+                ),
+                MultiSelectDialogField<String>(
+                  items: categoryOption
+                      .map((e) => MultiSelectItem<String>(e, e))
+                      .toList(),
+                  initialValue: selectedCategories,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                        color: const Color.fromARGB(255, 215, 214, 214),
+                        width: 1.0),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  buttonText: const Text('Book Category'),
+                  title: const Text('Book Category'),
+                  selectedColor: Colors.blue,
+                  buttonIcon: const Icon(
+                    Icons.arrow_drop_down,
+                    color: Colors.black,
+                  ),
+                  onConfirm: (List<String> values) {
+                    setState(() {
+                      selectedCategories = values;
+                    });
+                  },
+                  chipDisplay: MultiSelectChipDisplay<String>(
+                    items: selectedCategories
+                        .map((category) =>
+                            MultiSelectItem<String>(category, category))
+                        .toList(),
+                    onTap: (value) {
+                      setState(() {
+                        selectedCategories.remove(value);
+                      });
+                    },
+                    textStyle: const TextStyle(color: Colors.black),
+                    chipColor: Colors.white,
+                  ),
+                  searchable: true,
+                  searchHint: 'Search here...',
+                ),
+                const SizedBox(
                   height: 25,
                 ),
                 CustomButton(
@@ -220,7 +277,7 @@ class _UpdateBookState extends State<UpdateBook> {
                   onPressed: () {
                     if (titleController.text.isNotEmpty &&
                         authorController.text.isNotEmpty) {
-                      UpdateBook;
+                      updateBook();
                     }
                   },
                 ),

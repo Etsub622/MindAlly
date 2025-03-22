@@ -22,6 +22,7 @@ class BookBloc extends Bloc<BookEvent, BookState> {
     required this.updateBookUsecase,
     required this.getSingleBookUsecase,
   }) : super(BookInitial()) {
+    
     on<AddBookEvent>((event, emit) async {
       emit(BookLoading());
 

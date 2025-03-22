@@ -1,4 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:front_end/features/Q&A/presentation/bloc/bloc/answer_bloc.dart';
+import 'package:front_end/features/Q&A/presentation/bloc/bloc/question_bloc.dart';
 import 'package:front_end/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:front_end/features/chat/presentation/bloc/chat/chat_bloc.dart';
 import 'package:front_end/features/chat/presentation/bloc/chat_list/chat_list_bloc.dart';
@@ -13,7 +15,6 @@ import 'package:front_end/features/resource/presentation/bloc/book_bloc/bloc/boo
 import 'package:front_end/core/injection/injections.dart';
 import 'package:front_end/features/resource/presentation/bloc/video_bloc/bloc/video_bloc.dart';
 
-
 class MultiBLOCProvider {
   static final blocProvider = [
     BlocProvider<AuthBloc>(
@@ -21,34 +22,22 @@ class MultiBLOCProvider {
     ),
     BlocProvider<BookBloc>(
       create: (_) => sl<BookBloc>(),
-    ),   
-     BlocProvider<VideoBloc>(
+    ),
+    BlocProvider<VideoBloc>(
       create: (_) => sl<VideoBloc>(),
     ),
-
     BlocProvider<ArticleBloc>(
-      create:(_)=>sl<ArticleBloc>(),
+      create: (_) => sl<ArticleBloc>(),
     ),
-
-    BlocProvider<PatientProfileBloc>(
-      create: (_) => sl<PatientProfileBloc>()
-      ),
+    BlocProvider<PatientProfileBloc>(create: (_) => sl<PatientProfileBloc>()),
     BlocProvider<TherapistProfileBloc>(
-      create: (_) => sl<TherapistProfileBloc>()
-      ),
-    BlocProvider<UpdatePatientBloc>(
-      create: (_) => sl<UpdatePatientBloc>()
-      ),
-    BlocProvider<UpdateTherapistBloc>(
-      create: (_) => sl<UpdateTherapistBloc>()
-      ),
-
-    BlocProvider<ChatBloc>(
-      create: (_) => sl<ChatBloc>()
-    ),
-    BlocProvider<ChatListBloc>(
-      create: (_) => sl<ChatListBloc>()
-    ),
+        create: (_) => sl<TherapistProfileBloc>()),
+    BlocProvider<UpdatePatientBloc>(create: (_) => sl<UpdatePatientBloc>()),
+    BlocProvider<UpdateTherapistBloc>(create: (_) => sl<UpdateTherapistBloc>()),
+    BlocProvider<ChatBloc>(create: (_) => sl<ChatBloc>()),
+    BlocProvider<ChatListBloc>(create: (_) => sl<ChatListBloc>()),
+    BlocProvider<QuestionBloc>(create: (_) => sl<QuestionBloc>()),
+    BlocProvider<AnswerBloc>(create: (_) => sl<AnswerBloc>()),
     BlocProvider<DeletePatientBloc>(
       create: (_) => sl<DeletePatientBloc>()
     ),

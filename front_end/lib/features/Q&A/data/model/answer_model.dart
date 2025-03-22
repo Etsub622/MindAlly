@@ -19,7 +19,6 @@ class AnswerModel extends AnswerEntity {
   }
   Map<String, dynamic> toJson() {
     return {
-      'id': super.id,
       'questionId': super.questionId,
       'answer': super.answer,
       'therapistName': super.therapistName,

@@ -5,7 +5,8 @@ const answerSchema = new mongoose.Schema({
   therapistName: { type: String, required: true },
   therapistProfile: { type: String, required: true },
   questionId: { type: mongoose.Schema.Types.ObjectId, ref: "Question", required: true },
-});
+},
+{ timestamps: true });
 
 const Answer = mongoose.model("Answer", answerSchema);
 

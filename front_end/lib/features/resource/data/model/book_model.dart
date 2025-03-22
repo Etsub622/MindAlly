@@ -17,7 +17,7 @@ class BookModel extends BookEntity {
       image: json['image'],
       type: json['type'],
       id: json['_id'],
-      categories: List<String>.from(json['categories'] as List<dynamic>),
+      categories: List<String>.from(json['categories']),
     );
   }
 

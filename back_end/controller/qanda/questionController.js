@@ -12,7 +12,7 @@ export const createQuestion = async (req, res) => {
 
 export const getQuestions = async (req, res) => {
   try {
-    const questions = await Question.find();
+    const questions = await Question.find().sort({ createdAt: -1 });
     res.status(200).json(questions);
   } catch (error) {
     res.status(500).json({ message: error.message });
