@@ -29,12 +29,33 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<LoadMessagesEvent>(_onLoadMessages);
     on<SendChatEvent>(_onSendChat);
     on<ReceiveChatEvent>(_onReceiveChat);
+     _initializeSocketListener();
   }
 
+  Future<void> _initializeSocketListener() async {
+    await _socketService.initSocket(); // Wait for initialization
+    _socketService.socket.on("newMessage", (data) {
+      final message = MessageEntity(
+        message: data["message"],
+        receiverId: data["receiverId"],
+        senderId: data["senderId"],
+        timestamp: DateTime.parse(data["timestamp"]),
+        chatId: data["chatId"],
+        isRead: data["isRead"] ?? false,
+      );
+      add(ReceiveChatEvent(message: message));
+    });
+  }
 
   void _onLoadMessages(LoadMessagesEvent event, Emitter<ChatState> emit) async {
     emit(ChatLoadingState());
-
+     
+     if(event.chatId == null || event.chatId == ""){
+      emit(ChatLoadedState(messages: []));
+     }
+     else{
+      
+    
     final failureOrGet =
         await fetchMessagesUsecase(FetchMessagesUsecaseParams(chatId: event.chatId));
 
@@ -46,19 +67,19 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
           emit(ChatLoadedState(messages: chats));
           _socketService.socket.emit('joinChat', event.chatId);
 
-          _socketService.socket.on("newMessage", (data) => {
-            print("step 1 - revieve $data"),
-            add(ReceiveChatEvent(message: MessageEntity(
-      message: data["message"],
-      receiverId: data["receiverId"],
-      senderId: data["senderId"],
-      timestamp: DateTime.parse(data["timestamp"]),
-      chatId: event.chatId,
-      isRead: false
-    )))
-          });
+          // _socketService.socket.on("newMessage", (data) => {
+          //   add(ReceiveChatEvent(message: MessageEntity(
+          //   message: data["message"],
+          //   receiverId: data["receiverId"],
+          //   senderId: data["senderId"],
+          //   timestamp: DateTime.parse(data["timestamp"]),
+          //   chatId: data["chatId"],
+          //   isRead: false
+          // )))
+          // });
 
         });
+     }
   }
 
   void _onSendChat(SendChatEvent event, Emitter<ChatState> emit) async {
@@ -76,23 +97,30 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       'isRead': false
     };
      
-    _socketService.socket.emit('sendMessage', newMessage);
-    emit(ChatLoadedState(messages: List.from(_messages)));
+     if(event.messageModel.chatId == null || event.messageModel.chatId == ""){
+
+    final failureOrChatId = await sendMessageUsecase(SendMessageParams(messageModel: event.messageModel));
+    failureOrChatId.fold(
+      (failure) => emit(ChatErrorState(errorMessage: failure.toString())),
+      (chatId) {
+        // If it's a new chat, trigger loading messages with the new chatId
+        if (event.messageModel.chatId == null || event.messageModel.chatId == "") {
+          add(LoadMessagesEvent(chatId: chatId));
+        } else {
+          emit(ChatLoadedState(messages: List.from(_messages)));
+        }
+      },
+    );
+     }else{
+      _socketService.socket.emit('sendMessage', newMessage);
+     }
   }
 
   void _onReceiveChat(ReceiveChatEvent event, Emitter<ChatState> emit) async {
      print("step 1 - revieve event called");
      print(event.message);
-
-     final message = MessageEntity(
-       chatId: event.message.chatId,
-       message: event.message.message,
-       receiverId: event.message.receiverId,
-       senderId: event.message.senderId,
-       timestamp: event.message.timestamp,
-       isRead: event.message.isRead
-     );
-     _messages.add(message);
+     print(_messages);
+     _messages.add(event.message);
      emit(ChatLoadedState(messages: List.from(_messages)));
   }
 }

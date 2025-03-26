@@ -17,6 +17,7 @@ class UpdateTherapistEntity  extends Equatable{
   final List<String>? mode;
   final String? profilePicture;
   final int? experienceYears;
+  final String? chatId;
 
   const UpdateTherapistEntity({
     required this.id,
@@ -35,6 +36,7 @@ class UpdateTherapistEntity  extends Equatable{
     this.mode,
     this.profilePicture,
     this.experienceYears,
+    this.chatId
   });
   
   @override
@@ -53,6 +55,7 @@ class UpdateTherapistEntity  extends Equatable{
     availableDays,
     language,
     mode,
-    experienceYears
+    experienceYears,
+    chatId
   ];
 }

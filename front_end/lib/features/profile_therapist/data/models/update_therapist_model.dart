@@ -19,6 +19,7 @@ class UpdateTherapistModel  extends UpdateTherapistEntity{
     super.language,
     super.mode,
     super.experienceYears,
+    super.chatId,
     });
 
     factory UpdateTherapistModel.fromJson(Map<String, dynamic> json) {
@@ -26,6 +27,7 @@ class UpdateTherapistModel  extends UpdateTherapistEntity{
       id: json['_id'],
       name: json['FullName'],
       email: json['Email'],
+      chatId: json['chatId'],
       modality: json['modality'],
       certificate: json['Certificate'],
       bio: json['bio'] ?? "",

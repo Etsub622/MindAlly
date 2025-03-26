@@ -16,11 +16,11 @@ import 'package:http/http.dart' as http;
 
 
 abstract class ChatRemoteDataSource {
-  Future<void> sendMessage(
+  Future<String> sendMessage(
       {required MessageModel messageModel});
 
   Future<List<MessageEntity>> fetchMessages({
-    required String chatId
+    required String? chatId
   });
   Future<ListChatsEntity> getAllChats();
 }
@@ -84,7 +84,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   }
 
   @override
-  Future<List<MessageEntity>> fetchMessages({required String chatId}) async {
+  Future<List<MessageEntity>> fetchMessages({required String? chatId}) async {
     try {
       final prefs = await sharedPreferences;
       String token = prefs.getString("token_key") ?? '';
@@ -121,16 +121,25 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   }
 
   @override
-  Future<void> sendMessage(
+  Future<String> sendMessage(
       {required MessageModel messageModel}) async {
     try {
-      final response = http.post(
+      final response = await http.post(
         Uri.parse('$baseUrl/chat/message/send'),
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${await sharedPreferences.then((value) => value.getString("token_key"))}',
         },
         body: jsonEncode(messageModel.toJson()),
       );
+      if (response.statusCode == 201) {
+        final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
+        return jsonResponse["chatId"]; 
+      } else {
+        throw ServerException(
+          message: jsonDecode(response.body)["error"],
+        );
+      }
     } catch (e) {
       throw ServerException(
         message: 'Error in sending message',
