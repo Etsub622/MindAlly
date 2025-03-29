@@ -22,7 +22,7 @@ export const initializeSocket = (httpServer) => {
     });
 
     socket.on("sendMessage", async ({ chatId, senderId, message, receiverId, timestamp }) => {
-      console.log(`Message received in chat ${chatId}: ${message}`);
+      console.log(`Message received: ${message}`);
 
       if (!senderId || !message || !receiverId) {
         console.error("Missing required fields:", { senderId, message, receiverId });
@@ -31,12 +31,32 @@ export const initializeSocket = (httpServer) => {
       }
 
       try {
-        console.log("Saving Socket.IO message:", { senderId, message, receiverId, timestamp });
         let finalChatId = chatId;
 
-        if (!chatId) {
+        // Check for an existing chat between senderId and receiverId
+        let existingChat = await ChatHistory.findOne({
+          $or: [
+            { senderId, receiverId },
+            { senderId: receiverId, receiverId: senderId },
+          ],
+        });
+
+        if (existingChat) {
+          // Reuse the existing chat
+          finalChatId = existingChat.chatId;
+          await ChatHistory.updateOne(
+            { chatId: finalChatId },
+            {
+              $set: {
+                lastMessage: message,
+                lastMessageTime: new Date(timestamp),
+              },
+              $inc: { countOfUnreadMessages: 1 },
+            }
+          );
+        } else if (!finalChatId) {
+          // Create a new chat if none exists and no chatId is provided
           const newChat = new ChatHistory({
-            chatId: new mongoose.Types.ObjectId(),
             senderId,
             receiverId,
             lastMessage: message,
@@ -48,6 +68,7 @@ export const initializeSocket = (httpServer) => {
           finalChatId = newChat.chatId;
         }
 
+        // Save the message
         const newMessage = new Message({
           conversationId: finalChatId,
           senderId,
@@ -58,30 +79,25 @@ export const initializeSocket = (httpServer) => {
         });
         await newMessage.save();
 
-        if (chatId) {
-          const existingChat = await ChatHistory.findOne({ chatId });
-          if (existingChat) {
-            await ChatHistory.updateOne(
-              { chatId },
-              {
-                $set: {
-                  lastMessage: message,
-                  lastMessageTime: new Date(timestamp),
-                },
-                $inc: { countOfUnreadMessages: 1 },
-              }
-            );
-          }
-        }
-
+        // Emit the new message to the chat room
         io.to(finalChatId).emit("newMessage", {
           senderId,
           message,
           receiverId,
+          chatId: finalChatId,
           timestamp: timestamp,
+          isRead: false,
         });
+
+        // Notify the sender of the chatId
+        socket.emit("messageSent", { chatId: finalChatId });
       } catch (error) {
         console.error("Error saving Socket.IO message:", error);
+        if (error.code === 11000) {
+          socket.emit("messageError", { error: "Chat already exists" });
+        } else {
+          socket.emit("messageError", { error: error.message });
+        }
       }
     });
 

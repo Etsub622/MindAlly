@@ -8,7 +8,7 @@ import 'package:front_end/features/chat/domain/entities/message_entity.dart';
 import 'package:front_end/features/profile_patient/domain/entities/user_entity.dart';
 
 class ChatPage extends StatefulWidget {
-  final String chatId;
+  final String? chatId;
   final UserEntity receiver;
   const ChatPage({super.key, required this.chatId, required this.receiver});
 
@@ -19,11 +19,13 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   final TextEditingController _messageController = TextEditingController();
   final _storage = const FlutterSecureStorage();
+  String? currentChatId;
   String userId = "";
 
   @override
   void initState() {
     super.initState();
+    currentChatId = widget.chatId;
     BlocProvider.of<ChatBloc>(context).add(LoadMessagesEvent(chatId: widget.chatId));
     fetchUserId();
   }
@@ -46,7 +48,7 @@ class _ChatPageState extends State<ChatPage> {
     if (message.isNotEmpty) {
       BlocProvider.of<ChatBloc>(context).add(SendChatEvent(
         messageModel: MessageModel(
-          chatId: widget.chatId, 
+          chatId: currentChatId, 
           message: message,
           senderId: userId, 
           timestamp: DateTime.now(), 
@@ -61,7 +63,6 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-
         title: Row(
           children: [
             const CircleAvatar(
@@ -75,7 +76,6 @@ class _ChatPageState extends State<ChatPage> {
                 widget.receiver.name,
               style: Theme.of(context).textTheme.titleMedium
               ),
-
           ],
         ),
         backgroundColor:Colors.transparent,
@@ -89,12 +89,15 @@ class _ChatPageState extends State<ChatPage> {
               builder: (context, state) {
                 if(state is ChatLoadingState){
                   return const Center(child: CircularProgressIndicator());
-                
                 } else if(state is ChatLoadedState){
                   List<MessageEntity> messages = state.messages;
-
+                  if(messages.isNotEmpty ){
+                     currentChatId = messages.last.chatId;
+                  }else{
+                    currentChatId = null;
+                  }
                   return ListView.builder(
-                    padding: EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(20),
                     itemCount: messages.length,
                     itemBuilder: (context, index){
                       final content = messages[index];
@@ -111,7 +114,6 @@ class _ChatPageState extends State<ChatPage> {
                 } else{
                   return const Center(child: Text("Failed to load messages"));
                 }
-
             } )),
           _buildMessageInput(),
         ],

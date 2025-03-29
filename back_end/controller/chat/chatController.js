@@ -5,190 +5,190 @@ import mongoose from "mongoose";
 import { Patient } from "../../model/patientModel.js";
 import { Therapist } from "../../model/therapistModel.js";
 
-let io; // Store io instance
+let io;
 
 export const setIo = (socketIo) => {
-  io = socketIo; // Set io from index.js
+  io = socketIo;
 };
 
 const getSecondUser = async (userId) => {
- const  secondUser =  await Patient.findOne({ _id: userId
-  }) || await Therapist.findOne
-  ({ _id: userId });
+  const secondUser = await Patient.findOne({ _id: userId }) || await Therapist.findOne({ _id: userId });
   if (!secondUser) {
-      return res.status(404).json({
-          success: false,
-          message: "User not found"
-      });
+    throw new Error("User not found");
   }
-
   return secondUser;
-}
+};
 
 export const getAllChatsHistoryByUserId = async (req, res) => {
-    const query  = req.query;
+  const { userId } = req.query;
 
-    const userId = query.userId;
+  if (!userId) {
+    return res.status(400).json({ message: "User ID is required" });
+  }
 
-    if(userId){
-       try {
+  try {
+    const chatsHistory = await ChatHistory.find({
+      $or: [{ senderId: userId }, { receiverId: userId }],
+    });
+    const chatData = await Promise.all(
+      chatsHistory.map(async (chat) => {
+        const secondUserId = chat.senderId.toString() === userId ? chat.receiverId : chat.senderId;
+        const secondUser = await getSecondUser(secondUserId);
+        return {
+          chatId: chat.chatId,
+          senderId: chat.senderId,
+          receiverId: chat.receiverId,
+          lastMessage: chat.lastMessage,
+          lastMessageTime: chat.lastMessageTime,
+          countOfUnreadMessages: chat.countOfUnreadMessages,
+          isRead: chat.isRead,
+          secondUser,
+        };
+      })
+    );
 
-        const chatsHistory = await ChatHistory.find({ $or: [{ senderId: userId }, { receiverId: userId }] }); 
-        // Map chats and await secondUser details
-        const chatData = await Promise.all(
-          chatsHistory.map(async (chat) => {
-              const secondUserId = chat.senderId == userId ? chat.receiverId : chat.senderId;
-              console.log(chat.senderId, chat.receiverId == userId, chat.senderId == userId, secondUserId)
-              const secondUser = await getSecondUser(secondUserId);
-              
-              return {
-                  chatId: chat.chatId,
-                  senderId: chat.senderId,
-                  receiverId: chat.receiverId,
-                  lastMessage: chat.lastMessage,
-                  lastMessageTime: chat.lastMessageTime,
-                  countOfUnreadMessages: chat.countOfUnreadMessages,
-                  isRead: chat.isRead,
-                  secondUser
-              };
-          })
-      );
-
-        res.status(200).json(
-          {
-            success: true,
-            data: chatData
-            
-          }
-        );
-       } catch (err) {
-        res.status(500).json({ message: err.message });
-      }
-    } else{
-        res.status(400).json({ message: "User ID is required" });
-    }
+    res.status(200).json({
+      success: true,
+      data: chatData,
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };
 
 export const getAllMessagesByChatId = async (req, res) => {
-    const { userId } = req.params;
-    const { chatId } = req.query;
+  const { userId } = req.params;
+  const { chatId } = req.query;
 
-    try {
-        // Use findOne instead of find for a single document
-        const conversation = await ChatHistory.findOne({ chatId });
-
-        if (!conversation) {
-            return res.status(404).json({
-                success: false,
-                message: "Conversation not found"
-            });
-        }
-
-        // Identify the other participant
-        const secondUserId = conversation.senderId === userId ? conversation.receiverId : conversation.senderId;
-
-        // Fetch second user details (combine Patient/Therapist query with $or if possible)
-        const secondUser = await Patient.findOne({ _id: secondUserId }) || await Therapist.findOne({ _id: secondUserId });
-
-        if (!secondUser) {
-            return res.status(404).json({
-                success: false,
-                message: "User not found"
-            });
-        }
-
-        // Fetch messages with an index hint if needed
-        const messages = await Message.find({ conversationId: chatId }) // Match your schema field name
-            .sort({ createdAt: 1 }) // Use camelCase to match typical Mongoose schema
-            .lean(); // Faster by returning plain JS objects
-
-        // Send response
-        res.status(200).json({
-            success: true,
-            data: {
-                secondUser: {
-                    id: secondUser._id,
-                    username: secondUser.FullName,
-                    profilePicture: secondUser.profilePicture,
-                    role: secondUser.role,
-                },
-                messages: messages.map(msg => ({
-                    chatId: chatId,
-                    senderId: msg.senderId,
-                    receiverId: msg.receiverId,
-                    message: msg.content,
-                    isRead: msg.isRead,
-                    timestamp: msg.createdAt 
-                }))
-            }
-        });
-    } catch (error) {
-        console.error("Error fetching chat details:", error);
-        res.status(500).json({
-            success: false,
-            message: "Failed to fetch chat details",
-            error: error.message
-        });
+  try {
+    const conversation = await ChatHistory.findOne({ chatId });
+    if (!conversation) {
+      return res.status(404).json({
+        success: false,
+        message: "Conversation not found",
+      });
     }
+
+    const secondUserId = conversation.senderId.toString() === userId ? conversation.receiverId : conversation.senderId;
+    const secondUser = await Patient.findOne({ _id: secondUserId }) || await Therapist.findOne({ _id: secondUserId });
+
+    if (!secondUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const messages = await Message.find({ conversationId: chatId })
+      .sort({ createdAt: 1 })
+      .lean();
+
+    res.status(200).json({
+      success: true,
+      data: {
+        secondUser: {
+          id: secondUser._id,
+          username: secondUser.FullName,
+          profilePicture: secondUser.profilePicture,
+          role: secondUser.role,
+        },
+        messages: messages.map((msg) => ({
+          chatId: chatId,
+          senderId: msg.senderId,
+          receiverId: msg.receiverId,
+          message: msg.content,
+          isRead: msg.isRead,
+          timestamp: msg.createdAt,
+        })),
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching chat details:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch chat details",
+      error: error.message,
+    });
+  }
 };
 
+// Consolidated saveMessage to use Socket.IO logic
 export const saveMessage = async (req, res) => {
-    const { chatId, senderId, message, receiverId } = req.body;
-    console.log("INCOMING MESSAGE", req.body);
-  
-    if (!senderId || !message || !receiverId) {
-      return res.status(400).json({
-        success: false,
-        message: "senderId, message, and receiverId are required",
-      });
-    }
-  
-    try {
-      let finalChatId = chatId;
-  
-      if (!chatId) {
-        const newChat = new ChatHistory({
-          chatId: new mongoose.Types.ObjectId(),
-          senderId,
-          receiverId,
-          lastMessage: message,
-          lastMessageTime: Date.now(),
-          countOfUnreadMessages: 1,
-          isRead: false,
-        });
-        await newChat.save();
-        finalChatId = newChat.chatId;
-  
-        const newMessage = new Message({
-          conversationId: finalChatId,
-          senderId,
-          receiverId,
-          content: message,
-          isRead: false,
-        });
-        await newMessage.save();
-      } else {
-        // ... (rest of saveMessage logic)
-      }
-  
-      const socketIo = getIo(); // Use shared io instance
-      socketIo.to(finalChatId).emit("message", {
+  const { chatId, senderId, message, receiverId } = req.body;
+  console.log("INCOMING MESSAGE", req.body);
+
+  if (!senderId || !message || !receiverId) {
+    return res.status(400).json({
+      success: false,
+      message: "senderId, message, and receiverId are required",
+    });
+  }
+
+  try {
+    let finalChatId = chatId;
+
+    // Check for an existing chat
+    let existingChat = await ChatHistory.findOne({
+      $or: [
+        { senderId, receiverId },
+        { senderId: receiverId, receiverId: senderId },
+      ],
+    });
+
+    if (existingChat) {
+      finalChatId = existingChat.chatId;
+      await ChatHistory.updateOne(
+        { chatId: finalChatId },
+        {
+          $set: {
+            lastMessage: message,
+            lastMessageTime: new Date(),
+          },
+          $inc: { countOfUnreadMessages: 1 },
+        }
+      );
+    } else if (!finalChatId) {
+      const newChat = new ChatHistory({
         senderId,
-        message,
         receiverId,
-        timestamp: new Date(),
+        lastMessage: message,
+        lastMessageTime: new Date(),
+        countOfUnreadMessages: 1,
+        isRead: false,
       });
-  
-      res.status(201).json({
-        success: true,
-        message: "Message saved successfully",
-        chatId: finalChatId,
-      });
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        message: "Failed to save message",
-        error: error.message,
-      });
+      await newChat.save();
+      finalChatId = newChat.chatId;
     }
-  };
+
+    const newMessage = new Message({
+      conversationId: finalChatId,
+      senderId,
+      receiverId,
+      content: message,
+      isRead: false,
+    });
+    await newMessage.save();
+
+    const socketIo = getIo();
+    socketIo.to(finalChatId).emit("newMessage", {
+      senderId,
+      message,
+      receiverId,
+      chatId: finalChatId,
+      timestamp: new Date(),
+      isRead: false,
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "Message saved successfully",
+      chatId: finalChatId,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to save message",
+      error: error.message,
+    });
+  }
+};

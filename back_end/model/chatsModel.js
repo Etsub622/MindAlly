@@ -33,14 +33,15 @@ const chatschema = new mongoose.Schema({
     },
 })
 
-
-const ChatHistory = mongoose.model("ChatHistory", chatschema)
-
-export { ChatHistory }
-
 chatschema.pre('save', function(next) {
     if (!this.chatId) {
         this.chatId = new mongoose.Types.ObjectId().toString();
     } 
     next();
 });
+
+chatschema.index({ senderId: 1, receiverId: 1 }, { unique: true });
+
+const ChatHistory = mongoose.model("ChatHistory", chatschema)
+
+export { ChatHistory }

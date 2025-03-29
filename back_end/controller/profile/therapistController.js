@@ -1,5 +1,6 @@
 import { Patient } from "../../model/patientModel.js";
 import { Therapist } from "../../model/therapistModel.js";
+import { ChatHistory } from "../../model/chatsModel.js";
 import { spawn } from 'child_process';
 import bcrypt from "bcrypt";
 
@@ -156,14 +157,25 @@ export const getTopTherapists = async (req, res) => {
       });
     });
 
-    const enrichedTherapists = topTherapists.map((t) => {
+    const enrichedTherapists = await Promise.all(topTherapists.map(async (t) => {
       const therapist = therapists.find(th => th._id.toString() === t.therapist_id.toString());
 
-
-      return therapist
+    // Look for an existing chat between this patient and therapist
+    const existingChat = await ChatHistory.findOne({
+      $or: [
+        { senderId: patient_id, receiverId: t.therapist_id },
+        { senderId: t.therapist_id, receiverId: patient_id }
+      ]
     });
-
-    res.json({
+    const matchedTherapist = {
+      ...therapist.toObject(),
+      chatId: existingChat ? existingChat.chatId : null
+    };
+    console.log(matchedTherapist);
+    return matchedTherapist;
+    }));
+  console.log("enrichedTherapists", enrichedTherapists);
+    await res.json({
       patient_id,
       top_therapists: enrichedTherapists
     });

@@ -19,7 +19,7 @@ class FetchMessagesUsecase extends Usecase<void, FetchMessagesUsecaseParams> {
 }
 
 class FetchMessagesUsecaseParams {
-  final String chatId;
+  final String? chatId;
 
   FetchMessagesUsecaseParams({
     required this.chatId,
