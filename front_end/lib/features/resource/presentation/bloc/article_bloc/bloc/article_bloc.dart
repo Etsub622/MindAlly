@@ -63,7 +63,7 @@ class ArticleBloc extends Bloc<ArticleEvent, ArticleState> {
       emit(ArticleLoading());
       final result = await deleteArticleUsecase(DeleteArticleParams(event.id));
 
-      result.fold((l) {
+      result.fold((l) {gi
         emit(ArticleError(l.message));
       }, (successMessage) {
         emit(ArticleDeleted(successMessage));
@@ -78,7 +78,7 @@ class ArticleBloc extends Bloc<ArticleEvent, ArticleState> {
       result.fold((l) {
         emit(ArticleError(l.message));
       }, (articles) {
-        emit(SearchArticleLoaded(articles));
+        emit(ArticleLoaded(articles));
       });
     });
     on<GetSingleArticleEvent>((event, emit) async {

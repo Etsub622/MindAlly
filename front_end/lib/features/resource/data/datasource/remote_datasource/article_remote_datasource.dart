@@ -16,20 +16,20 @@ abstract class ArticleRemoteDatasource {
 
 class ArticleRemoteDataSourceImpl implements ArticleRemoteDatasource {
   final http.Client client;
-ArticleRemoteDataSourceImpl(this.client){
-  print('ArticleRemoteDataSourceImpl created');
-}
+  ArticleRemoteDataSourceImpl(this.client) {
+    print('ArticleRemoteDataSourceImpl created');
+  }
 
-  final baseUrl = '${ConfigKey.baseUrl}/Article';
+  final baseUrl = '${ConfigKey.baseUrl}/resources';
 
   @override
   Future<String> addArticle(ArticleModel article) async {
     try {
       var url = Uri.parse(baseUrl);
-      final newArticle =
-          await client.post(url, body: jsonEncode(article.toJson()));
-      if (newArticle.statusCode == 200) {
-        // final decodedResponse = jsonDecode(newArticle.body);
+      final newArticle = await client.post(url,
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode(article.toJson()));
+      if (newArticle.statusCode == 201) {
         return 'Article added successfully';
       } else {
         throw ServerException(
@@ -52,16 +52,15 @@ ArticleRemoteDataSourceImpl(this.client){
         throw ServerException(
             message: 'Failed to delete article:${deletedArticle.statusCode}');
       }
-
     } catch (e) {
       throw ServerException(message: e.toString());
     }
   }
 
   @override
-  Future<List<ArticleModel>> getArticles() async{
+  Future<List<ArticleModel>> getArticles() async {
     try {
-      var url = Uri.parse('$baseUrl/getArticles');
+      var url = Uri.parse('$baseUrl/type/Article');
       final response = await client.get(url, headers: {
         'Content-Type': 'application/json',
       });
@@ -72,21 +71,21 @@ ArticleRemoteDataSourceImpl(this.client){
           articles.add(ArticleModel.fromJson(article));
         }
         return articles;
-      } else if(response.statusCode == 404){
+      } else if (response.statusCode == 404) {
         return [];
-      }else {
-        throw ServerException(message: 'Failed to get articles:${response.statusCode}');
+      } else {
+        throw ServerException(
+            message: 'Failed to get articles:${response.statusCode}');
       }
     } catch (e) {
       throw ServerException(message: e.toString());
     }
-   
   }
 
   @override
-  Future<List<ArticleModel>> searchArticles(String title) async{
+  Future<List<ArticleModel>> searchArticles(String title) async {
     try {
-      var url = Uri.parse('$baseUrl/searchArticles/$title');
+      var url = Uri.parse('$baseUrl/search?query=$title');
       final response = await client.get(url, headers: {
         'Content-Type': 'application/json',
       });
@@ -98,20 +97,24 @@ ArticleRemoteDataSourceImpl(this.client){
         }
         return articles;
       } else {
-        throw ServerException(message: 'Failed to search articles:${response.statusCode}');
+        throw ServerException(
+            message: 'Failed to search articles:${response.statusCode}');
       }
     } catch (e) {
       throw ServerException(message: e.toString());
     }
-    
   }
 
   @override
-  Future<String> updateArticle(ArticleModel article, String id) async{
+  Future<String> updateArticle(ArticleModel article, String id) async {
     try {
-      var url = Uri.parse('$baseUrl/updateArticle/$id');
+      var url = Uri.parse('$baseUrl/$id');
       final updatedArticle =
-          await client.put(url, body: jsonEncode(article.toJson()));
+          await client.put(url,
+          headers: {
+            'Content-Type':'application/json'
+          },
+           body: jsonEncode(article.toJson()));
       if (updatedArticle.statusCode == 200) {
         final decodedResponse = jsonDecode(updatedArticle.body);
         return decodedResponse['message'];
@@ -122,12 +125,10 @@ ArticleRemoteDataSourceImpl(this.client){
     } catch (e) {
       throw ServerException(message: e.toString());
     }
-   
   }
-  
-  @override
-  Future<ArticleModel> getSingleArticle(String id)async {
 
+  @override
+  Future<ArticleModel> getSingleArticle(String id) async {
     try {
       var url = Uri.parse('$baseUrl/getSingleArticle/$id');
       final response = await client.get(url, headers: {
@@ -137,12 +138,11 @@ ArticleRemoteDataSourceImpl(this.client){
         final decodedResponse = jsonDecode(response.body);
         return ArticleModel.fromJson(decodedResponse);
       } else {
-        throw ServerException(message: 'Failed to get single article:${response.statusCode}');
+        throw ServerException(
+            message: 'Failed to get single article:${response.statusCode}');
       }
     } catch (e) {
       throw ServerException(message: e.toString());
-   
+    }
   }
-}
-
 }

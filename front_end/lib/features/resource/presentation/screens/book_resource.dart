@@ -14,10 +14,11 @@ class BookResource extends StatefulWidget {
 }
 
 class _BookResourceState extends State<BookResource> {
+  final TextEditingController _searchController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
-
     context.read<BookBloc>().add(GetBookEvent());
   }
 
@@ -25,87 +26,122 @@ class _BookResourceState extends State<BookResource> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(left: 10.0),
-            child: IconButton(
-              icon: const Icon(
-                Icons.refresh,
-                color: Color.fromARGB(239, 130, 5, 220),
-                size: 25,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: Container(
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(255, 226, 225, 225),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Search for books..',
+                    hintStyle: const TextStyle(
+                        color: Colors.amber), // Fixed hex code typo
+                    prefixIcon: Icon(Icons.search, color: Colors.grey[700]),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 10.0),
+                  ),
+                  style: const TextStyle(color: Colors.black),
+                  onSubmitted: (query) {
+                    if (query.isNotEmpty) {
+                      context.read<BookBloc>().add(SearchEvent(query));
+                    }
+                  },
+                ),
               ),
-              onPressed: () {
-                context.read<BookBloc>().add(GetBookEvent());
-              },
+              IconButton(
+                icon: const Icon(Icons.search, color: Colors.grey),
+                onPressed: () {
+                  final query = _searchController.text;
+                  if (query.isNotEmpty) {
+                    context.read<BookBloc>().add(SearchEvent(query));
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(
+              Icons.refresh,
+              color: Color.fromARGB(239, 130, 5, 220),
+              size: 25,
             ),
+            onPressed: () {
+              _searchController.clear();
+              context.read<BookBloc>().add(GetBookEvent());
+            },
           ),
         ],
       ),
       body: BlocBuilder<BookBloc, BookState>(
         builder: (context, state) {
           if (state is BookLoading) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (state is BookError) {
             return Center(child: Text(state.message));
           } else if (state is BookLoaded) {
             final books = state.books;
             if (books.isEmpty) {
-              return Center(child: Text('No books available.'));
+              return const Center(child: Text('No books available.'));
             }
             return GridView.builder(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 16), // Add padding around the grid
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2, // Number of columns
-                crossAxisSpacing: 16, // Horizontal space between items
-                mainAxisSpacing: 16, // Vertical space between items
-                childAspectRatio: 0.75, // Adjust the aspect ratio of items
+                crossAxisCount: 2,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                childAspectRatio: 0.75,
               ),
               itemCount: books.length,
               itemBuilder: (context, index) {
                 final book = books[index];
                 return BookItem(
-                    onUpdate: () async {
-                      final result = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => UpdateBook(
-                            title: book.title,
-                            author: book.author,
-                            imageUrl: book.image,
-                            categories: book.categories,
-                            onUpdate: (updatedBookMap) {
-                              final updatedBook = BookEntity(
-                                type: book.type,
-                                id: book.id,
-                                title: updatedBookMap['title'] as String,
-                                author: updatedBookMap['author'] as String,
-                                image: updatedBookMap['imageUrl'] as String,
-                                categories: book.categories,
-                              );
-                              context
-                                  .read<BookBloc>()
-                                  .add(UpdateBookEvent(updatedBook, book.id));
-                            },
-                          ),
+                  onUpdate: () async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => UpdateBook(
+                          id: book.id,
+                          title: book.title,
+                          author: book.author,
+                          imageUrl: book.image,
+                          categories: book.categories,
+                          onUpdate: (updatedBookMap) {
+                            final updatedBook = BookEntity(
+                              type: book.type,
+                              id: book.id,
+                              title: updatedBookMap['title'] as String,
+                              author: updatedBookMap['author'] as String,
+                              image: updatedBookMap['imageUrl'] as String,
+                              categories: book.categories,
+                            );
+                            context
+                                .read<BookBloc>()
+                                .add(UpdateBookEvent(updatedBook, book.id));
+                          },
                         ),
-                      );
-
-                      if (result == true) {
-                        context
-                            .read<BookBloc>()
-                            .add(GetSingleBookEvent(book.id));
-                      }
-                    },
-                    onDelete: () {
-                      _showDeleteDialog(context, book.id);
-                    },
-                    book: book);
+                      ),
+                    );
+                    if (result == true) {
+                      context.read<BookBloc>().add(GetSingleBookEvent(book.id));
+                    }
+                  },
+                  onDelete: () {
+                    _showDeleteDialog(context, book.id);
+                  },
+                  book: book,
+                );
               },
             );
-          } else {
-            return Center(child: Text('Something went wrong!'));
           }
+          return const Center(child: Text('Something went wrong!'));
         },
       ),
       floatingActionButton: FloatingActionButton(
@@ -115,13 +151,13 @@ class _BookResourceState extends State<BookResource> {
             MaterialPageRoute(builder: (context) => AddBook()),
           );
         },
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
         backgroundColor: Colors.purple,
       ),
     );
   }
 
-  void _showDeleteDialog(BuildContext context, id) {
+  void _showDeleteDialog(BuildContext context, String id) {
     showDialog(
       context: context,
       builder: (BuildContext context) {

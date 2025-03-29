@@ -32,10 +32,10 @@ class ArticleDeleted extends ArticleState {
   ArticleDeleted(this.message);
 }
 
-class SearchArticleLoaded extends ArticleState {
-  final List<ArticleEntity> articles;
-  SearchArticleLoaded(this.articles);
-}
+// class SearchArticleLoaded extends ArticleState {
+//   final List<ArticleEntity> articles;
+//   SearchArticleLoaded(this.articles);
+// }
 
 class SingleArticleLoaded extends ArticleState {
   final ArticleEntity article;

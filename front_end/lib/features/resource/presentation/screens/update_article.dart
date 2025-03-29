@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front_end/core/common_widget.dart/circular_indicator.dart';
 import 'package:front_end/core/common_widget.dart/snack_bar.dart';
 import 'package:front_end/features/authentication/presentation/widget/custom_button.dart';
+import 'package:front_end/features/resource/domain/entity/article_entity.dart';
 import 'package:front_end/features/resource/presentation/bloc/article_bloc/bloc/article_bloc.dart';
 import 'package:front_end/features/resource/presentation/bloc/video_bloc/bloc/video_bloc.dart';
 import 'package:front_end/features/resource/presentation/widget/custom_formfield.dart';
@@ -12,6 +13,7 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 
 class UpdateArticle extends StatefulWidget {
+  final String id;
   final String content;
   final String title;
   final String link;
@@ -21,6 +23,7 @@ class UpdateArticle extends StatefulWidget {
 
   const UpdateArticle({
     super.key,
+    required this.id,
     required this.content,
     required this.link,
     required this.logo,
@@ -37,30 +40,29 @@ class _UpdateArticleState extends State<UpdateArticle> {
   late TextEditingController linkController;
   late TextEditingController contentController;
   late TextEditingController logoController;
- 
 
   @override
   void initState() {
     super.initState();
     titleController = TextEditingController(text: widget.title);
     linkController = TextEditingController(text: widget.link);
-    logoController =
-        TextEditingController(text: widget.logo);
+    logoController = TextEditingController(text: widget.logo);
     contentController = TextEditingController(text: widget.content);
-   
   }
 
   void UpdateArticle() async {
     await _uploadImage();
-    final Map<String, Object> updatedbook = {
-      'title': titleController.text,
-      'link': linkController.text,
-    
-      'content': contentController.text,
-      'logo':
-          _imageUrl?.isNotEmpty == true ? _imageUrl! : logoController.text,
-    };
-    widget.onUpdate(updatedbook);
+    final updatedArticle = ArticleEntity(
+        id: '',
+        title: titleController.text,
+        content: contentController.text,
+        link: linkController.text,
+        logo: logoController.text,
+        type: "Article",
+        categories: ['categories', 'categories']);
+    context
+        .read<ArticleBloc>()
+        .add(UpdateArticleEvent(updatedArticle, widget.id));
   }
 
   // Pick images from the device
@@ -218,8 +220,7 @@ class _UpdateArticleState extends State<UpdateArticle> {
                 const SizedBox(
                   height: 25,
                 ),
-                CustomFormField(
-                    text: 'content', controller: contentController),
+                CustomFormField(text: 'content', controller: contentController),
                 const SizedBox(
                   height: 25,
                 ),
@@ -232,8 +233,7 @@ class _UpdateArticleState extends State<UpdateArticle> {
                     if (titleController.text.isNotEmpty &&
                         linkController.text.isNotEmpty &&
                         contentController.text.isNotEmpty) {
-                          
-                      UpdateArticle;
+                      UpdateArticle();
                     }
                   },
                 ),
@@ -252,7 +252,7 @@ class _UpdateArticleState extends State<UpdateArticle> {
   void dispose() {
     titleController.dispose();
     linkController.dispose();
-   
+
     contentController.dispose();
     logoController.dispose();
 

@@ -74,7 +74,7 @@ class VideoBloc extends Bloc<VideoEvent, VideoState> {
       result.fold((l) {
         emit(VideoError(l.message));
       }, (video) {
-        emit(SearchVideoLoaded(video));
+        emit(VideoLoaded(video));
       });
     });
 

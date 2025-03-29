@@ -5,28 +5,32 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front_end/core/common_widget.dart/circular_indicator.dart';
 import 'package:front_end/core/common_widget.dart/snack_bar.dart';
 import 'package:front_end/features/authentication/presentation/widget/custom_button.dart';
+import 'package:front_end/features/resource/domain/entity/video_entity.dart';
 import 'package:front_end/features/resource/presentation/bloc/video_bloc/bloc/video_bloc.dart';
 import 'package:front_end/features/resource/presentation/widget/custom_formfield.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 
 class UpdateVideo extends StatefulWidget {
+  final String id;
   final String image;
   final String title;
   final String link;
   final String profilePicture;
   final String name;
+  final List<String> categories;
   final Function(Map<String, Object>) onUpdate;
 
   const UpdateVideo({
     super.key,
+    required this.id,
     required this.image,
     required this.link,
     required this.profilePicture,
     required this.name,
-
     required this.title,
     required this.onUpdate,
+    required this.categories,
   });
 
   @override
@@ -39,28 +43,32 @@ class _UpdateVideoState extends State<UpdateVideo> {
   late TextEditingController profilePictureController;
   late TextEditingController nameController;
   late TextEditingController imageController;
+  List<String> selectedCategories = [];
 
   @override
   void initState() {
     super.initState();
     titleController = TextEditingController(text: widget.title);
     linkController = TextEditingController(text: widget.link);
-    profilePictureController = TextEditingController(text: widget.profilePicture);
+    profilePictureController =
+        TextEditingController(text: widget.profilePicture);
     nameController = TextEditingController(text: widget.name);
     imageController = TextEditingController(text: widget.image);
+    selectedCategories = widget.categories;
   }
 
-  void UpdateVideo() async {
+  void updateVideo() async {
     await _uploadImage();
-    final Map<String, Object> updatedbook = {
-      'title': titleController.text,
-      'link': linkController.text,
-      'profilePicture': profilePictureController.text,
-      'name': nameController.text,
-  
-      'image': _imageUrl?.isNotEmpty == true ? _imageUrl! : imageController.text,
-    };
-    widget.onUpdate(updatedbook);
+    final updatedVideo = VideoEntity(
+        id: '',
+        image: _imageUrl!,
+        title: titleController.text,
+        link: linkController.text,
+        profilePicture: 'profilePicture',
+        name: 'name',
+        type: 'Video',
+        categories: selectedCategories);
+    context.read<VideoBloc>().add(UpdateVideoEvent(updatedVideo, widget.id));
   }
 
   // Pick images from the device
@@ -74,7 +82,6 @@ class _UpdateVideoState extends State<UpdateVideo> {
     setState(() {
       if (pickedFile != null) {
         _imageFile = File(pickedFile.path);
-       
       }
     });
   }
@@ -227,7 +234,7 @@ class _UpdateVideoState extends State<UpdateVideo> {
                   onPressed: () {
                     if (titleController.text.isNotEmpty &&
                         linkController.text.isNotEmpty) {
-                      UpdateVideo;
+                      updateVideo();
                     }
                   },
                 ),

@@ -14,6 +14,7 @@ class ArticleResource extends StatefulWidget {
 }
 
 class _ArticleResourceState extends State<ArticleResource> {
+  final TextEditingController _searchController = TextEditingController();
   @override
   void initState() {
     super.initState();
@@ -25,6 +26,49 @@ class _ArticleResourceState extends State<ArticleResource> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: Container(
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(255, 226, 225, 225),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Search for articles...',
+                    hintStyle: const TextStyle(
+                      color: Color.fromARGB(239, 130, 5, 220),
+                    ),
+                    prefixIcon: Icon(Icons.search, color: Colors.grey[700]),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 10.0),
+                  ),
+                  style: const TextStyle(color: Colors.black),
+                  onSubmitted: (query) {
+                    if (query.isNotEmpty) {
+                      context
+                          .read<ArticleBloc>()
+                          .add(SearchArticleEvent(query));
+                    }
+                  },
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.search, color: Colors.grey),
+                onPressed: () {
+                  final query = _searchController.text;
+                  if (query.isNotEmpty) {
+                    context.read<ArticleBloc>().add(SearchArticleEvent(query));
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
         actions: [
           Padding(
             padding: const EdgeInsets.only(left: 10.0),
@@ -52,30 +96,28 @@ class _ArticleResourceState extends State<ArticleResource> {
             if (articles.isEmpty) {
               return Center(child: Text('No articles available.'));
             }
-            return GridView.builder(
-              padding: EdgeInsets.all(16), 
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2, // Number of columns
-                crossAxisSpacing: 16, // Horizontal space between items
-                mainAxisSpacing: 16, // Vertical space between items
-                childAspectRatio: 0.75, // Adjust the aspect ratio of items
-              ),
+            return ListView.builder(
+              padding: EdgeInsets.all(16),
               itemCount: articles.length,
               itemBuilder: (context, index) {
                 final article = articles[index];
-                return ArticleCard(
+                return Padding(
+                  padding:
+                      const EdgeInsets.only(bottom: 16), // Space between cards
+                  child: ArticleCard(
                     onUpdate: () async {
                       final result = await Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => UpdateArticle(
+                            id:article.id,
                             title: article.title,
                             content: article.content,
                             logo: article.logo,
                             link: article.link,
                             onUpdate: (updatedArticleMap) {
                               final updatedArticle = ArticleEntity(
-                               type: article.type,
+                                type: article.type,
                                 id: article.id,
                                 title: updatedArticleMap['title'] as String,
                                 content: updatedArticleMap['content'] as String,
@@ -83,9 +125,8 @@ class _ArticleResourceState extends State<ArticleResource> {
                                 link: updatedArticleMap['link'] as String,
                                 categories: article.categories,
                               );
-                              context
-                                  .read<ArticleBloc>()
-                                  .add(UpdateArticleEvent(
+                              context.read<ArticleBloc>().add(
+                                  UpdateArticleEvent(
                                       updatedArticle, article.id));
                             },
                           ),
@@ -101,7 +142,9 @@ class _ArticleResourceState extends State<ArticleResource> {
                     onDelete: () {
                       _showDeleteDialog(context, article.id);
                     },
-                    article: article);
+                    article: article,
+                  ),
+                );
               },
             );
           } else {

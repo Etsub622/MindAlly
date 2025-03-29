@@ -22,7 +22,6 @@ class BookBloc extends Bloc<BookEvent, BookState> {
     required this.updateBookUsecase,
     required this.getSingleBookUsecase,
   }) : super(BookInitial()) {
-    
     on<AddBookEvent>((event, emit) async {
       emit(BookLoading());
 
@@ -74,7 +73,7 @@ class BookBloc extends Bloc<BookEvent, BookState> {
       final books = await searchBookUsecase(SearchParams(event.title));
 
       books.fold((l) => emit(BookError('No book found')),
-          (books) => emit(SearchLoaded(books)));
+          (books) => emit(BookLoaded(books)));
     });
 
     on<GetSingleBookEvent>((event, emit) async {

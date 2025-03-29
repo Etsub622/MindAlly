@@ -15,10 +15,10 @@ class VideoResource extends StatefulWidget {
 }
 
 class _VideoResourceState extends State<VideoResource> {
+  final TextEditingController _searchController = TextEditingController();
   @override
   void initState() {
     super.initState();
-
     context.read<VideoBloc>().add(GetVideoEvent());
   }
 
@@ -26,11 +26,52 @@ class _VideoResourceState extends State<VideoResource> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: Container(
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(255, 226, 225, 225),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Search for books..',
+                    hintStyle: const TextStyle(
+                      color: Color.fromARGB(239, 130, 5, 220),
+                    ),
+                    prefixIcon: Icon(Icons.search, color: Colors.grey[700]),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 10.0),
+                  ),
+                  style: const TextStyle(color: Colors.black),
+                  onSubmitted: (query) {
+                    if (query.isNotEmpty) {
+                      context.read<VideoBloc>().add(SearchVideoEvent(query));
+                    }
+                  },
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.search, color: Colors.grey),
+                onPressed: () {
+                  final query = _searchController.text;
+                  if (query.isNotEmpty) {
+                    context.read<VideoBloc>().add(SearchVideoEvent(query));
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
         actions: [
           Padding(
             padding: const EdgeInsets.only(left: 10.0),
             child: IconButton(
-              icon:const Icon(
+              icon: const Icon(
                 Icons.refresh,
                 color: Color.fromARGB(239, 130, 5, 220),
                 size: 25,
@@ -53,57 +94,54 @@ class _VideoResourceState extends State<VideoResource> {
             if (videos.isEmpty) {
               return Center(child: Text('No Videos available.'));
             }
-            return GridView.builder(
-              padding: const EdgeInsets.all(16),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                childAspectRatio: 0.75,
-              ),
+            return ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
               itemCount: videos.length,
               itemBuilder: (context, index) {
                 final video = videos[index];
                 return VideoCard(
-                    onUpdate: () async {
-                      final result = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => UpdateVideo(
-                            title: video.title,
-                            link: video.link,
-                            image: video.image,
-                            profilePicture: video.profilePicture,
-                            name: video.name,
-                            onUpdate: (updatedVideoMap) {
-                              final updatedBook = VideoEntity(
-                                type: video.type,
-                                id: video.id,
-                                title: updatedVideoMap['title'] as String,
-                                link: updatedVideoMap['link'] as String,
-                                image: updatedVideoMap['imageUrl'] as String,
-                                profilePicture: video.profilePicture,
-                                name: video.name,
-                                categories: video.categories,
-                              );
-                              context
-                                  .read<VideoBloc>()
-                                  .add(UpdateVideoEvent(updatedBook, video.id));
-                            },
-                          ),
+                  onUpdate: () async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => UpdateVideo(
+                          id: video.id,
+                          title: video.title,
+                          link: video.link,
+                          image: video.image,
+                          profilePicture: video.profilePicture,
+                          name: video.name,
+                          categories: video.categories,
+                          onUpdate: (updatedVideoMap) {
+                            final updatedVideo = VideoEntity(
+                              type: video.type,
+                              id: video.id,
+                              title: updatedVideoMap['title'] as String,
+                              link: updatedVideoMap['link'] as String,
+                              image: updatedVideoMap['imageUrl'] as String,
+                              profilePicture: video.profilePicture,
+                              name: video.name,
+                              categories: video.categories,
+                            );
+                            context
+                                .read<VideoBloc>()
+                                .add(UpdateVideoEvent(updatedVideo, video.id));
+                          },
                         ),
-                      );
+                      ),
+                    );
 
-                      if (result == true) {
-                        context
-                            .read<VideoBloc>()
-                            .add(GetSingleVideoEvent(video.id));
-                      }
-                    },
-                    onDelete: () {
-                      _showDeleteDialog(context, video.id);
-                    },
-                    video: video);
+                    if (result == true) {
+                      context
+                          .read<VideoBloc>()
+                          .add(GetSingleVideoEvent(video.id));
+                    }
+                  },
+                  onDelete: () {
+                    _showDeleteDialog(context, video.id);
+                  },
+                  video: video,
+                );
               },
             );
           } else {
