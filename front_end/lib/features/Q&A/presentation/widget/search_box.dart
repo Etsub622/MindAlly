@@ -8,33 +8,28 @@ class SearchInputField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top,
-        bottom: MediaQuery.of(context).padding.top * 0.3,
-        left: MediaQuery.of(context).size.width * 0.02,
-        right: MediaQuery.of(context).size.width * 0.02,
+    return Container(
+      height: 50,
+      decoration: BoxDecoration(
+        color: Color.fromARGB(238, 239, 227, 248),
+        borderRadius: BorderRadius.circular(30),
       ),
       child: TextField(
         controller: controller,
         decoration: InputDecoration(
           hintText: 'What do you want to ask?',
-          hintStyle: TextStyle(color: Color(0xff08E0EEA)),
-          prefixIcon: Icon(Icons.search, color: Colors.grey[700]),
+          hintStyle:
+              TextStyle(color: Color.fromARGB(239, 130, 5, 220), fontSize: 16),
+          suffixIcon: Icon(Icons.search, color: Colors.white),
           filled: true,
-          fillColor: Color.fromARGB(255, 226, 225, 225),
+          fillColor: Color.fromARGB(238, 239, 224, 249),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30.0),
+            borderRadius: BorderRadius.circular(15),
             borderSide: BorderSide.none,
           ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30.0),
-            borderSide: BorderSide.none,
-          ),
-          contentPadding:
-              EdgeInsets.symmetric(vertical: 15.0, horizontal: 20.0),
+          contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
         ),
-        style: TextStyle(color: Colors.black),
+        style: TextStyle(color: Color.fromARGB(239, 130, 5, 220), fontSize: 16),
       ),
     );
   }

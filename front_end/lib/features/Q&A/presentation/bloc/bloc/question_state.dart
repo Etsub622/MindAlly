@@ -31,7 +31,7 @@ class QuestionDeleted extends QuestionState {
   QuestionDeleted(this.message);
 }
 
-class SearchLoaded extends QuestionState {
-  final List<QuestionEntity> questions;
-  SearchLoaded(this.questions);
+class SearchFailed extends QuestionState {
+  final String message;
+  SearchFailed(this.message);
 }

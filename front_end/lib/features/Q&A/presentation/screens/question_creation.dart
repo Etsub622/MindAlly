@@ -104,39 +104,41 @@ class _CreateQuestionBottomSheetState extends State<CreateQuestionBottomSheet> {
               maxline: 5,
             ),
             SizedBox(height: 16),
-            MultiSelectDialogField<String>(
-              items: categoryOption
-                  .map((e) => MultiSelectItem<String>(e, e))
-                  .toList(),
-              decoration: BoxDecoration(
-                border: Border.all(
-                    color: const Color.fromARGB(255, 215, 214, 214),
-                    width: 1.0),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              buttonText: const Text('Question Category'),
-              title: const Text('Question Category'),
-              selectedColor: Colors.blue,
-              buttonIcon: const Icon(
-                Icons.arrow_drop_down,
-                color: Colors.black,
-              ),
-              onConfirm: (List<String> values) {
-                setState(() {
-                  selectedCategories = values;
-                });
-              },
-              chipDisplay: MultiSelectChipDisplay<String>(
-                onTap: (value) {
+            Flexible(
+              child: MultiSelectDialogField<String>(
+                items: categoryOption
+                    .map((e) => MultiSelectItem<String>(e, e))
+                    .toList(),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                      color: const Color.fromARGB(255, 215, 214, 214),
+                      width: 1.0),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                buttonText: const Text('Question Category'),
+                title: const Text('Question Category'),
+                selectedColor: Colors.blue,
+                buttonIcon: const Icon(
+                  Icons.arrow_drop_down,
+                  color: Colors.black,
+                ),
+                onConfirm: (List<String> values) {
                   setState(() {
-                    selectedCategories.remove(value);
+                    selectedCategories = values;
                   });
                 },
-                textStyle: const TextStyle(color: Colors.black),
-                chipColor: Colors.white,
+                chipDisplay: MultiSelectChipDisplay<String>(
+                  onTap: (value) {
+                    setState(() {
+                      selectedCategories.remove(value);
+                    });
+                  },
+                  textStyle: const TextStyle(color: Colors.black),
+                  chipColor: Colors.white,
+                ),
+                searchable: true,
+                searchHint: 'Search here...',
               ),
-              searchable: true,
-              searchHint: 'Search here...',
             ),
             SizedBox(height: 16),
             CustomButton(

@@ -31,17 +31,24 @@ class _QuestionCardState extends State<QuestionCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      elevation: _isExpanded ? 8 : 0,
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        width: double.infinity,
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            blurRadius: 10,
+            spreadRadius: 2,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Padding(
         padding: EdgeInsets.all(16),
-        margin: EdgeInsets.symmetric(vertical: 8),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey),
-          borderRadius: BorderRadius.circular(8),
-        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -49,16 +56,21 @@ class _QuestionCardState extends State<QuestionCard> {
               children: [
                 CircleAvatar(
                   backgroundImage: NetworkImage(widget.profileImage),
-                  radius: 20,
+                  radius: 22,
                 ),
-                SizedBox(width: 10),
-                Text(
-                  widget.name,
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    widget.name,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-                Spacer(),
                 PopupMenuButton<String>(
-                  icon: Icon(Icons.more_vert),
+                  icon: Icon(Icons.more_vert, color: Colors.grey[700]),
                   onSelected: (value) {
                     if (value == 'update') {
                       widget.onUpdate();
@@ -67,28 +79,36 @@ class _QuestionCardState extends State<QuestionCard> {
                     }
                   },
                   itemBuilder: (context) => [
-                    const PopupMenuItem(
-                      value: 'update',
-                      child: Text('Update'),
-                    ),
-                    const PopupMenuItem(
-                      value: 'delete',
-                      child: Text('Delete'),
-                    ),
+                    PopupMenuItem(value: 'update', child: Text('Edit')),
+                    PopupMenuItem(
+                        value: 'delete',
+                        child: Text('Delete',
+                            style: TextStyle(color: Colors.red))),
                   ],
                 ),
               ],
             ),
-            SizedBox(height: 8),
+            SizedBox(height: 10),
             Text(
               widget.title,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             SizedBox(height: 8),
-            Text(
-              widget.content,
-              maxLines: _isExpanded ? null : 3,
-              overflow: _isExpanded ? null : TextOverflow.ellipsis,
+            AnimatedCrossFade(
+              duration: Duration(milliseconds: 250),
+              crossFadeState: _isExpanded
+                  ? CrossFadeState.showSecond
+                  : CrossFadeState.showFirst,
+              firstChild: Text(
+                widget.content,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: Colors.grey[700]),
+              ),
+              secondChild: Text(
+                widget.content,
+                style: TextStyle(color: Colors.grey[700]),
+              ),
             ),
             SizedBox(height: 8),
             GestureDetector(
@@ -97,34 +117,50 @@ class _QuestionCardState extends State<QuestionCard> {
                   _isExpanded = !_isExpanded;
                 });
               },
-              child: Text(
-                _isExpanded ? 'Read less' : 'Read more',
-                style: TextStyle(color: Colors.blue),
+              child: Row(
+                children: [
+                  Text(
+                    _isExpanded ? 'Read less' : 'Read more',
+                    style: TextStyle(
+                        color: Colors.blue, fontWeight: FontWeight.w500),
+                  ),
+                  Icon(
+                    _isExpanded ? Icons.expand_less : Icons.expand_more,
+                    color: Color.fromARGB(239, 130, 5, 220),
+                    size: 18,
+                  ),
+                ],
               ),
             ),
-            SizedBox(height: 8),
+            SizedBox(height: 7),
             Wrap(
               spacing: 6,
               runSpacing: 4,
               children: widget.category.map((cat) {
                 return Chip(
+                  backgroundColor: Colors.blue[50],
                   label: Text(
                     cat,
                     style: TextStyle(
-                      fontSize: 12, // Reduce font size
+                      fontSize: 12,
+                      color: Color.fromARGB(239, 130, 5, 220),
                     ),
                   ),
-                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
                 );
               }).toList(),
             ),
-            SizedBox(height: 12),
-            InkWell(
-              onTap: widget.onPressed,
-              child: const Icon(Icons.message, color: Colors.blue, size: 28),
-            ),
-            SizedBox(
-              height: 8,
+            SizedBox(height: 5),
+            Align(
+              alignment: Alignment.centerRight,
+              child: IconButton(
+                onPressed: widget.onPressed,
+                icon: Icon(Icons.message,
+                    color: Color.fromARGB(239, 130, 5, 220), size: 28),
+              ),
             ),
           ],
         ),
