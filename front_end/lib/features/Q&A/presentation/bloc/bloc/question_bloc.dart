@@ -65,15 +65,24 @@ class QuestionBloc extends Bloc<QuestionEvent, QuestionState> {
       });
     });
 
-    on<SearchQuestionEvent>((event, emit) async {
+     on<SearchQuestionEvent>((event, emit) async {
       emit(QuestionLoading());
+
       final question = await getQuestionByCategoryUsecase(
           GetQuestionByCategoryParams(event.title));
-      question.fold((l) {
-        emit(QuestionError(l.message));
-      }, (questions) {
-        emit(QuestionLoaded(questions));
-      });
+
+      question.fold(
+        (failure) {
+          emit(SearchFailed(failure.message));
+        },
+        (books) {
+          if (books.isEmpty) {
+            emit(SearchFailed('No resources found'));
+          } else {
+            emit(QuestionLoaded(books));
+          }
+        },
+      );
     });
   }
 }

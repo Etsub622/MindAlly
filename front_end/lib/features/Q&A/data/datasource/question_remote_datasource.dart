@@ -60,11 +60,19 @@ class QuestionRemoteDataSourceImpl implements QuestionRemoteDatasource {
   @override
   Future<List<QuestionModel>> getQuestionbyCategory(String category) async {
     try {
-      var url = Uri.parse('$baseUrl/getQuestionsByCategory/$category');
+      var url = Uri.parse('$baseUrl/questions/category/$category');
       final response = await client.get(url);
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
       if (response.statusCode == 200) {
-        final decodedResponse = jsonDecode(response.body);
-        return decodedResponse['message'];
+        final List<dynamic> questionJson = json.decode(response.body);
+        if (questionJson.isEmpty) {
+          return [];
+        } else {
+          return questionJson.map((jsonItem) {
+            return QuestionModel.fromJson(jsonItem as Map<String, dynamic>);
+          }).toList();
+        }
       } else {
         throw ServerException(
             message: 'Failed to get question:${response.statusCode}');

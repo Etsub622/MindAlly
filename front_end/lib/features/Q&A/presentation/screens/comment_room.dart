@@ -24,6 +24,22 @@ class _CommentRoomState extends State<CommentRoom> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Answer Room'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.add,
+                size: 30, color: Color.fromARGB(239, 130, 5, 220)),
+            onPressed: () {
+              showModalBottomSheet(
+                context: context,
+                builder: (context) {
+                  return CreateAnswerBottomSheet(
+                    questionId: widget.questionId,
+                  );
+                },
+              );
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -74,19 +90,6 @@ class _CommentRoomState extends State<CommentRoom> {
                 }
               },
             ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              showModalBottomSheet(
-                context: context,
-                builder: (context) {
-                  return CreateAnswerBottomSheet(
-                    questionId: widget.questionId,
-                  );
-                },
-              );
-            },
-            child: Text('Add Answer'),
           ),
         ],
       ),
