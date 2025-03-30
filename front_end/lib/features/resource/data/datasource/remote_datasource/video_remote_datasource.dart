@@ -45,7 +45,7 @@ class VideoRemoteDataSourceImpl implements VideoRemoteDatasource {
   @override
   Future<String> deleteVideo(String id) async {
     try {
-      final url = Uri.parse('$baseUrl/deleteVideo/$id');
+      final url = Uri.parse('$baseUrl/$id');
       final deletedVideo = await client.delete(url);
       if (deletedVideo.statusCode == 200) {
         final decodedResponse = jsonDecode(deletedVideo.body);
@@ -94,7 +94,8 @@ class VideoRemoteDataSourceImpl implements VideoRemoteDatasource {
       final response = await client.get(url, headers: {
         'Content-Type': 'application/json',
       });
-
+      print(response.body);
+      print(response.statusCode);
       if (response.statusCode == 200) {
         final List<dynamic> videoJson = json.decode(response.body);
         if (videoJson.isEmpty) {
@@ -104,6 +105,12 @@ class VideoRemoteDataSourceImpl implements VideoRemoteDatasource {
             return VideoModel.fromJson(jsonItem as Map<String, dynamic>);
           }).toList();
         }
+      } else if (response.statusCode == 404) {
+        final Map<String, dynamic> errorResponse = json.decode(response.body);
+        final errorMessage =
+            errorResponse['message'] ?? 'No matching resources found.';
+        print('Error: $errorMessage');
+        return [];
       } else {
         throw ServerException(
             message: 'Failed to get videos:${response.statusCode}');

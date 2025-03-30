@@ -37,13 +37,11 @@ class ArticleBloc extends Bloc<ArticleEvent, ArticleState> {
 
     on<GetArticleEvent>((event, emit) async {
       emit(ArticleLoading());
-      final article = await getArticlesUsecase(NoParams(
-        
-      ));
+      final article = await getArticlesUsecase(NoParams());
       article.fold((l) {
         emit(ArticleError(l.message));
-      }, (books) {
-        emit(ArticleLoaded(books));
+      }, (articles) {
+        emit(ArticleLoaded(articles));
       });
     });
 
@@ -63,7 +61,7 @@ class ArticleBloc extends Bloc<ArticleEvent, ArticleState> {
       emit(ArticleLoading());
       final result = await deleteArticleUsecase(DeleteArticleParams(event.id));
 
-      result.fold((l) {gi
+      result.fold((l) {
         emit(ArticleError(l.message));
       }, (successMessage) {
         emit(ArticleDeleted(successMessage));
@@ -72,18 +70,28 @@ class ArticleBloc extends Bloc<ArticleEvent, ArticleState> {
 
     on<SearchArticleEvent>((event, emit) async {
       emit(ArticleLoading());
+
       final result =
           await searchArticleUsecase(SearchArticleParams(event.title));
 
-      result.fold((l) {
-        emit(ArticleError(l.message));
-      }, (articles) {
-        emit(ArticleLoaded(articles));
-      });
+      result.fold(
+        (failure) {
+          emit(SearchFailed(failure.message));
+        },
+        (articles) {
+          if (articles.isEmpty) {
+            emit(SearchFailed('No resources found'));
+          } else {
+            emit(ArticleLoaded(articles));
+          }
+        },
+      );
     });
+
     on<GetSingleArticleEvent>((event, emit) async {
       emit(ArticleLoading());
-      final result = await getSingleArticleUsecase(GetSingleArticleParams(event.id));
+      final result =
+          await getSingleArticleUsecase(GetSingleArticleParams(event.id));
 
       result.fold((l) {
         emit(ArticleError(l.message));

@@ -76,6 +76,7 @@ class _UpdateArticleState extends State<UpdateArticle> {
     setState(() {
       if (pickedFile != null) {
         _imageFile = File(pickedFile.path);
+        _imageUrl = '';
       }
     });
   }
@@ -110,6 +111,8 @@ class _UpdateArticleState extends State<UpdateArticle> {
         if (state is ArticleUpdated) {
           final snack = snackBar('Article successfully Updated!');
           ScaffoldMessenger.of(context).showSnackBar(snack);
+          Navigator.of(context).pop();
+          context.read<ArticleBloc>().add(GetArticleEvent());
         } else if (state is ArticleError) {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text('Article update Failed!'),
@@ -151,7 +154,7 @@ class _UpdateArticleState extends State<UpdateArticle> {
                       ),
                     ),
                     const SizedBox(
-                      width: 130,
+                      width: 60,
                     ),
                     const Text(
                       'Update an article',

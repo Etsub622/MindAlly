@@ -10,7 +10,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class AuthRemoteDatasource {
   Future<Map<String, dynamic>> studentSignUp(StudentSignupModel studentModel);
-  Future<Map<String, dynamic>> professionalSignUp(ProfessionalSignupModel professionalModel);
+  Future<Map<String, dynamic>> professionalSignUp(
+      ProfessionalSignupModel professionalModel);
   Future<StudentResponseModel> logIn(LoginModel loginModel);
   Future<String> sendOtp(String email);
   Future<String> verifyOtp(String otp, String email);
@@ -29,11 +30,11 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       final user = await client.post(url,
           body: jsonEncode(professionalModel.toJson()),
           headers: {'Content-Type': 'application/json'});
-     
+
       if (user.statusCode == 200) {
         final jsonResponse = jsonDecode(user.body);
         final token = jsonResponse['token'];
-         // Save the token to SharedPreferences
+        // Save the token to SharedPreferences
         final sharedPreferences = await SharedPreferences.getInstance();
         await sharedPreferences.setString('token_key', token);
 
@@ -56,14 +57,15 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   }
 
   @override
-  Future<Map<String, dynamic>> studentSignUp(StudentSignupModel studentModel) async {
+  Future<Map<String, dynamic>> studentSignUp(
+      StudentSignupModel studentModel) async {
     try {
       var url = Uri.parse('$baseUrl/user/PatientSignup');
 
       final user = await client.post(url,
           body: jsonEncode(studentModel.toJson()),
           headers: {'Content-Type': 'application/json'});
-      
+
       if (user.statusCode == 200) {
         final jsonResponse = jsonDecode(user.body);
         final token = jsonResponse['token'];
@@ -110,12 +112,10 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       // } else {
       //   url = '';
       // }
-    
-      final user = await client.post(
-          url,
+
+      final user = await client.post(url,
           body: jsonEncode(loginModel.toJson()),
           headers: {'Content-Type': 'application/json'});
-
       if (user.statusCode == 200) {
         final responseJson = jsonDecode(user.body);
 

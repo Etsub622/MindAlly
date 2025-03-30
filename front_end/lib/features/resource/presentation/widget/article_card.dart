@@ -14,19 +14,30 @@ class ArticleCard extends StatelessWidget {
     required this.onUpdate,
   });
 
-  void _launchURL() async {
-    final Uri url = Uri.parse(article.link);
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url, mode: LaunchMode.externalApplication);
-    } else {
-      debugPrint("Could not launch $url");
+  Future<void> _launchURL(BuildContext context) async {
+    String urlString = article.link.trim();
+    if (!urlString.startsWith('http')) {
+      urlString = 'https://$urlString';
+    }
+
+    final Uri url = Uri.parse(urlString);
+    final bool launched = await launchUrl(
+      url,
+      mode: LaunchMode.externalApplication,
+    );
+
+    if (!launched) {
+      debugPrint("Failed to launch: $url");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to open: $url")),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: double.infinity, // Makes the card take full width
+      width: double.infinity,
       child: Card(
         elevation: 4,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -34,9 +45,8 @@ class ArticleCard extends StatelessWidget {
           padding: const EdgeInsets.all(12.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min, // Prevents unnecessary stretching
+            mainAxisSize: MainAxisSize.min,
             children: [
-              // Logo and Title Row
               Row(
                 children: [
                   CircleAvatar(
@@ -87,16 +97,15 @@ class ArticleCard extends StatelessWidget {
                   fontSize: 14,
                   color: Colors.grey,
                 ),
-                maxLines: 5, 
+                maxLines: 5,
                 overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 8),
-              // Read more link
               GestureDetector(
-                onTap: _launchURL,
-                child: Text(
+                onTap: () => _launchURL(context),
+                child: const Text(
                   'Read more',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 14,
                     color: Colors.blue,

@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:front_end/bloc_providers.dart';
 import 'package:front_end/core/common_widget.dart/circular_indicator.dart';
 import 'package:front_end/core/common_widget.dart/snack_bar.dart';
 import 'package:front_end/features/authentication/presentation/widget/custom_button.dart';
@@ -10,7 +9,6 @@ import 'package:front_end/features/resource/data/model/book_model.dart';
 import 'package:front_end/features/resource/presentation/bloc/book_bloc/bloc/book_bloc.dart';
 import 'package:front_end/features/resource/presentation/widget/custom_formfield.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
@@ -111,10 +109,8 @@ class _AddBookState extends State<AddBook> {
         if (state is BookAdded) {
           const snack = SnackBar(content: Text('Book added successfully'));
           ScaffoldMessenger.of(context).showSnackBar(snack);
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => AddBook()),
-          );
+          Navigator.of(context).pop();
+          context.read<BookBloc>().add(GetBookEvent());
         } else if (state is BookError) {
           final snack = errorsnackBar('Try again later');
           ScaffoldMessenger.of(context).showSnackBar(snack);

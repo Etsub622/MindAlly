@@ -39,7 +39,7 @@ class BookItem extends StatelessWidget {
                     ),
             ),
           ),
-         Padding(
+          Padding(
             padding: EdgeInsets.all(8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -51,21 +51,20 @@ class BookItem extends StatelessWidget {
                       child: Text(
                         book.title,
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 12,
                           fontWeight: FontWeight.bold,
                         ),
-                        maxLines: 1,
+                        maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     PopupMenuButton<String>(
-                      icon: Icon(Icons.more_vert), 
+                      icon: Icon(Icons.more_vert),
                       onSelected: (value) {
                         if (value == 'update') {
                           onUpdate();
                         } else if (value == 'delete') {
                           onDelete();
-                           
                         }
                       },
                       itemBuilder: (context) => [
@@ -94,7 +93,6 @@ class BookItem extends StatelessWidget {
               ],
             ),
           ),
-
         ],
       ),
     );

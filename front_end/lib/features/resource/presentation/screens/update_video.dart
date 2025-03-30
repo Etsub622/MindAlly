@@ -82,6 +82,7 @@ class _UpdateVideoState extends State<UpdateVideo> {
     setState(() {
       if (pickedFile != null) {
         _imageFile = File(pickedFile.path);
+        _imageUrl = '';
       }
     });
   }
@@ -116,6 +117,8 @@ class _UpdateVideoState extends State<UpdateVideo> {
         if (state is VideoUpdated) {
           final snack = snackBar('video successfully Updated!');
           ScaffoldMessenger.of(context).showSnackBar(snack);
+          Navigator.of(context).pop();
+          context.read<VideoBloc>().add(GetVideoEvent());
         } else if (state is VideoError) {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text('video update Failed!'),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:front_end/features/resource/domain/entity/video_entity.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class VideoCard extends StatelessWidget {
   final VideoEntity video;
@@ -13,6 +14,26 @@ class VideoCard extends StatelessWidget {
     required this.onUpdate,
   });
 
+  Future<void> _launchURL(BuildContext context) async {
+    String urlString = video.link.trim();
+    if (!urlString.startsWith('http')) {
+      urlString = 'https://$urlString';
+    }
+
+    final Uri url = Uri.parse(urlString);
+    final bool launched = await launchUrl(
+      url,
+      mode: LaunchMode.externalApplication,
+    );
+
+    if (!launched) {
+      debugPrint("Failed to launch: $url");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to open: $url")),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -25,42 +46,62 @@ class VideoCard extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image Section
+            // Image Section with Video Icon Overlay
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: Image.network(
-                video.image,
-                width: 130,
-                height: 100,
-                fit: BoxFit.cover,
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return SizedBox(
-                    width: 100,
+              child: Stack(
+                children: [
+                  Image.network(
+                    video.image,
+                    width: 130,
                     height: 100,
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        value: loadingProgress.expectedTotalBytes != null
-                            ? loadingProgress.cumulativeBytesLoaded /
-                                (loadingProgress.expectedTotalBytes ?? 1)
-                            : null,
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return SizedBox(
+                        width: 130,
+                        height: 100,
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded /
+                                    (loadingProgress.expectedTotalBytes ?? 1)
+                                : null,
+                          ),
+                        ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return SizedBox(
+                        width: 130,
+                        height: 100,
+                        child: Center(
+                          child: Icon(
+                            Icons.broken_image,
+                            size: 40,
+                            color: Colors.grey.shade400,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  Positioned.fill(
+                    child: GestureDetector(
+                      onTap: () => _launchURL(context),
+                      child: Container(
+                        color: Colors.black
+                            .withOpacity(0.3), 
+                        child: Center(
+                          child: Icon(
+                            Icons.play_circle_fill,
+                            size: 40,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
                     ),
-                  );
-                },
-                errorBuilder: (context, error, stackTrace) {
-                  return SizedBox(
-                    width: 100,
-                    height: 100,
-                    child: Center(
-                      child: Icon(
-                        Icons.broken_image,
-                        size: 40,
-                        color: Colors.grey.shade400,
-                      ),
-                    ),
-                  );
-                },
+                  ),
+                ],
               ),
             ),
             SizedBox(width: 12),

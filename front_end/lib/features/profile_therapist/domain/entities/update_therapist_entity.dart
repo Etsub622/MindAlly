@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 class UpdateTherapistEntity  extends Equatable{
+  final String? chatId;
   final String? id;
   final String? name;
   final String? email;
@@ -19,6 +20,7 @@ class UpdateTherapistEntity  extends Equatable{
   final int? experienceYears;
 
   const UpdateTherapistEntity({
+    this.chatId,
     required this.id,
     this.name,
     this.email,
@@ -39,6 +41,7 @@ class UpdateTherapistEntity  extends Equatable{
   
   @override
   List<Object?> get props => [
+    chatId,
     id,
     name,
     email,

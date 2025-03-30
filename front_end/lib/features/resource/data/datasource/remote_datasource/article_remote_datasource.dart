@@ -29,6 +29,8 @@ class ArticleRemoteDataSourceImpl implements ArticleRemoteDatasource {
       final newArticle = await client.post(url,
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode(article.toJson()));
+      print(newArticle.statusCode);
+      print(newArticle.body);
       if (newArticle.statusCode == 201) {
         return 'Article added successfully';
       } else {
@@ -43,7 +45,7 @@ class ArticleRemoteDataSourceImpl implements ArticleRemoteDatasource {
   @override
   Future<String> deleteArticle(String id) async {
     try {
-      var url = Uri.parse('$baseUrl/deleteArticle/$id');
+      var url = Uri.parse('$baseUrl/$id');
       final deletedArticle = await client.delete(url);
       if (deletedArticle.statusCode == 200) {
         final decodedResponse = jsonDecode(deletedArticle.body);
@@ -90,12 +92,20 @@ class ArticleRemoteDataSourceImpl implements ArticleRemoteDatasource {
         'Content-Type': 'application/json',
       });
       if (response.statusCode == 200) {
-        final decodedResponse = jsonDecode(response.body);
-        final List<ArticleModel> articles = [];
-        for (var article in decodedResponse) {
-          articles.add(ArticleModel.fromJson(article));
+        final List<dynamic> articleJson = json.decode(response.body);
+        if (articleJson.isEmpty) {
+          return [];
+        } else {
+          return articleJson.map((jsonItem) {
+            return ArticleModel.fromJson(jsonItem as Map<String, dynamic>);
+          }).toList();
         }
-        return articles;
+      } else if (response.statusCode == 404) {
+        final Map<String, dynamic> errorResponse = json.decode(response.body);
+        final errorMessage =
+            errorResponse['message'] ?? 'No matching resources found.';
+        print('Error: $errorMessage');
+        return [];
       } else {
         throw ServerException(
             message: 'Failed to search articles:${response.statusCode}');
@@ -109,15 +119,11 @@ class ArticleRemoteDataSourceImpl implements ArticleRemoteDatasource {
   Future<String> updateArticle(ArticleModel article, String id) async {
     try {
       var url = Uri.parse('$baseUrl/$id');
-      final updatedArticle =
-          await client.put(url,
-          headers: {
-            'Content-Type':'application/json'
-          },
-           body: jsonEncode(article.toJson()));
+      final updatedArticle = await client.put(url,
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode(article.toJson()));
       if (updatedArticle.statusCode == 200) {
-        final decodedResponse = jsonDecode(updatedArticle.body);
-        return decodedResponse['message'];
+        return 'Article updated successfully';
       } else {
         throw ServerException(
             message: 'Failed to update article:${updatedArticle.statusCode}');

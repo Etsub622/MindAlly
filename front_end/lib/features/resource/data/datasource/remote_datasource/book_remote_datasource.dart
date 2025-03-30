@@ -96,6 +96,8 @@ class BookRemoteDataSourceImpl implements BookRemoteDatasource {
       final response = await client.get(url, headers: {
         'Content-Type': 'application/json',
       });
+      print(response.body);
+      print(response.statusCode);
       if (response.statusCode == 200) {
         final List<dynamic> bookJson = json.decode(response.body);
         if (bookJson.isEmpty) {
@@ -105,6 +107,12 @@ class BookRemoteDataSourceImpl implements BookRemoteDatasource {
             return BookModel.fromJson(jsonItem as Map<String, dynamic>);
           }).toList();
         }
+      } else if (response.statusCode == 404) {
+        final Map<String, dynamic> errorResponse = json.decode(response.body);
+        final errorMessage =
+            errorResponse['message'] ?? 'No matching resources found.';
+        print('Error: $errorMessage');
+        return [];
       } else {
         throw ServerException(
             message: 'Failed to get books:${response.statusCode}');

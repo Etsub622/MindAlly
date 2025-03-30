@@ -70,12 +70,22 @@ class BookBloc extends Bloc<BookEvent, BookState> {
 
     on<SearchEvent>((event, emit) async {
       emit(BookLoading());
-      final books = await searchBookUsecase(SearchParams(event.title));
 
-      books.fold((l) => emit(BookError('No book found')),
-          (books) => emit(BookLoaded(books)));
+      final booksResult = await searchBookUsecase(SearchParams(event.title));
+
+      booksResult.fold(
+        (failure) {
+          emit(SearchFailed(failure.message));
+        },
+        (books) {
+          if (books.isEmpty) {
+            emit(SearchFailed('No resources found'));
+          } else {
+            emit(BookLoaded(books));
+          }
+        },
+      );
     });
-
     on<GetSingleBookEvent>((event, emit) async {
       emit(BookLoading());
       final book = await getSingleBookUsecase(SingleBookParams(event.id));

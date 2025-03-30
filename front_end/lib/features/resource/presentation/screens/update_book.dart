@@ -124,6 +124,8 @@ class _UpdateBookState extends State<UpdateBook> {
         if (state is BookUpdated) {
           final snack = snackBar('book successfully Updated!');
           ScaffoldMessenger.of(context).showSnackBar(snack);
+          Navigator.of(context).pop();
+          context.read<BookBloc>().add(GetBookEvent());
         } else if (state is BookError) {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text('book update Failed!'),

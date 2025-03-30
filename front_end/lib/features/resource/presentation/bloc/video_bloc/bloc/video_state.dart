@@ -30,10 +30,10 @@ class VideoDeleted extends VideoState {
   final String message;
   VideoDeleted(this.message);
 }
-// class SearchVideoLoaded extends VideoState {
-//   final List<VideoEntity> videos;
-//   SearchVideoLoaded(this.videos);
-// }
+class SearchFailed extends VideoState {
+  final String message;
+  SearchFailed(this.message);
+}
 
 class SingleVideoLoaded extends VideoState {
   final VideoEntity video;
