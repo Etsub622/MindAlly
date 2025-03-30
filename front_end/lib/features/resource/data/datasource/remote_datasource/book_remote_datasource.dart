@@ -92,19 +92,27 @@ class BookRemoteDataSourceImpl implements BookRemoteDatasource {
   @override
   Future<List<BookModel>> searchBooks(String title) async {
     try {
-      var url = Uri.parse('$baseUrl/searchBooks/$title');
+      var url = Uri.parse('$baseUrl/search?query=$title');
       final response = await client.get(url, headers: {
         'Content-Type': 'application/json',
       });
+      print(response.body);
+      print(response.statusCode);
       if (response.statusCode == 200) {
         final List<dynamic> bookJson = json.decode(response.body);
         if (bookJson.isEmpty) {
-          throw ServerException(message: 'No books found');
+          return [];
         } else {
           return bookJson.map((jsonItem) {
             return BookModel.fromJson(jsonItem as Map<String, dynamic>);
           }).toList();
         }
+      } else if (response.statusCode == 404) {
+        final Map<String, dynamic> errorResponse = json.decode(response.body);
+        final errorMessage =
+            errorResponse['message'] ?? 'No matching resources found.';
+        print('Error: $errorMessage');
+        return [];
       } else {
         throw ServerException(
             message: 'Failed to get books:${response.statusCode}');
@@ -118,12 +126,14 @@ class BookRemoteDataSourceImpl implements BookRemoteDatasource {
   Future<String> updateBook(BookModel book, String id) async {
     try {
       var url = Uri.parse('$baseUrl/$id');
-      final updatedBook =
-          await client.put(url, body: jsonEncode(book.toJson()));
+      print('body:${jsonEncode(book.toJson())}');
+      final updatedBook = await client.put(url,
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode(book.toJson()));
+      print(url);
       print(updatedBook.body);
       print(updatedBook.statusCode);
       if (updatedBook.statusCode == 200) {
-        // final decodedResponse = jsonDecode(updatedBook.body);
         return 'Book Updated Successfully';
       } else {
         throw ServerException(

@@ -16,20 +16,22 @@ abstract class ArticleRemoteDatasource {
 
 class ArticleRemoteDataSourceImpl implements ArticleRemoteDatasource {
   final http.Client client;
-ArticleRemoteDataSourceImpl(this.client){
-  print('ArticleRemoteDataSourceImpl created');
-}
+  ArticleRemoteDataSourceImpl(this.client) {
+    print('ArticleRemoteDataSourceImpl created');
+  }
 
-  final baseUrl = '${ConfigKey.baseUrl}/Article';
+  final baseUrl = '${ConfigKey.baseUrl}/resources';
 
   @override
   Future<String> addArticle(ArticleModel article) async {
     try {
       var url = Uri.parse(baseUrl);
-      final newArticle =
-          await client.post(url, body: jsonEncode(article.toJson()));
-      if (newArticle.statusCode == 200) {
-        // final decodedResponse = jsonDecode(newArticle.body);
+      final newArticle = await client.post(url,
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode(article.toJson()));
+      print(newArticle.statusCode);
+      print(newArticle.body);
+      if (newArticle.statusCode == 201) {
         return 'Article added successfully';
       } else {
         throw ServerException(
@@ -43,7 +45,7 @@ ArticleRemoteDataSourceImpl(this.client){
   @override
   Future<String> deleteArticle(String id) async {
     try {
-      var url = Uri.parse('$baseUrl/deleteArticle/$id');
+      var url = Uri.parse('$baseUrl/$id');
       final deletedArticle = await client.delete(url);
       if (deletedArticle.statusCode == 200) {
         final decodedResponse = jsonDecode(deletedArticle.body);
@@ -52,16 +54,15 @@ ArticleRemoteDataSourceImpl(this.client){
         throw ServerException(
             message: 'Failed to delete article:${deletedArticle.statusCode}');
       }
-
     } catch (e) {
       throw ServerException(message: e.toString());
     }
   }
 
   @override
-  Future<List<ArticleModel>> getArticles() async{
+  Future<List<ArticleModel>> getArticles() async {
     try {
-      var url = Uri.parse('$baseUrl/getArticles');
+      var url = Uri.parse('$baseUrl/type/Article');
       final response = await client.get(url, headers: {
         'Content-Type': 'application/json',
       });
@@ -72,49 +73,57 @@ ArticleRemoteDataSourceImpl(this.client){
           articles.add(ArticleModel.fromJson(article));
         }
         return articles;
-      } else if(response.statusCode == 404){
+      } else if (response.statusCode == 404) {
         return [];
-      }else {
-        throw ServerException(message: 'Failed to get articles:${response.statusCode}');
+      } else {
+        throw ServerException(
+            message: 'Failed to get articles:${response.statusCode}');
       }
     } catch (e) {
       throw ServerException(message: e.toString());
     }
-   
   }
 
   @override
-  Future<List<ArticleModel>> searchArticles(String title) async{
+  Future<List<ArticleModel>> searchArticles(String title) async {
     try {
-      var url = Uri.parse('$baseUrl/searchArticles/$title');
+      var url = Uri.parse('$baseUrl/search?query=$title');
       final response = await client.get(url, headers: {
         'Content-Type': 'application/json',
       });
       if (response.statusCode == 200) {
-        final decodedResponse = jsonDecode(response.body);
-        final List<ArticleModel> articles = [];
-        for (var article in decodedResponse) {
-          articles.add(ArticleModel.fromJson(article));
+        final List<dynamic> articleJson = json.decode(response.body);
+        if (articleJson.isEmpty) {
+          return [];
+        } else {
+          return articleJson.map((jsonItem) {
+            return ArticleModel.fromJson(jsonItem as Map<String, dynamic>);
+          }).toList();
         }
-        return articles;
+      } else if (response.statusCode == 404) {
+        final Map<String, dynamic> errorResponse = json.decode(response.body);
+        final errorMessage =
+            errorResponse['message'] ?? 'No matching resources found.';
+        print('Error: $errorMessage');
+        return [];
       } else {
-        throw ServerException(message: 'Failed to search articles:${response.statusCode}');
+        throw ServerException(
+            message: 'Failed to search articles:${response.statusCode}');
       }
     } catch (e) {
       throw ServerException(message: e.toString());
     }
-    
   }
 
   @override
-  Future<String> updateArticle(ArticleModel article, String id) async{
+  Future<String> updateArticle(ArticleModel article, String id) async {
     try {
-      var url = Uri.parse('$baseUrl/updateArticle/$id');
-      final updatedArticle =
-          await client.put(url, body: jsonEncode(article.toJson()));
+      var url = Uri.parse('$baseUrl/$id');
+      final updatedArticle = await client.put(url,
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode(article.toJson()));
       if (updatedArticle.statusCode == 200) {
-        final decodedResponse = jsonDecode(updatedArticle.body);
-        return decodedResponse['message'];
+        return 'Article updated successfully';
       } else {
         throw ServerException(
             message: 'Failed to update article:${updatedArticle.statusCode}');
@@ -122,12 +131,10 @@ ArticleRemoteDataSourceImpl(this.client){
     } catch (e) {
       throw ServerException(message: e.toString());
     }
-   
   }
-  
-  @override
-  Future<ArticleModel> getSingleArticle(String id)async {
 
+  @override
+  Future<ArticleModel> getSingleArticle(String id) async {
     try {
       var url = Uri.parse('$baseUrl/getSingleArticle/$id');
       final response = await client.get(url, headers: {
@@ -137,12 +144,11 @@ ArticleRemoteDataSourceImpl(this.client){
         final decodedResponse = jsonDecode(response.body);
         return ArticleModel.fromJson(decodedResponse);
       } else {
-        throw ServerException(message: 'Failed to get single article:${response.statusCode}');
+        throw ServerException(
+            message: 'Failed to get single article:${response.statusCode}');
       }
     } catch (e) {
       throw ServerException(message: e.toString());
-   
+    }
   }
-}
-
 }

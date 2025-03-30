@@ -140,108 +140,119 @@ class _AddVideoState extends State<AddVideo> {
           ),
         ]),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          children: [
-            const Text('select images'),
-            SizedBox(
-              height: 10,
-            ),
-            GestureDetector(
-                onTap: () {
-                  _pickImage(ImageSource.gallery);
-                },
-                child: const Padding(
-                  padding: EdgeInsets.only(left: 15.0),
-                  child: Icon(
-                    Icons.add_a_photo,
-                    size: 33,
-                    color: Color(0xff800080),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Column(
+            children: [
+              const Text('select images'),
+              SizedBox(
+                height: 10,
+              ),
+              GestureDetector(
+                  onTap: () {
+                    _pickImage(ImageSource.gallery);
+                  },
+                  child: const Padding(
+                    padding: EdgeInsets.only(left: 15.0),
+                    child: Icon(
+                      Icons.add_a_photo,
+                      size: 33,
+                      color: Color(0xff800080),
+                    ),
+                  )),
+              SizedBox(height: 10),
+              if (_imageFile != null)
+                Container(
+                  height: 200,
+                  width: double.infinity,
+                  child: Image.file(
+                    _imageFile!,
+                    fit: BoxFit.cover,
                   ),
-                )),
-            SizedBox(
-              height: 10,
-            ),
-            SizedBox(
-              height: 7,
-            ),
-            CustomFormField(text: 'title', controller: titleController),
-            SizedBox(
-              height: 15,
-            ),
-            SizedBox(
-              height: 7,
-            ),
-            CustomFormField(text: 'link', controller: linkController),
-            SizedBox(
-              height: 15,
-            ),
-            CustomFormField(
-                text: 'profile', controller: profilePictureController),
-            SizedBox(
-              height: 15,
-            ),
-            CustomFormField(text: 'name', controller: nameController),
-            SizedBox(
-              height: 15,
-            ),
-             Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: MultiSelectDialogField<String>(
-                items: categoryOption
-                    .map((e) => MultiSelectItem<String>(e, e))
-                    .toList(),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                      color: const Color.fromARGB(255, 215, 214, 214),
-                      width: 1.0),
-                  borderRadius: BorderRadius.circular(15),
                 ),
-                buttonText: const Text('Book Category'),
-                title: const Text('Book Category'),
-                selectedColor: Colors.blue,
-                buttonIcon: const Icon(
-                  Icons.arrow_drop_down,
-                  color: Colors.black,
-                ),
-                onConfirm: (List<String> values) {
-                  setState(() {
-                    selectedCategories = values;
-                  });
-                },
-                chipDisplay: MultiSelectChipDisplay<String>(
-                  onTap: (value) {
+              SizedBox(
+                height: 10,
+              ),
+              SizedBox(
+                height: 7,
+              ),
+              CustomFormField(text: 'title', controller: titleController),
+              SizedBox(
+                height: 15,
+              ),
+              SizedBox(
+                height: 7,
+              ),
+              CustomFormField(text: 'link', controller: linkController),
+              SizedBox(
+                height: 15,
+              ),
+              CustomFormField(
+                  text: 'profile', controller: profilePictureController),
+              SizedBox(
+                height: 15,
+              ),
+              CustomFormField(text: 'name', controller: nameController),
+              SizedBox(
+                height: 15,
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: MultiSelectDialogField<String>(
+                  items: categoryOption
+                      .map((e) => MultiSelectItem<String>(e, e))
+                      .toList(),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                        color: const Color.fromARGB(255, 215, 214, 214),
+                        width: 1.0),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  buttonText: const Text('Book Category'),
+                  title: const Text('Book Category'),
+                  selectedColor: Colors.blue,
+                  buttonIcon: const Icon(
+                    Icons.arrow_drop_down,
+                    color: Colors.black,
+                  ),
+                  onConfirm: (List<String> values) {
                     setState(() {
-                      selectedCategories.remove(value);
+                      selectedCategories = values;
                     });
                   },
-                  textStyle: const TextStyle(color: Colors.black),
-                  chipColor: Colors.white,
+                  chipDisplay: MultiSelectChipDisplay<String>(
+                    onTap: (value) {
+                      setState(() {
+                        selectedCategories.remove(value);
+                      });
+                    },
+                    textStyle: const TextStyle(color: Colors.black),
+                    chipColor: Colors.white,
+                  ),
+                  searchable: true,
+                  searchHint: 'Search here...',
                 ),
-                searchable: true,
-                searchHint: 'Search here...',
               ),
-            ),
-            SizedBox(
-              height: 40,
-            ),
-            
-            CustomButton(
-              wdth: double.infinity,
-              rad: 10,
-              hgt: 50,
-              text: "Upload Video",
-              onPressed: () async {
-                if (titleController.text.isNotEmpty &&
-                    nameController.text.isNotEmpty &&
-                    profilePictureController.text.isNotEmpty &&
-                    linkController.text.isNotEmpty) {
-                  _uploadVideo(context);
-                }
-              },
-            ),
-          ],
+              SizedBox(
+                height: 40,
+              ),
+              CustomButton(
+                wdth: double.infinity,
+                rad: 10,
+                hgt: 50,
+                text: "Upload Video",
+                onPressed: () async {
+                  if (titleController.text.isNotEmpty &&
+                      nameController.text.isNotEmpty &&
+                      profilePictureController.text.isNotEmpty &&
+                      linkController.text.isNotEmpty) {
+                    _uploadVideo(context);
+                  }
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

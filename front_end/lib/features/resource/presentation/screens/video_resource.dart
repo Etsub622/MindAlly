@@ -15,68 +15,135 @@ class VideoResource extends StatefulWidget {
 }
 
 class _VideoResourceState extends State<VideoResource> {
+  final TextEditingController _searchController = TextEditingController();
   @override
   void initState() {
     super.initState();
-
     context.read<VideoBloc>().add(GetVideoEvent());
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(left: 10.0),
-            child: IconButton(
-              icon:const Icon(
-                Icons.refresh,
-                color: Color.fromARGB(239, 130, 5, 220),
-                size: 25,
-              ),
-              onPressed: () {
-                context.read<VideoBloc>().add(GetVideoEvent());
-              },
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          title: Container(
+            decoration: BoxDecoration(
+              color: const Color.fromARGB(255, 226, 225, 225),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 20.0),
+                    child: TextField(
+                      controller: _searchController,
+                      decoration: InputDecoration(
+                        hintText: 'Search for videos...',
+                        hintStyle: const TextStyle(
+                          color: Color.fromARGB(239, 130, 5, 220),
+                        ),
+                        border: InputBorder.none,
+                        contentPadding:
+                            const EdgeInsets.symmetric(vertical: 10.0),
+                      ),
+                      style: const TextStyle(
+                        color: Color.fromARGB(239, 130, 5, 220),
+                      ),
+                      onSubmitted: (query) {
+                        if (query.isNotEmpty) {
+                          context
+                              .read<VideoBloc>()
+                              .add(SearchVideoEvent(query));
+                        }
+                      },
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.search,size: 27, color: Colors.grey),
+                  onPressed: () {
+                    final query = _searchController.text;
+                    if (query.isNotEmpty) {
+                      context.read<VideoBloc>().add(SearchVideoEvent(query));
+                    }
+                  },
+                ),
+              ],
             ),
           ),
-        ],
-      ),
-      body: BlocBuilder<VideoBloc, VideoState>(
-        builder: (context, state) {
-          if (state is VideoLoading) {
-            return Center(child: CircularProgressIndicator());
-          } else if (state is VideoError) {
-            return Center(child: Text(state.message));
-          } else if (state is VideoLoaded) {
-            final videos = state.videos;
-            if (videos.isEmpty) {
-              return Center(child: Text('No Videos available.'));
-            }
-            return GridView.builder(
-              padding: const EdgeInsets.all(16),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                childAspectRatio: 0.75,
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(left: 10.0),
+              child: IconButton(
+                icon: const Icon(
+                  Icons.refresh,
+                  color: Color.fromARGB(239, 130, 5, 220),
+                  size: 25,
+                ),
+                onPressed: () {
+                  context.read<VideoBloc>().add(GetVideoEvent());
+                },
               ),
-              itemCount: videos.length,
-              itemBuilder: (context, index) {
-                final video = videos[index];
-                return VideoCard(
+            ),
+          ],
+        ),
+        body: BlocConsumer<VideoBloc, VideoState>(
+          listener: (context, state) {
+            if (state is VideoDeleted) {
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                content: Text('Video deleted successfully!'),
+                backgroundColor: Colors.green,
+              ));
+              context.read<VideoBloc>().add(GetVideoEvent());
+            } else if (state is VideoError) {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.red,
+              ));
+            }
+          },
+          builder: (context, state) {
+            if (state is VideoLoading) {
+              return Center(child: CircularProgressIndicator());
+            } else if (state is SearchFailed) {
+              return Center(
+                child: Text(
+                  state.message,
+                  style: const TextStyle(color: Colors.red, fontSize: 16),
+                ),
+              );
+            } else if (state is VideoLoaded) {
+              final videos = state.videos;
+              if (videos.isEmpty) {
+                return Center(child: Text('No Videos available.'));
+              }
+              return ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                itemCount: videos.length,
+                itemBuilder: (context, index) {
+                  final video = videos[index];
+                  return VideoCard(
                     onUpdate: () async {
                       final result = await Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => UpdateVideo(
+                            id: video.id,
                             title: video.title,
                             link: video.link,
                             image: video.image,
                             profilePicture: video.profilePicture,
                             name: video.name,
+                            categories: video.categories,
                             onUpdate: (updatedVideoMap) {
-                              final updatedBook = VideoEntity(
+                              final updatedVideo = VideoEntity(
                                 type: video.type,
                                 id: video.id,
                                 title: updatedVideoMap['title'] as String,
@@ -86,9 +153,8 @@ class _VideoResourceState extends State<VideoResource> {
                                 name: video.name,
                                 categories: video.categories,
                               );
-                              context
-                                  .read<VideoBloc>()
-                                  .add(UpdateVideoEvent(updatedBook, video.id));
+                              context.read<VideoBloc>().add(
+                                  UpdateVideoEvent(updatedVideo, video.id));
                             },
                           ),
                         ),
@@ -103,23 +169,25 @@ class _VideoResourceState extends State<VideoResource> {
                     onDelete: () {
                       _showDeleteDialog(context, video.id);
                     },
-                    video: video);
-              },
+                    video: video,
+                  );
+                },
+              );
+            } else {
+              return Center(child: Text('Something went wrong!'));
+            }
+          },
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => AddVideo()),
             );
-          } else {
-            return Center(child: Text('Something went wrong!'));
-          }
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => AddVideo()),
-          );
-        },
-        child: Icon(Icons.add),
-        backgroundColor: Colors.purple,
+          },
+          child: Icon(Icons.add),
+          backgroundColor: Colors.purple,
+        ),
       ),
     );
   }

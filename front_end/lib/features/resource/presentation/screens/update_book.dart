@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front_end/core/common_widget.dart/circular_indicator.dart';
 import 'package:front_end/core/common_widget.dart/snack_bar.dart';
 import 'package:front_end/features/authentication/presentation/widget/custom_button.dart';
+import 'package:front_end/features/resource/domain/entity/book_entity.dart';
 import 'package:front_end/features/resource/presentation/bloc/book_bloc/bloc/book_bloc.dart';
 import 'package:front_end/features/resource/presentation/widget/custom_formfield.dart';
 import 'package:http/http.dart' as http;
@@ -14,6 +15,7 @@ import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
 
 class UpdateBook extends StatefulWidget {
+  final String id;
   final String title;
   final String author;
   final String imageUrl;
@@ -21,7 +23,9 @@ class UpdateBook extends StatefulWidget {
   final Function(Map<String, Object>) onUpdate;
 
   const UpdateBook({
+
     super.key,
+    required this.id,
     required this.author,
     required this.imageUrl,
     required this.title,
@@ -60,16 +64,19 @@ class _UpdateBookState extends State<UpdateBook> {
 
   void updateBook() async {
     await _uploadImage();
-    final Map<String, Object> updatedbook = {
-      'title': titleController.text,
-      'author': authorController.text,
-      'categories': selectedCategories,
-      'imageUrl':
-          _imageUrl?.isNotEmpty == true ? _imageUrl! : imageController.text,
-    };
-    print('updateBook:$updatedbook');
-    widget.onUpdate(updatedbook);
+    final updatedbook = BookEntity(
+      id: '', 
+      image: _imageUrl?.isNotEmpty == true ? _imageUrl! : imageController.text,
+      author: authorController.text, 
+      title: titleController.text, 
+      type: 'Book', 
+      categories: selectedCategories,
+    );
+    print('updatedbook: $updatedbook');
+    context.read<BookBloc>().add(UpdateBookEvent(updatedbook, widget.id));
   }
+
+
 
   // Pick images from the device
   File? _imageFile;
@@ -117,6 +124,8 @@ class _UpdateBookState extends State<UpdateBook> {
         if (state is BookUpdated) {
           final snack = snackBar('book successfully Updated!');
           ScaffoldMessenger.of(context).showSnackBar(snack);
+          Navigator.of(context).pop();
+          context.read<BookBloc>().add(GetBookEvent());
         } else if (state is BookError) {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text('book update Failed!'),

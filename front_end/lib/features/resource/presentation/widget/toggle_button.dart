@@ -4,7 +4,8 @@ class CustomToggleButton extends StatefulWidget {
   final List<bool> isSelected;
   final Function(int) onToggle;
 
- const CustomToggleButton({super.key, 
+  const CustomToggleButton({
+    super.key,
     required this.isSelected,
     required this.onToggle,
   });
@@ -58,13 +59,12 @@ class CustomToggleButtonState extends State<CustomToggleButton>
   Widget build(BuildContext context) {
     return SizedBox(
       height: 80,
-      width: double.infinity,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15.0),
+        padding: const EdgeInsets.only(left: 15.0, right: 15.0, top: 30.0),
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: toggleTabs(),
           ),
         ),
@@ -79,20 +79,22 @@ class CustomToggleButtonState extends State<CustomToggleButton>
           handleToggle(index);
           widget.onToggle(index);
         },
-        child: SizedBox(
-          height: 50,
-          width: 110,
-          child: Card(
-            color: isSelected[index] ? Color(0xff08E0EEA) : Colors.white,
-            elevation: 7,
-            child: Center(
-              child: Text(
-                toggleTitles[index],
-                style: TextStyle(
-                  color: isSelected[index] ? Colors.white : Colors.black,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w600,
-                  fontSize: 19,
+        child: Center(
+          child: SizedBox(
+            height: 50,
+            width: 110,
+            child: Card(
+              color: isSelected[index] ? Color(0xff08E0EEA) : Colors.white,
+              elevation: 7,
+              child: Center(
+                child: Text(
+                  toggleTitles[index],
+                  style: TextStyle(
+                    color: isSelected[index] ? Colors.white : Colors.black,
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w600,
+                    fontSize: 19,
+                  ),
                 ),
               ),
             ),

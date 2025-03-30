@@ -32,9 +32,9 @@ class BookDeleted extends BookState {
   BookDeleted(this.message);
 }
 
-class SearchLoaded extends BookState {
-  final List<BookEntity> books;
-  SearchLoaded(this.books);
+class SearchFailed extends BookState {
+  final String message;
+  SearchFailed(this.message);
 }
 class SingleBookLoaded extends BookState {
   final BookEntity book;

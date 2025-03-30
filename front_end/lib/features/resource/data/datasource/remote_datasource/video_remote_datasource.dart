@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:front_end/core/config/config_key.dart';
 import 'package:front_end/core/error/exception.dart';
 import 'package:front_end/features/resource/data/model/video_model.dart';
 import 'package:http/http.dart' as http;
@@ -17,7 +18,7 @@ class VideoRemoteDataSourceImpl implements VideoRemoteDatasource {
   final http.Client client;
   VideoRemoteDataSourceImpl(this.client);
 
-  final baseUrl = 'http://192.168.83.216:8000/api/resources';
+  final baseUrl = '${ConfigKey.baseUrl}/resources';
 
   @override
   Future<String> addVideo(VideoModel video) async {
@@ -44,7 +45,7 @@ class VideoRemoteDataSourceImpl implements VideoRemoteDatasource {
   @override
   Future<String> deleteVideo(String id) async {
     try {
-      final url = Uri.parse('$baseUrl/deleteVideo/$id');
+      final url = Uri.parse('$baseUrl/$id');
       final deletedVideo = await client.delete(url);
       if (deletedVideo.statusCode == 200) {
         final decodedResponse = jsonDecode(deletedVideo.body);
@@ -61,7 +62,7 @@ class VideoRemoteDataSourceImpl implements VideoRemoteDatasource {
   @override
   Future<List<VideoModel>> getVideos() async {
     try {
-      final url = Uri.parse('$baseUrl/type/Video');
+      var url = Uri.parse('$baseUrl/type/Video');
       final response = await client.get(url, headers: {
         'Content-Type': 'application/json',
       });
@@ -70,14 +71,16 @@ class VideoRemoteDataSourceImpl implements VideoRemoteDatasource {
       print(response.statusCode);
       if (response.statusCode == 200) {
         final List<dynamic> videoJson = json.decode(response.body);
-        return videoJson.map((jsonItem) {
-          return VideoModel.fromJson(jsonItem as Map<String, dynamic>);
-        }).toList();
-      } else if (response.statusCode == 404) {
-        return [];
+        if (videoJson.isEmpty) {
+          return [];
+        } else {
+          return videoJson.map((jsonItem) {
+            return VideoModel.fromJson(jsonItem as Map<String, dynamic>);
+          }).toList();
+        }
       } else {
         throw ServerException(
-            message: 'Failed to get videos: ${response.statusCode}');
+            message: 'Failed to get books:${response.statusCode}');
       }
     } catch (e) {
       throw ServerException(message: e.toString());
@@ -87,15 +90,27 @@ class VideoRemoteDataSourceImpl implements VideoRemoteDatasource {
   @override
   Future<List<VideoModel>> searchVideos(String title) async {
     try {
-      final url = Uri.parse('$baseUrl/searchVideos/$title');
+      var url = Uri.parse('$baseUrl/search?query=$title');
       final response = await client.get(url, headers: {
         'Content-Type': 'application/json',
       });
-
+      print(response.body);
+      print(response.statusCode);
       if (response.statusCode == 200) {
-        final decodedResponse = jsonDecode(response.body);
-        final videos = decodedResponse['videos'] as List;
-        return videos.map((video) => VideoModel.fromJson(video)).toList();
+        final List<dynamic> videoJson = json.decode(response.body);
+        if (videoJson.isEmpty) {
+          return [];
+        } else {
+          return videoJson.map((jsonItem) {
+            return VideoModel.fromJson(jsonItem as Map<String, dynamic>);
+          }).toList();
+        }
+      } else if (response.statusCode == 404) {
+        final Map<String, dynamic> errorResponse = json.decode(response.body);
+        final errorMessage =
+            errorResponse['message'] ?? 'No matching resources found.';
+        print('Error: $errorMessage');
+        return [];
       } else {
         throw ServerException(
             message: 'Failed to get videos:${response.statusCode}');
@@ -108,13 +123,13 @@ class VideoRemoteDataSourceImpl implements VideoRemoteDatasource {
   @override
   Future<String> updateVideo(VideoModel video, String id) async {
     try {
-      final url = Uri.parse('$baseUrl/updateVideo/$id');
-      final updatedVideo =
-          await client.put(url, body: jsonEncode(video.toJson()));
+      final url = Uri.parse('$baseUrl/$id');
+      final updatedVideo = await client.put(url,
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode(video.toJson()));
 
       if (updatedVideo.statusCode == 200) {
-        final decodedResponse = jsonDecode(updatedVideo.body);
-        return decodedResponse['message'];
+        return 'video Updated successfuly';
       } else {
         throw ServerException(
             message: 'Failed to update video:${updatedVideo.statusCode}');

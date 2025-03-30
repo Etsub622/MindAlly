@@ -69,13 +69,21 @@ class VideoBloc extends Bloc<VideoEvent, VideoState> {
 
     on<SearchVideoEvent>((event, emit) async {
       emit(VideoLoading());
+
       final result = await searchVideoUsecase(SearchVideoParams(event.title));
 
-      result.fold((l) {
-        emit(VideoError(l.message));
-      }, (video) {
-        emit(SearchVideoLoaded(video));
-      });
+      result.fold(
+        (failure) {
+          emit(SearchFailed(failure.message));
+        },
+        (videos) {
+          if (videos.isEmpty) {
+            emit(SearchFailed('No resources found'));
+          } else {
+            emit(VideoLoaded(videos));
+          }
+        },
+      );
     });
 
     on<GetSingleVideoEvent>((event, emit) async {

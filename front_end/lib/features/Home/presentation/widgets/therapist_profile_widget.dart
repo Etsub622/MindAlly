@@ -31,7 +31,7 @@ class _TherapistProfileWidgetState extends State<TherapistProfileWidget> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Row(
-            spacing: 35,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               CircleAvatar(
                 radius: 30,

@@ -13,7 +13,7 @@ export const addResource = async (req, res) => {
 
 export const getResources = async (req, res) => {
   try {
-    const resources = await Resource.find(req.query);
+    const resources = await Resource.find(req.query).sort({ createdAt: -1 });
     res.status(200).json(resources);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -23,7 +23,7 @@ export const getResources = async (req, res) => {
 export const getResourcesByType = async (req, res) => {
   try {
     const { type } = req.params;
-    const resources = await Resource.find({ type });
+    const resources = await Resource.find({ type }).sort({ createdAt: -1 });
     if (!resources.length) {
       return res.status(404).json({ message: `No resources found for type: ${type}` });
     }
