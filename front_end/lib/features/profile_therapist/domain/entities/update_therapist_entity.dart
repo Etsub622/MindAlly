@@ -1,12 +1,11 @@
 import 'package:equatable/equatable.dart';
 
-class UpdateTherapistEntity  extends Equatable{
-  final String? chatId;
+class UpdateTherapistEntity extends Equatable {
   final String? id;
   final String? name;
   final String? email;
   final String? modality;
-  final String?  certificate;
+  final String? certificate;
   final String? bio;
   final double? fee;
   final double? rating;
@@ -18,44 +17,44 @@ class UpdateTherapistEntity  extends Equatable{
   final List<String>? mode;
   final String? profilePicture;
   final int? experienceYears;
+  final String? chatId;
 
-  const UpdateTherapistEntity({
-    this.chatId,
-    required this.id,
-    this.name,
-    this.email,
-    this.modality,
-    this.certificate,
-    this.bio,
-    this.fee,
-    this.rating,
-    this.gender,
-    this.verified,
-    this.specialities,
-    this.availableDays,
-    this.language,
-    this.mode,
-    this.profilePicture,
-    this.experienceYears,
-  });
-  
+  const UpdateTherapistEntity(
+      {required this.id,
+      this.name,
+      this.email,
+      this.modality,
+      this.certificate,
+      this.bio,
+      this.fee,
+      this.rating,
+      this.gender,
+      this.verified,
+      this.specialities,
+      this.availableDays,
+      this.language,
+      this.mode,
+      this.profilePicture,
+      this.experienceYears,
+      this.chatId});
+
   @override
   List<Object?> get props => [
-    chatId,
-    id,
-    name,
-    email,
-    modality,
-    certificate,
-    bio,
-    fee,
-    rating,
-    gender,
-    verified,
-    specialities,
-    availableDays,
-    language,
-    mode,
-    experienceYears
-  ];
+        id,
+        name,
+        email,
+        modality,
+        certificate,
+        bio,
+        fee,
+        rating,
+        gender,
+        verified,
+        specialities,
+        availableDays,
+        language,
+        mode,
+        experienceYears,
+        chatId
+      ];
 }

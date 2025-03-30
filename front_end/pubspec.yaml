@@ -60,6 +60,7 @@ dependencies:
   flutter_markdown: ^0.7.6+2
   flutter_animate: ^4.5.2
   url_launcher: ^6.3.1
+  badges: ^3.1.2
 
 dev_dependencies:
   flutter_test:
@@ -71,16 +72,21 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.14.3
 
 flutter_native_splash:
   color: "#B57EDC"
   color_dark: "#B57EDC"
-  image: "asset/image/therapist.jpg"
+  image: "asset/image/logo.png"
   icon_background_color: "#B57EDC"
 
   android_12:
-    image: "asset/image/therapist.jpg"
+    image: "asset/image/logo.png"
 
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "asset/image/logo.png"
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

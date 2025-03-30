@@ -4,7 +4,6 @@ import 'package:front_end/core/error/failure.dart';
 import 'package:front_end/core/network/network.dart';
 import 'package:front_end/features/authentication/data/datasource/reset_password_remote_datasource.dart';
 import 'package:front_end/features/authentication/data/models/reset_password_model.dart';
-import 'package:front_end/features/authentication/data/models/student_data_model.dart';
 import 'package:front_end/features/authentication/domain/entities/reset_password.dart';
 import 'package:front_end/features/authentication/domain/repositories/reset_repo.dart';
 

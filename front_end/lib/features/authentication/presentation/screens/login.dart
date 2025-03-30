@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:front_end/core/common_widget.dart/circular_indicator.dart';
 import 'package:front_end/core/common_widget.dart/snack_bar.dart';
 import 'package:front_end/core/routes/app_path.dart';
-import 'package:front_end/features/authentication/data/datasource/auth_local_datasource/login_local_datasource.dart';
 import 'package:front_end/features/authentication/data/models/login_model.dart';
 import 'package:front_end/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:front_end/features/authentication/presentation/widget/custom_button.dart';
 import 'package:front_end/features/authentication/presentation/widget/text_field.dart';
 import 'package:go_router/go_router.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});

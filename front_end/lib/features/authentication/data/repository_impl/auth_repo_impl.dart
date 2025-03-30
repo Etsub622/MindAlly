@@ -1,9 +1,7 @@
 import 'package:dartz/dartz.dart';
-import 'package:flutter/material.dart';
 import 'package:front_end/core/error/exception.dart';
 import 'package:front_end/core/error/failure.dart';
 import 'package:front_end/core/network/network.dart';
-import 'package:front_end/core/util/get_user_credential.dart';
 import 'package:front_end/features/authentication/data/datasource/auth_local_datasource/login_local_datasource.dart';
 import 'package:front_end/features/authentication/data/datasource/auth_remote_datasource/auth_remote_datasource.dart';
 import 'package:front_end/features/authentication/data/models/login_model.dart';
@@ -24,7 +22,7 @@ class AuthRepoImpl implements AuthRepository {
 
   @override
   Future<Either<Failure, StudentResponseModel>> login(LoginEntity login) async {
-    if (await networkInfo.isConnected) {
+    // if (await networkInfo.isConnected) {
       try {
         final user = LoginModel(
             id: login.id, email: login.email, password: login.password);
@@ -39,16 +37,16 @@ class AuthRepoImpl implements AuthRepository {
       } on ServerException {
         return Left(ServerFailure(message: 'Server Failure'));
       }
-    } else {
-      return Left(
-          NetworkFailure(message: 'You are not connected to the internet'));
-    }
+    // } else {
+    //   return Left(
+    //       NetworkFailure(message: 'You are not connected to the internet'));
+    // }
   }
 
   @override
   Future<Either<Failure, String>> professionalSignup(
       ProfessionalSignupEntity professionalSignup) async {
-    // if (await networkInfo.isConnected) {
+    if (await networkInfo.isConnected) {
       try {
         final user = ProfessionalSignupModel(
             id: professionalSignup.id,
@@ -65,10 +63,10 @@ class AuthRepoImpl implements AuthRepository {
       } on ServerException {
         return Left(ServerFailure(message: 'Server Failure'));
       }
-    // } else {
-    //   return Left(
-    //       NetworkFailure(message: 'You are not connected to the internet'));
-    // }
+    } else {
+      return Left(
+          NetworkFailure(message: 'You are not connected to the internet'));
+    }
   }
 
   @override

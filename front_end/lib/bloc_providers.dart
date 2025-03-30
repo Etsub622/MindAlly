@@ -1,19 +1,20 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:front_end/core/injection/injections.dart';
+import 'package:front_end/features/chat/presentation/bloc/chat/chat_bloc.dart';
 import 'package:front_end/features/Q&A/presentation/bloc/bloc/answer_bloc.dart';
 import 'package:front_end/features/Q&A/presentation/bloc/bloc/question_bloc.dart';
 import 'package:front_end/features/authentication/presentation/bloc/auth_bloc.dart';
-import 'package:front_end/features/chat/presentation/bloc/chat/chat_bloc.dart';
 import 'package:front_end/features/chat/presentation/bloc/chat_list/chat_list_bloc.dart';
-import 'package:front_end/features/profile_patient/presentation/bloc/delete_patient_bloc/delete_patient_bloc.dart';
-import 'package:front_end/features/profile_patient/presentation/bloc/get_patient_bloc/get_patient_bloc.dart';
-import 'package:front_end/features/profile_patient/presentation/bloc/update_patient_bloc/update_patient_bloc.dart';
-import 'package:front_end/features/profile_therapist/presentation/bloc/delete_therapist_bloc/delete_therapist_bloc.dart';
-import 'package:front_end/features/profile_therapist/presentation/bloc/get_therapist_bloc/get_therapist_bloc.dart';
-import 'package:front_end/features/profile_therapist/presentation/bloc/update_therapist_bloc/update_therapist_bloc.dart';
-import 'package:front_end/features/resource/presentation/bloc/article_bloc/bloc/article_bloc.dart';
 import 'package:front_end/features/resource/presentation/bloc/book_bloc/bloc/book_bloc.dart';
-import 'package:front_end/core/injection/injections.dart';
 import 'package:front_end/features/resource/presentation/bloc/video_bloc/bloc/video_bloc.dart';
+import 'package:front_end/features/resource/presentation/bloc/article_bloc/bloc/article_bloc.dart';
+import 'package:front_end/features/profile_patient/presentation/bloc/get_patient_bloc/get_patient_bloc.dart';
+import 'package:front_end/features/profile_patient/presentation/bloc/delete_patient_bloc/delete_patient_bloc.dart';
+import 'package:front_end/features/profile_patient/presentation/bloc/update_patient_bloc/update_patient_bloc.dart';
+import 'package:front_end/features/profile_therapist/presentation/bloc/get_therapist_bloc/get_therapist_bloc.dart';
+import 'package:front_end/features/profile_therapist/presentation/bloc/delete_therapist_bloc/delete_therapist_bloc.dart';
+import 'package:front_end/features/profile_therapist/presentation/bloc/update_therapist_bloc/update_therapist_bloc.dart';
+import 'package:front_end/features/Home/presentation/bloc/get_matched_therapists_bloc/get_matched_therapists_bloc.dart';
 
 class MultiBLOCProvider {
   static final blocProvider = [
@@ -43,6 +44,10 @@ class MultiBLOCProvider {
     ),
     BlocProvider<DeleteTherapistBloc>(
       create: (_) => sl<DeleteTherapistBloc>()
+    ),
+
+    BlocProvider<GetMatchedTherapistsBloc>(
+      create: (_) => sl<GetMatchedTherapistsBloc>()
     ),
 
   ];

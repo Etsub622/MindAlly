@@ -6,7 +6,7 @@ sealed class ChatEvent {}
 class GetChatsEvent extends ChatEvent {}
 
 class LoadMessagesEvent extends ChatEvent {
-  final String chatId;
+  final String? chatId;
 
   LoadMessagesEvent({required this.chatId});
 }

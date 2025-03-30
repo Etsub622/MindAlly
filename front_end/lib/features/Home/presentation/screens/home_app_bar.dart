@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,8 +12,10 @@ import 'package:front_end/features/profile_therapist/presentation/screens/update
 import 'package:go_router/go_router.dart';
 
 class AppbarHome extends StatefulWidget implements PreferredSizeWidget {
-  final BuildContext context;
-  const AppbarHome({super.key, required this.context});
+  final String userId;
+  final String role;
+  
+  const AppbarHome({super.key, required this.userId, required this.role});
 
   @override
   Size get preferredSize => const Size.fromHeight(110);
@@ -25,34 +26,18 @@ class AppbarHome extends StatefulWidget implements PreferredSizeWidget {
 
 class _AppbarHomeState extends State<AppbarHome> {
   final FlutterSecureStorage flutterSecureStorage = const FlutterSecureStorage();
-  String role = "";
-  String? userId;
 
   @override
   void initState() {
     super.initState();
-    getRoleAndId();
-  }
-
-  Future<void> getRoleAndId() async {
-    final userCredential = await flutterSecureStorage.read(key: 'user_profile');
-    if (userCredential != null) {
-      final userProfile = json.decode(userCredential);
-      setState(() {
-        role = userProfile["Role"] ?? "";
-        userId = userProfile["_id"]?.toString();
-      });
-
-      if (role == "therapist" && userId != null) {
-        widget.context.read<TherapistProfileBloc>().add(GetTherapistLoadEvent(therapistId: userId!));
-      } else if (role == "patient" && userId != null) {
-        widget.context.read<PatientProfileBloc>().add(GetPatientLoadEvent(patientId: userId!));
-      }
-    } else {
-      // Dispatch logout event if user_profile is null
-      widget.context.read<AuthBloc>().add(LogoutEvent());
+    if (widget.role == "therapist") {
+      BlocProvider.of<TherapistProfileBloc>(context).add(GetTherapistLoadEvent(therapistId: widget.userId));
+    } else if (widget.role == "patient") {
+      BlocProvider.of<PatientProfileBloc>(context).add(GetPatientLoadEvent(patientId: widget.userId));
     }
   }
+
+  
 
   String cutUsername(String username) {
     if (username.length > 10) {
@@ -90,7 +75,7 @@ class _AppbarHomeState extends State<AppbarHome> {
         child: Row(
           children: [
             Expanded(
-              child: role == "therapist"
+              child: widget.role == "therapist"
                       ? BlocBuilder<TherapistProfileBloc, GetTherapistState>(
                           builder: (context, state) => buildProfileContent(context, state),
                         )
@@ -106,26 +91,27 @@ class _AppbarHomeState extends State<AppbarHome> {
   }
 
   Widget buildProfileContent(BuildContext context, dynamic state) {
-    if (role == "therapist" && state is GetTherapistLoaded) {
+    if (widget.role == "therapist" && state is GetTherapistLoaded) {
       String userName = state.therapist.name;
       String profilePicture = state.therapist.profilePicture ?? "";
       bool hasPassword = state.therapist.hasPassword;
       String email = state.therapist.email;
 
       return buildProfileUI(context, userName, profilePicture, hasPassword, email);
-    } else if (role == "patient" && state is GetPatientLoaded) {
+    } else if (widget.role == "patient" && state is GetPatientLoaded) {
       String userName = state.patient.name;
       String profilePicture = state.patient.profilePicture ?? "";
       bool hasPassword = state.patient.hasPassword;
       String email = state.patient.email;
 
       return buildProfileUI(context, userName, profilePicture, hasPassword, email);
-    } else if ((role == "therapist" && state is GetTherapistError) ||
-        (role == "patient" && state is GetPatientError)) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.read<AuthBloc>().add(LogoutEvent());
-      });
-      return const SizedBox();
+    } else if ((widget.role == "therapist" && state is GetTherapistError) ||
+        (widget.role == "patient" && state is GetPatientError)) {
+      // WidgetsBinding.instance.addPostFrameCallback((_) {
+      //   context.read<AuthBloc>().add(LogoutEvent());
+      // });
+      return buildProfileUI(context, "userName", "profilePicture", true, "email");
+      // return const SizedBox();
     } else {
       return const Center(child: CircularProgressIndicator());
     }
@@ -139,12 +125,12 @@ class _AppbarHomeState extends State<AppbarHome> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => role == "therapist"
+                builder: (context) => widget.role == "therapist"
                     ? TherapistProfileNew(
                         username: userName,
                         profilePicture: profilePicture,
                         email: email,
-                        therapistId: userId ?? "",
+                        therapistId: widget.userId,
                         hasPassword: hasPassword,
                       )
                     : UpdatePatientProfileNew(
@@ -152,7 +138,7 @@ class _AppbarHomeState extends State<AppbarHome> {
                         username: userName,
                         hasPassword: hasPassword,
                         email: email,
-                        patientId: userId!,
+                        patientId: widget.userId,
                       ),
               ),
             );
