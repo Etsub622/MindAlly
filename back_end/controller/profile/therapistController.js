@@ -2,11 +2,16 @@ import { Patient } from "../../model/patientModel.js";
 import { Therapist } from "../../model/therapistModel.js";
 import { spawn } from 'child_process';
 import bcrypt from "bcrypt";
+// import upload from "../../middlewares/upload.js";// Import multer middleware
 
 // Create a new therapist
 export const createTherapist = async (req, res) => {
-  const { FullName, Email, Password, modality, Certificate, Bio, Fee, Rating, verified } = req.body;
+  const { FullName, Email, Password, modality, Certificate, Bio, Fee, Rating, verified,  } = req.body;
+  const ProfileImage = req.file ? `/uploads/${req.file.filename}` : "";
   print(req.body);
+  print(req.file);
+  // console.log("Request Body:", req.body);
+  // console.log("Uploaded File:", req.file);
 
   try {
     const existingTherapist = await Therapist.findOne({ Email });
@@ -24,9 +29,11 @@ export const createTherapist = async (req, res) => {
       Fee,
       Rating,
       verified,
+      ProfileImage,
     });
 
     print(newTherapist);
+    // console.log(newTherapist);
 
     await newTherapist.save();
     

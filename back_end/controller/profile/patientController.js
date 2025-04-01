@@ -3,7 +3,10 @@ import bcrypt from "bcrypt";
 
 // Create a new patient
 export const createPatient = async (req, res) => {
-  const { FullName, Email, Password, Collage } = req.body;
+  const { FullName, Email, Password, Collage, ProfileIMage } = req.body;
+  const ProfileImage = req.file ? `/uploads/${req.file.filename}` : "";
+  console.log("Request Body:", req.body);
+  console.log("Uploaded File:", req.file);
 
   try {
     const existingPatient = await Patient.findOne({ Email });
@@ -16,6 +19,7 @@ export const createPatient = async (req, res) => {
       Email,
       Password: hashedPassword,
       Collage,
+      ProfileImage,
     });
 
     await newPatient.save();

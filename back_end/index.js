@@ -13,6 +13,9 @@ import therapistRoutes from "./routes/profile/therapist.js";
 import chatRoutes from "./routes/chat/chatRoutes.js";
 import { resourceRoutes } from "./routes/resource/resourceRoutes.js";
 import { setIo } from "./controller/chat/chatController.js";
+// import { dirname } from "path";
+import { fileURLToPath } from "url";
+import path from "path";
 
 dotenv.config();
 import answerRoutes from "./routes/qanda/answerRoutes.js";
@@ -21,6 +24,8 @@ import questionRoutes from "./routes/qanda/questionRoutes.js";
 
 const app = express();
 const httpServer = createServer(app);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Middleware
 app.use(bodyParser.json());
@@ -49,6 +54,8 @@ app.use("/api/chat", chatRoutes);
 
 app.use("/api/questions", questionRoutes);
 app.use("/api/answers", answerRoutes);
+
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Initialize database and Socket.IO
 connectDB();
