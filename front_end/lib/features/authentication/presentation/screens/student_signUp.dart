@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:front_end/core/common_widget.dart/circular_indicator.dart';
 import 'package:front_end/core/common_widget.dart/snack_bar.dart';
 import 'package:front_end/core/routes/app_path.dart';
@@ -38,6 +37,31 @@ class _StudentSignUpState extends State<StudentSignUp> {
     super.dispose();
   }
 
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Email is required';
+    }
+    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+    if (!emailRegex.hasMatch(value)) {
+      return 'Enter a valid email address';
+    }
+    return null;
+  }
+
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Password is required';
+    }
+    if (value.length < 8) {
+      return 'Password must be at least 8 characters';
+    }
+    if (!RegExp(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$')
+        .hasMatch(value)) {
+      return 'Password must contain letters, numbers, and a special character';
+    }
+    return null;
+  }
+
   void _studentSignUP(BuildContext context) {
     final newUser = StudentSignupModel(
         id: '',
@@ -56,7 +80,7 @@ class _StudentSignUpState extends State<StudentSignUp> {
     return Scaffold(
       body: BlocConsumer<AuthBloc, AuthState>(builder: (context, state) {
         if (state is AuthLoading) {
-          return CircularIndicator();
+          return const CircularIndicator();
         } else {
           return _buildForm(context);
         }
@@ -91,10 +115,10 @@ class _StudentSignUpState extends State<StudentSignUp> {
                   height: 100,
                   width: 100,
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 30,
                 ),
-                Text(
+                const Text(
                   'Create your account',
                   style: TextStyle(
                     fontFamily: 'Poppins',
@@ -103,40 +127,75 @@ class _StudentSignUpState extends State<StudentSignUp> {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 30,
                 ),
-                CustomTextField(text: "full name", controller: nameController),
-                SizedBox(
-                  height: 20,
+                CustomTextField(
+                  text: "full name",
+                  controller: nameController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Full name is required';
+                    }
+                    return null;
+                  },
                 ),
-                CustomTextField(text: "email", controller: emailController),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 CustomTextField(
-                    text: "password",
-                    sign: Icon(Icons.remove_red_eye),
-                    controller: passwordController,
-                    isPassword: true),
-                SizedBox(
+                  text: "email",
+                  controller: emailController,
+                  validator: _validateEmail,
+                ),
+                const SizedBox(
                   height: 20,
                 ),
                 CustomTextField(
-                    text: "confirm password",
-                    sign: Icon(Icons.remove_red_eye),
-                    controller: confirmPasswordController,
-                    isPassword: true),
-                SizedBox(
+                  text: "password",
+                  controller: passwordController,
+                  isPassword: true,
+                  validator: _validatePassword,
+                ),
+                const SizedBox(height: 20),
+                CustomTextField(
+                  text: "confirm password",
+                  controller: confirmPasswordController,
+                  isPassword: true,
+                  validator: (value) {
+                    if (value != passwordController.text) {
+                      return 'Passwords do not match';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(
                   height: 20,
                 ),
                 CustomTextField(
-                    text: "Phone Number", controller: phoneController),
-                SizedBox(
+                  text: "Phone Number",
+                  controller: phoneController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Phone number is required';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(
                   height: 20,
                 ),
-                CustomTextField(text: "College(Optional)", controller: college),
-                SizedBox(
+                CustomTextField(
+                  text: "College",
+                  controller: college,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'College is required';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(
                   height: 40,
                 ),
                 CustomButton(
@@ -157,17 +216,17 @@ class _StudentSignUpState extends State<StudentSignUp> {
                     }
                   },
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 15,
                 ),
                 Align(
                   alignment: Alignment.bottomRight,
                   child: GestureDetector(
                     onTap: () {
-                      context.go(AppPath.login);
+                      context.go(AppPath.patientOnboard);
                     },
                     child: RichText(
-                      text: TextSpan(
+                      text: const TextSpan(
                         text: 'Already have an account? ',
                         style: TextStyle(
                           color: Colors.black,

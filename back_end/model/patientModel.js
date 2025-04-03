@@ -9,7 +9,6 @@ const patientschema = new mongoose.Schema({
         type: String,
         required: true,
         unique:true
-        
     },
     Password: {
         type: String,
@@ -17,12 +16,40 @@ const patientschema = new mongoose.Schema({
     },
     Collage: {
         type: String,
-    
     },
     Role: {
         type: String,
         default:"patient"
-    }
+    },
+   gender: {
+    type: String,
+   },
+
+   preferred_modality:{
+    type: String,
+   },
+
+   preferred_gender:{
+    type:Array,
+   },
+
+   preferred_language: {
+    type: Array
+   },
+
+   preferred_days: {
+    type:Array,
+   },
+
+   preferred_mode:{
+    type: Array
+   },
+
+   preferred_specialties:{
+    type:Array
+   }
+
+    
  
 
 })

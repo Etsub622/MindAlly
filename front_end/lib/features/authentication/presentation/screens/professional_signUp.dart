@@ -40,6 +40,31 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
     super.dispose();
   }
 
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Email is required';
+    }
+    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+    if (!emailRegex.hasMatch(value)) {
+      return 'Enter a valid email address';
+    }
+    return null;
+  }
+
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Password is required';
+    }
+    if (value.length < 8) {
+      return 'Password must be at least 8 characters';
+    }
+    if (!RegExp(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$')
+        .hasMatch(value)) {
+      return 'Password must contain letters, numbers, and a special character';
+    }
+    return null;
+  }
+
   void _professionalSignUp(BuildContext context) {
     final newUser = ProfessionalSignupModel(
         id: '',
@@ -59,7 +84,7 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
     return Scaffold(
       body: BlocConsumer<AuthBloc, AuthState>(builder: (context, state) {
         if (state is AuthLoading) {
-          return CircularIndicator();
+          return const CircularIndicator();
         } else {
           return _build(context);
         }
@@ -69,7 +94,7 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
           ScaffoldMessenger.of(context).showSnackBar(snack);
 
           Future.delayed(const Duration(seconds: 2), () {
-            context.go(AppPath.login);
+            context.go(AppPath.therapistOnboard);
           });
         } else if (state is AuthError) {
           final snack = errorsnackBar('Try again later');
@@ -94,10 +119,10 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
                   height: 100,
                   width: 100,
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 30,
                 ),
-                Text(
+                const Text(
                   'Create your account',
                   style: TextStyle(
                     fontFamily: 'Poppins',
@@ -106,46 +131,75 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 30,
                 ),
-                CustomTextField(text: "full name", controller: nameController),
-                SizedBox(
+                CustomTextField(
+                  text: "full name",
+                  controller: nameController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Full name is required';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(
                   height: 20,
                 ),
-                CustomTextField(text: "email", controller: emailController),
-                SizedBox(
+                CustomTextField(
+                    text: "email",
+                    controller: emailController,
+                    validator: _validateEmail),
+                const SizedBox(
                   height: 20,
                 ),
                 CustomTextField(
                     text: "password",
-                    sign: Icon(Icons.remove_red_eye),
+                    sign: const Icon(Icons.remove_red_eye),
                     controller: passwordController,
-                    isPassword: true),
-                SizedBox(
+                    isPassword: true,
+                    validator: _validatePassword),
+                const SizedBox(
                   height: 20,
                 ),
                 CustomTextField(
                     text: "confirm password",
-                    sign: Icon(Icons.remove_red_eye),
+                    sign: const Icon(Icons.remove_red_eye),
                     controller: confirmPasswordController,
                     isPassword: true),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 CustomTextField(
-                    text: "Phone Number", controller: phoneController),
-                SizedBox(
+                  text: "Phone Number",
+                  controller: phoneController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Phone number is required';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(
                   height: 20,
                 ),
                 CustomTextField(
-                    text: "Area of Specialization", controller: areaContloller),
-                SizedBox(
+                  text: "Area of Specialization",
+                  controller: areaContloller,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Area of specialization is required';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(
                   height: 20,
                 ),
                 CustomTextField(
                     text: "Certified document", controller: documentController),
-                SizedBox(
+                const SizedBox(
                   height: 40,
                 ),
                 CustomButton(
@@ -165,7 +219,7 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
                     }
                   },
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 15,
                 ),
                 Align(
@@ -175,7 +229,7 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
                       context.go(AppPath.login);
                     },
                     child: RichText(
-                      text: TextSpan(
+                      text: const TextSpan(
                         text: 'Already have an account? ',
                         style: TextStyle(
                           color: Colors.black,

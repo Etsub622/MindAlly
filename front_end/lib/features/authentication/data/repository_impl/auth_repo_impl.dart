@@ -1,5 +1,4 @@
 import 'package:dartz/dartz.dart';
-import 'package:flutter/material.dart';
 import 'package:front_end/core/error/exception.dart';
 import 'package:front_end/core/error/failure.dart';
 import 'package:front_end/core/network/network.dart';
@@ -23,7 +22,7 @@ class AuthRepoImpl implements AuthRepository {
 
   @override
   Future<Either<Failure, StudentResponseModel>> login(LoginEntity login) async {
-    if (await networkInfo.isConnected) {
+    // if (await networkInfo.isConnected) {
       try {
         final user = LoginModel(
             id: login.id, email: login.email, password: login.password);
@@ -32,14 +31,16 @@ class AuthRepoImpl implements AuthRepository {
         await loginLocalDataSource
             .setStudentUser(response.studentData as StudentDataModel);
         await loginLocalDataSource.cacheUser(response.token);
+        final resData = response.toJson();
+        await loginLocalDataSource.cacheUserData(userCredentialModel: resData);
         return Right(response);
       } on ServerException {
         return Left(ServerFailure(message: 'Server Failure'));
       }
-    } else {
-      return Left(
-          NetworkFailure(message: 'You are not connected to the internet'));
-    }
+    // } else {
+    //   return Left(
+    //       NetworkFailure(message: 'You are not connected to the internet'));
+    // }
   }
 
   @override
@@ -56,7 +57,9 @@ class AuthRepoImpl implements AuthRepository {
             specialization: professionalSignup.specialization,
             certificate: professionalSignup.certificate);
         final response = await authRemoteDatasource.professionalSignUp(user);
-        return Right(response);
+        final resData = response['user'];
+        await loginLocalDataSource.cacheUserData(userCredentialModel: resData);
+        return Right(response['token']);          
       } on ServerException {
         return Left(ServerFailure(message: 'Server Failure'));
       }
@@ -79,9 +82,8 @@ class AuthRepoImpl implements AuthRepository {
             phoneNumber: studentSignUp.phoneNumber,
             collage: studentSignUp.collage);
         final response = await authRemoteDatasource.studentSignUp(user);
-        print(response);
-        print('helllojkldjkljkag');
-        return Right(response);
+        await loginLocalDataSource.cacheUserData(userCredentialModel: response['user']);
+        return Right(response['token']);
       } on ServerException {
         return Left(ServerFailure(message: 'Server Failure'));
       }

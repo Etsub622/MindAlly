@@ -19,7 +19,6 @@ class LogOutRepoImpl extends LogOutRepo {
   });
   @override
   Future<Either<Failure, String>> logOut() async {
-    if (await networkInfo.isConnected) {
       try {
         await loginLocalDataSource.deleteUser();
         return Right('Logged out successfully');
@@ -28,8 +27,5 @@ class LogOutRepoImpl extends LogOutRepo {
       } on CacheException {
         return Left(CacheFailure(message: 'Cache Failure'));
       }
-    } else {
-      return Left(ServerFailure(message: 'No Internet Connection'));
-    }
   }
 }
