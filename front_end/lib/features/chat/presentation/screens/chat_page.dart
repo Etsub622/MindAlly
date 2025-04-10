@@ -59,9 +59,9 @@ class _ChatPageState extends State<ChatPage> {
           'http://192.168.31.220:8000/api/notifications/sendUserNotification';
       final data = {
         'receiverId': widget.receiver.id,
-        'senderId': userId, 
+        'senderId': userId,
         'message': message,
-        'notificationType': 'new_message', 
+        'notificationType': 'new_message',
       };
       print('userId: $userId');
       print('receiverId: ${widget.receiver.id}');
@@ -125,7 +125,7 @@ class _ChatPageState extends State<ChatPage> {
               timestamp: DateTime.now(),
               isRead: false,
               receiverId: widget.receiver.id)));
-      // await _sendNotificationToReceiver(message);
+      await _sendNotificationToReceiver(message);
       _messageController.clear();
     }
   }
