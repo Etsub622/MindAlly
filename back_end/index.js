@@ -11,6 +11,7 @@ import googleRoutes from "./routes/authenticaionRoutes/loginwithGoogle.js";
 import patientRoutes from "./routes/profile/profile.js";
 import therapistRoutes from "./routes/profile/therapist.js";
 import chatRoutes from "./routes/chat/chatRoutes.js";
+import NotificationRoute from './routes/chat/notificationRoute.js';
 import { resourceRoutes } from "./routes/resource/resourceRoutes.js";
 import { setIo } from "./controller/chat/chatController.js";
 
@@ -42,6 +43,7 @@ app.use("/api/google", googleRoutes);
 
 app.use("/api/patients", patientRoutes);
 app.use("/api/therapists", therapistRoutes);
+app.use("/api/notifications", NotificationRoute); 
 
 app.use("/api/resources", resourceRoutes);
 

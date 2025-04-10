@@ -61,6 +61,9 @@ const therapistschema = new mongoose.Schema({
     experience_years:{
         type: Number,
         default: 0,
+    },
+    fcmToken: {
+        type: String,
     }
 })
 

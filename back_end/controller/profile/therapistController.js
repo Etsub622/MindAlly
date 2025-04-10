@@ -4,6 +4,10 @@ import { ChatHistory } from "../../model/chatsModel.js";
 import { spawn } from 'child_process';
 import bcrypt from "bcrypt";
 
+import { promises as fs } from 'fs'; // For async file operations
+import { tmpdir } from 'os'; // Import tmpdir
+import { join } from 'path'; // Import join explicitly
+
 // Create a new therapist
 export const createTherapist = async (req, res) => {
   const { FullName, Email, Password, modality, Certificate, Bio, Fee, Rating, verified } = req.body;
@@ -92,8 +96,6 @@ export const deleteTherapist = async (req, res) => {
   }
 };
 
-
-// Inside getTopTherapists function, replace the Python call section with:
 export const getTopTherapists = async (req, res) => {
   const { patient_id } = req.params;
 
@@ -106,11 +108,10 @@ export const getTopTherapists = async (req, res) => {
     const userData = {
       preferred_modality: user.preferred_modality || "",
       preferred_gender: user.preferred_gender || "",
-      preferred_language: user.preferred_language || "",
-      preferred_days: user.preferred_days || "",
+      preferred_language: Array.isArray(user.preferred_language) ? user.preferred_language : (user.preferred_language || []),
+      preferred_days: Array.isArray(user.preferred_days) ? user.preferred_days : (user.preferred_days || []),
       preferred_mode: user.preferred_mode || "",
-      preferred_specialties: user.preferred_specialties || "",
-      // age: user.age || 0
+      preferred_specialties: Array.isArray(user.preferred_specialties) ? user.preferred_specialties : (user.preferred_specialties || []),
     };
 
     const therapistsData = therapists.map(t => ({
@@ -118,68 +119,166 @@ export const getTopTherapists = async (req, res) => {
       FullName: t.FullName,
       modality: t.modality || "",
       gender: t.gender || "",
-      language: t.language || "",
-      available_days: t.available_days || "",
-      mode: t.mode || "",
-      specialties: t.AreaofSpecification || "",
+      language: Array.isArray(t.language) ? t.language : (t.language || []),
+      available_days: Array.isArray(t.available_days) ? t.available_days.join(',') : (t.available_days || ""),
+      mode: Array.isArray(t.mode) ? t.mode : (t.mode || []),
+      AreaofSpecification: Array.isArray(t.specialties) ? t.specialties.join(',') : (t.specialties || ""),
       experience_years: t.experience_years || 0
     }));
 
     const inputData = { user: userData, therapists: therapistsData };
 
-    const pythonProcess = spawn('python3', ['therapist_matching/therapist_matcher.py']);
-    let output = '';
+    // Create a temporary file path
+    const tempFile = join(tmpdir(), `therapist_output_${Date.now()}.json`);
+    
+    const pythonProcess = spawn('python', ['therapist_matching/therapist_matcher.py', tempFile]);
     let errorOutput = '';
 
     pythonProcess.stdin.write(JSON.stringify(inputData) + '\n');
     pythonProcess.stdin.end();
 
-    pythonProcess.stdout.on('data', (data) => {
-      output += data.toString();
-    });
-
     pythonProcess.stderr.on('data', (data) => {
       errorOutput += data.toString();
+      console.log("Python error output:", data.toString());
     });
 
     const topTherapists = await new Promise((resolve, reject) => {
-      pythonProcess.on('close', (code) => {
+      pythonProcess.on('close', async (code) => {
         if (code !== 0) {
+          console.log(`Python process exited with code ${code}: ${errorOutput}`);
           return reject(new Error(`Python process exited with code ${code}: ${errorOutput}`));
         }
         try {
+          // Read the result from the temporary file
+          const output = await fs.readFile(tempFile, 'utf8');
           const result = JSON.parse(output);
           if (result.error) return reject(new Error(result.error));
           resolve(result);
         } catch (e) {
+          console.error("Error reading or parsing temp file:", e.message);
           reject(e);
+        } finally {
+          // Clean up the temporary file
+          fs.unlink(tempFile).catch(err => console.error("Failed to delete temp file:", err));
         }
       });
     });
 
     const enrichedTherapists = await Promise.all(topTherapists.map(async (t) => {
       const therapist = therapists.find(th => th._id.toString() === t.therapist_id.toString());
-
-    // Look for an existing chat between this patient and therapist
-    const existingChat = await ChatHistory.findOne({
-      $or: [
-        { senderId: patient_id, receiverId: t.therapist_id },
-        { senderId: t.therapist_id, receiverId: patient_id }
-      ]
-    });
-    const matchedTherapist = {
-      ...therapist.toObject(),
-      chatId: existingChat ? existingChat.chatId : null
-    };
-    console.log(matchedTherapist);
-    return matchedTherapist;
+      const existingChat = await ChatHistory.findOne({
+        $or: [
+          { senderId: patient_id, receiverId: t.therapist_id },
+          { senderId: t.therapist_id, receiverId: patient_id }
+        ]
+      });
+      return {
+        ...therapist.toObject(),
+        chatId: existingChat ? existingChat.chatId : null
+      };
     }));
-  console.log("enrichedTherapists", enrichedTherapists);
-    await res.json({
+
+    res.json({
       patient_id,
       top_therapists: enrichedTherapists
     });
   } catch (err) {
+    console.error("Error in getTopTherapists:", err);
     res.status(500).json({ message: err.message });
   }
 };
+// // Inside getTopTherapists function, replace the Python call section with:
+// export const getTopTherapists = async (req, res) => {
+//   const { patient_id } = req.params;
+
+//   try {
+//     const user = await Patient.findById(patient_id);
+//     if (!user) return res.status(404).json({ message: "User not found" });
+
+//     const therapists = await Therapist.find();
+
+//     const userData = {
+//       preferred_modality: user.preferred_modality || "",
+//       preferred_gender: user.preferred_gender || "",
+//       preferred_language: user.preferred_language || "",
+//       preferred_days: user.preferred_days || "",
+//       preferred_mode: user.preferred_mode || "",
+//       preferred_specialties: user.preferred_specialties || "",
+//       // age: user.age || 0
+//     };
+
+//     const therapistsData = therapists.map(t => ({
+//       _id: t._id.toString(),
+//       FullName: t.FullName,
+//       modality: t.modality || "",
+//       gender: t.gender || "",
+//       language: t.language || "",
+//       available_days: t.available_days || "",
+//       mode: t.mode || "",
+//       specialties: t.AreaofSpecification || "",
+//       experience_years: t.experience_years || 0
+//     }));
+    
+    
+//     const inputData = { user: userData, therapists: therapistsData };
+
+//     const pythonProcess = spawn('python', ['therapist_matching/therapist_matcher.py']);
+//     let output = '';
+//     let errorOutput = '';
+
+//     pythonProcess.stdin.write(JSON.stringify(inputData) + '\n');
+//     pythonProcess.stdin.end();
+
+//     pythonProcess.stdout.on('data', (data) => {
+//       output += data.toString();
+//       console.log("Python output:", data.toString());
+//     });
+
+//     pythonProcess.stderr.on('data', (data) => {
+//       errorOutput += data.toString();
+//       console.log("Python error output:", data.toString());
+//     });
+
+//     const topTherapists = await new Promise((resolve, reject) => {
+//       pythonProcess.on('close', (code) => {
+//         if (code !== 0) {
+//           console.log(`Python process exited with code ${code}: ${errorOutput}`);
+//           return reject(new Error(`Python process exited with code ${code}: ${errorOutput}`));
+//         }
+//         try {
+//           console.log("Python output:", output);  
+//           const result = JSON.parse(output);
+//           if (result.error) return reject(new Error(result.error));
+//           resolve(result);
+//         } catch (e) {
+//           reject(e);
+//         }
+//       });
+//     });
+
+//     const enrichedTherapists = await Promise.all(topTherapists.map(async (t) => {
+//       const therapist = therapists.find(th => th._id.toString() === t.therapist_id.toString());
+
+//     // Look for an existing chat between this patient and therapist
+//     const existingChat = await ChatHistory.findOne({
+//       $or: [
+//         { senderId: patient_id, receiverId: t.therapist_id },
+//         { senderId: t.therapist_id, receiverId: patient_id }
+//       ]
+//     });
+//     const matchedTherapist = {
+//       ...therapist.toObject(),
+//       chatId: existingChat ? existingChat.chatId : null
+//     };
+//     console.log(matchedTherapist);
+//     return matchedTherapist;
+//     }));
+//   console.log("enrichedTherapists", enrichedTherapists);
+//     await res.json({
+//       patient_id,
+//       top_therapists: enrichedTherapists
+//     });
+//   } catch (err) {
+//     res.status(500).json({ message: err.message });
+//   }
+// };

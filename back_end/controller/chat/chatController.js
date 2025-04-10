@@ -4,6 +4,7 @@ import { Message } from "../../model/messagesModel.js";
 import mongoose from "mongoose";
 import { Patient } from "../../model/patientModel.js";
 import { Therapist } from "../../model/therapistModel.js";
+import { sendNotification } from "../../utils/notificationUtils.js"; 
 
 let io;
 
@@ -168,6 +169,17 @@ export const saveMessage = async (req, res) => {
       isRead: false,
     });
     await newMessage.save();
+
+   // Get the receiver's FCM token (retrieve from user model or another source)
+    const receiver = await getSecondUser(receiverId);
+    const receiverFcmToken = receiver.fcmToken; // Assuming fcmToken field exists on Patient/Therapist models
+
+    if (receiverFcmToken) {
+      // Send notification to receiver
+      await sendNotification(receiverFcmToken, "New Message", message, {
+        chatId: finalChatId,
+      });
+    }
 
     const socketIo = getIo();
     socketIo.to(finalChatId).emit("newMessage", {

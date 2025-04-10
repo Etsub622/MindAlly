@@ -47,10 +47,10 @@ const patientschema = new mongoose.Schema({
 
    preferred_specialties:{
     type:Array
-   }
-
-    
- 
+   },
+   fcmToken: {
+        type: String,
+    }
 
 })
 

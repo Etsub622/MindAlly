@@ -17,6 +17,7 @@ export const createPatient = async (req, res) => {
       Password: hashedPassword,
       Collage,
     });
+    console.log(newPatient);
 
     await newPatient.save();
     res.status(201).json({ message: "Patient created successfully", newPatient });
@@ -30,7 +31,7 @@ export const getPatient = async (req, res) => {
   try {
     const patient = await Patient.findById(req.params.patient_id);
     if (!patient) return res.status(404).json({ message: "Patient not found" });
-
+   console.log(patient);
     res.json(patient);
   } catch (err) {
     res.status(500).json({ message: err.message });

@@ -67,7 +67,7 @@ const verifyPasswordResetOTP = async (req, res) => {
             return res.status(400).json({ success: false, message: "OTP has expired" });
         }
     
-        const resetToken = jwt.sign({email}, process.env.JWT_SECRET, { expiresIn: "10m" });
+        const resetToken = jwt.sign({email}, process.env.JWT_SECRET, { expiresIn: "100m" });
         res.status(200).json({
             success: true,
             message: "OTP verified. Use the reset token to reset your password.",

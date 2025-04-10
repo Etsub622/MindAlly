@@ -118,6 +118,8 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
           headers: {'Content-Type': 'application/json'});
       if (user.statusCode == 200) {
         final responseJson = jsonDecode(user.body);
+        print('responseJson: $responseJson');
+        final token = responseJson['token'];
 
         if (responseJson['user'] == null) {
           throw ServerException(message: 'User data is null');
