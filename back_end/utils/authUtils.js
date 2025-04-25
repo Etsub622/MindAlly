@@ -21,8 +21,12 @@ export const hashedPassword = async (password) => {
 export const generateAccessToken = (userId, role) => {
     return jwt.sign(
         { id: userId, role },
+
         process.env.ACCESS_SECRET,
         { expiresIn: "15m" }
+
+       
+
     )
 };
 
