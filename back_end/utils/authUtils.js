@@ -7,10 +7,10 @@ export const hashedPassword = async (password) => {
         throw new Error("Password is required");
     }
 
-    const saltRounds = 10; // Number of rounds for salt generation
+    const saltRounds = 10; 
     try {
-        const salt = await bcrypt.genSalt(saltRounds); // Generate a salt
-        return await bcrypt.hash(password, salt); // Hash the password using the salt
+        const salt = await bcrypt.genSalt(saltRounds); 
+        return await bcrypt.hash(password, salt); 
     } catch (err) {
         throw new Error(`Error hashing password: ${err.message}`);
     }
@@ -18,10 +18,20 @@ export const hashedPassword = async (password) => {
 
 
 
-export const generateJWT = (userId, role) => {
+export const generateAccessToken = (userId, role) => {
     return jwt.sign(
         { id: userId, role },
-        process.env.JWT_SECRET,
-        { expiresIn: "1h" }
+        process.env.ACCESS_SECRET,
+        { expiresIn: "15m" }
     )
 };
+
+
+export const generateRefreshToken = (userId, role) => {
+    return jwt.sign(
+        { id: userId, role },
+        process.env.REFRESH_SECRET,
+        {expiresIn:"3d"}
+    )
+}
+

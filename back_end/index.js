@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import bodyParser from "body-parser";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import { createServer } from "http";
 import { initializeSocket } from "./socket.js";
 import { connectDB } from "./db.js";
@@ -25,6 +26,7 @@ const httpServer = createServer(app);
 
 // Middleware
 app.use(bodyParser.json());
+app.use(cookieParser());
 app.use(cors({
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type"],

@@ -1,7 +1,10 @@
 import bcrypt from "bcrypt"
 import { Therapist } from "../../model/therapistModel.js";
 import { Patient } from "../../model/patientModel.js";
-import { generateJWT, hashedPassword } from "../../utils/authUtils.js";
+import { Token } from "../../model/token.js"
+import jwt from "jsonwebtoken"
+
+import { generateAccessToken, generateRefreshToken, hashedPassword } from "../../utils/authUtils.js";
 
 
 const registerTherapist = async (req, res) => {
@@ -55,7 +58,7 @@ const registerPatient = async (req, res) => {
     })
     
         await patient.save()
-        const token = generateJWT(patient._id,patient.Role)
+        const token = generateAccessToken(patient._id,patient.Role)
         
         res.status(200).json({
             message: "patient signup successful",
@@ -91,13 +94,56 @@ const Login = async (req, res) => {
             return res.status(401).json({ error: "Invalid email or password." });
         }
 
-    const token = generateJWT(userModel._id, userModel.Role);
-
-    res.status(200).json({ message: "user login successful", token, user:userModel });  
+        const accessToken = generateAccessToken(userModel._id, userModel.Role);
+        const refreshToken = generateRefreshToken(userModel._id, userModel.Role);
+        
+        await Token.create({
+        userId: userModel._id,
+        userModel: userModel.Role === "patient" ? "Patient" : "Therapist",
+        refreshToken
+        });
+         res
+      .cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+        maxAge: 3 * 24 * 60 * 60 * 1000 
+      })
+      .json({ message: "user login successful",accessToken, user:userModel  });
+        
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "An error occurred during login." });
     }
 };
 
-export {registerTherapist,Login,registerPatient}
+const refreshToken = async (req, res) => {
+  const refreshToken = req.cookies.refreshToken;
+  if (!refreshToken) return res.sendStatus(401);
+
+  try {
+    const stored = await Token.findOne({ refreshToken });
+    if (!stored) return res.sendStatus(403);
+
+    jwt.verify(refreshToken, process.env.REFRESH_SECRET, async (err, payload) => {
+      if (err) return res.sendStatus(403);
+
+      const accessToken = generateAccessToken(payload.userId, payload.role);
+      res.json({ accessToken });
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Error validating token" });
+  }
+};
+
+const Logout= async (req, res) => {
+  const refreshToken = req.cookies.refreshToken;
+  if (!refreshToken) return res.sendStatus(204); // No content
+
+  await Token.deleteOne({ refreshToken });
+  res.clearCookie("refreshToken").sendStatus(200);
+};
+
+
+export { registerTherapist, Login, registerPatient,refreshToken,Logout }
+
