@@ -8,6 +8,7 @@ import otpRoutes from "./routes/authenticaionRoutes/otpRoutes.js"
 import googleRoutes from "./routes/authenticaionRoutes/loginwithGoogle.js"
 import patientRoutes from "./routes/profile/profile.js";
 import therapistRoutes from "./routes/profile/therapist.js";
+import scheduleRoutes from "./routes/scheduler/scheduleRoutes.js";
 // import session from "express-session";
 // import passport from "passport";
 // import { Strategy as GoogleStrategy } from "passport-google-oauth20";
@@ -84,12 +85,7 @@ app.get('/', (req, res) => {
 
 
 
-const io = new Server(httpServer, {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST"],
-  },
-});
+
 
 app.use(cors({
  
