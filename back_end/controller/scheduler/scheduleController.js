@@ -1,5 +1,6 @@
 import { Session } from "../../model/sessionModel.js";
 import { Therapist } from "../../model/therapistModel.js";
+import { io } from "../../index.js";
 
 
 // Fetch therapist availability
@@ -26,7 +27,7 @@ export const bookSession = async (req, res) => {
     const session = new Session({ userId, therapistId, date, timeSlot });
     await session.save();
 
- 
+    io.emit("sessionBooked", session);
 
    
 
@@ -69,7 +70,7 @@ export const cancelSession = async (req, res) => {
     session.status = "Cancelled";
     await session.save();
 
-
+    io.emit("sessionCancelled", session);
 
     res.status(200).json({ message: "Session cancelled", session });
   } catch (error) {
