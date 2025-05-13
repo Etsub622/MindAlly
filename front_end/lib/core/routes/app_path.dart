@@ -15,6 +15,7 @@ class AppPath {
   static String bookResource ='bookResource';
   static const String chat = '/chat';
   static const String chatDetails = '/chatDetails';
+  static const String calendar = '/calendar';
 }
 
 const List<String> publicRoutes = [
@@ -31,4 +32,5 @@ const List<String> protectedRoutes = [
   AppPath.home,
   AppPath.chat,
   AppPath.chatDetails,
+  AppPath.calendar,
 ];

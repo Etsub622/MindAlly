@@ -10,6 +10,7 @@ import 'package:front_end/features/authentication/presentation/screens/reset_pas
 import 'package:front_end/features/authentication/presentation/screens/role_selection.dart';
 import 'package:front_end/features/authentication/presentation/screens/student_signUp.dart';
 import 'package:front_end/features/authentication/presentation/screens/therapist_onboarding.dart';
+import 'package:front_end/features/calendar/presentation/screen/calendar_screen.dart';
 import 'package:front_end/features/chat/presentation/screens/chat_page.dart';
 import 'package:front_end/features/chat/presentation/screens/chat_room.dart';
 import 'package:front_end/features/profile_patient/domain/entities/user_entity.dart';
@@ -74,6 +75,12 @@ final routes = <GoRoute>[
       receiver: UserEntity(
         id: state.uri.queryParameters['id'] ?? "", name: state.uri.queryParameters['name'] ?? "", email: state.uri.queryParameters['email'] ?? "", hasPassword: state.uri.queryParameters['hasPassword']== "true" ? true : false, role: state.uri.queryParameters['role'] ?? ""),
     ),
+  ),
+
+  GoRoute(
+    name:"calendar",
+    path: AppPath.calendar,
+    builder: (BuildContext context, GoRouterState state) => const DateTimePicker()
   )
 ];
 
