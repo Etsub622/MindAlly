@@ -16,6 +16,7 @@ import { resourceRoutes } from "./routes/resource/resourceRoutes.js";
 
 
 
+
  
 
 
@@ -83,7 +84,8 @@ app.get('/', (req, res) => {
 
 
 
-import scheduleRoutes from "./routes/scheduler/scheduleRoutes.js";
+
+
 
 app.use(cors({
  
