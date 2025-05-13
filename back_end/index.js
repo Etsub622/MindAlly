@@ -78,20 +78,6 @@ app.get('/', (req, res) => {
 
 
 
-
-
-
-
-
-
-
-const io = new Server(httpServer, {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST"],
-  },
-});
-
 app.use(cors({
  
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
