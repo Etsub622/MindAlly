@@ -13,7 +13,6 @@ import therapistRoutes from "./routes/profile/therapist.js";
 // import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 
 import { resourceRoutes } from "./routes/resource/resourceRoutes.js";
-import scheduleRoutes from "./routes/scheduler/scheduleRoutes.js";
 
 
 
@@ -84,8 +83,7 @@ app.get('/', (req, res) => {
 
 
 
-
-
+import scheduleRoutes from "./routes/scheduler/scheduleRoutes.js";
 
 app.use(cors({
  
