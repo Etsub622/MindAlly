@@ -1,5 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front_end/core/injection/injections.dart';
+import 'package:front_end/features/calendar/presentation/bloc/add_event/add_events_bloc.dart';
+import 'package:front_end/features/calendar/presentation/bloc/delete_event/delete_events_bloc.dart';
+import 'package:front_end/features/calendar/presentation/bloc/get_events/get_events_bloc.dart';
+import 'package:front_end/features/calendar/presentation/bloc/get_single_event/get_event_bloc.dart';
+import 'package:front_end/features/calendar/presentation/bloc/update_event/update_events_bloc.dart';
 import 'package:front_end/features/chat/presentation/bloc/chat/chat_bloc.dart';
 import 'package:front_end/features/Q&A/presentation/bloc/bloc/answer_bloc.dart';
 import 'package:front_end/features/Q&A/presentation/bloc/bloc/question_bloc.dart';
@@ -48,6 +53,22 @@ class MultiBLOCProvider {
 
     BlocProvider<GetMatchedTherapistsBloc>(
       create: (_) => sl<GetMatchedTherapistsBloc>()
+    ),
+
+    BlocProvider<AddScheduledEventsBloc>(
+      create: (_) => sl<AddScheduledEventsBloc>()
+    ),
+    BlocProvider<DeleteScheduledEventsBloc>(
+      create: (_) => sl<DeleteScheduledEventsBloc>()
+    ),
+    BlocProvider<GetScheduledEventsBloc>(
+      create: (_) => sl<GetScheduledEventsBloc>()
+    ),
+    BlocProvider<GetScheduledEventBloc>(
+      create: (_) => sl<GetScheduledEventBloc>()
+    ),
+    BlocProvider<UpdateScheduledEventsBloc>(
+      create: (_) => sl<UpdateScheduledEventsBloc>()
     ),
 
   ];
