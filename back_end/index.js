@@ -8,13 +8,12 @@ import otpRoutes from "./routes/authenticaionRoutes/otpRoutes.js"
 import googleRoutes from "./routes/authenticaionRoutes/loginwithGoogle.js"
 import patientRoutes from "./routes/profile/profile.js";
 import therapistRoutes from "./routes/profile/therapist.js";
-import chatRoutes from "./routes/chat/chatRoutes.js";
-import scheduleRoutes from "./routes/scheduler/scheduleRoutes.js";
 // import session from "express-session";
 // import passport from "passport";
 // import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 
 import { resourceRoutes } from "./routes/resource/resourceRoutes.js";
+import scheduleRoutes from "./routes/scheduler/scheduleRoutes.js";
 
 
 
