@@ -48,7 +48,7 @@ class EventScheduleRemoteDataSourceImpl implements EventScheduleRemoteDataSource
   }
   @override
   Future<EventModel> addEventSchedule(EventModel event) async {
-    const String endpoint = 'http://localhost:8000/api/schedule/book';
+    const String endpoint = 'http://10.0.2.2:8000/api/schedule/book';
 
     try {
       final response = await client.post(
@@ -58,7 +58,10 @@ class EventScheduleRemoteDataSourceImpl implements EventScheduleRemoteDataSource
           'userId': event.userId,
           'therapistId': event.therapistId,
           'date': event.date,
-          'timeSlot': event.timeSlot,
+          'startTime': event.startTime,
+          'endTime': event.endTime,
+          'meeting_id':event.meetingId,
+          "meeting_token": event.meetingToken,
         }),
       );
 
@@ -66,7 +69,7 @@ class EventScheduleRemoteDataSourceImpl implements EventScheduleRemoteDataSource
         final jsonResponse = jsonDecode(response.body);
         return EventModel.fromJson(jsonResponse['session']);
       } else {
-        throw ServerException(message: 'Failed to book session: ${response.statusCode}');
+        throw ServerException(message: 'Failed to   session: ${response.statusCode}');
       }
     } catch (e) {
       throw ServerException(message: 'Network error: $e');

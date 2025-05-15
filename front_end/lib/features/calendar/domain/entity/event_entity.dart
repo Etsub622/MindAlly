@@ -4,8 +4,11 @@ class EventEntity extends Equatable {
   final String id;
   final String userId;
   final String therapistId;
+  final String meetingId;
+  final String meetingToken;
   final String date;
-  final String timeSlot;
+  final String startTime;
+  final String endTime;
   final String status;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -15,25 +18,17 @@ class EventEntity extends Equatable {
     required this.userId,
     required this.therapistId,
     required this.date,
-    required this.timeSlot,
+    required this.meetingId,
+    required this.meetingToken,
+    required this.startTime,
+    required this.endTime,
     required this.status,
     required this.createdAt,
     required this.updatedAt,
   });
 
-  // Compute startTime for DateTimePicker compatibility
-  DateTime get startTime {
-    final dateParts = date.split('-').map(int.parse).toList();
-    final timeParts = timeSlot.split(':').map(int.parse).toList();
-    return DateTime(
-      dateParts[0], // year
-      dateParts[1], // month
-      dateParts[2], // day
-      timeParts[0], // hour
-      timeParts[1], // minute
-    );
-  }
+
 
   @override
-  List<Object?> get props => [id, userId, therapistId, date, timeSlot, status, createdAt, updatedAt];
+  List<Object?> get props => [id, userId, therapistId, date, startTime, endTime, status, createdAt, updatedAt];
 }

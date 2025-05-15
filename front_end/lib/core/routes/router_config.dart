@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:front_end/core/routes/app_path.dart';
 import 'package:front_end/features/Home/presentation/screens/home_navigation_screen.dart';
+import 'package:front_end/features/Home/presentation/screens/therapist_detail_screen.dart';
 import 'package:front_end/features/authentication/presentation/screens/forgot_password.dart';
 import 'package:front_end/features/authentication/presentation/screens/login.dart';
 import 'package:front_end/features/authentication/presentation/screens/otp.dart';
@@ -14,6 +15,7 @@ import 'package:front_end/features/calendar/presentation/screen/calendar_screen.
 import 'package:front_end/features/chat/presentation/screens/chat_page.dart';
 import 'package:front_end/features/chat/presentation/screens/chat_room.dart';
 import 'package:front_end/features/profile_patient/domain/entities/user_entity.dart';
+import 'package:front_end/features/profile_therapist/domain/entities/update_therapist_entity.dart';
 import 'package:front_end/features/resource/presentation/screens/book_resource.dart';
 
 import 'package:go_router/go_router.dart';
@@ -81,7 +83,15 @@ final routes = <GoRoute>[
     name:"calendar",
     path: AppPath.calendar,
     builder: (BuildContext context, GoRouterState state) => const DateTimePicker()
-  )
+  ),
+  GoRoute(
+      path: '/therapistDetails',
+      name: 'therapistDetails',
+      builder: (context, state) {
+        final therapist = state.extra as UpdateTherapistEntity;
+        return TherapistDetailScreen(therapist: therapist);
+      },
+    ),
 ];
 
 GoRouter routerConfig() {

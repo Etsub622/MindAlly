@@ -16,31 +16,31 @@ class ChatRepositoryImpl extends ChatRepository {
 
   @override
   Future<Either<Failure, ListChatsEntity>> getAllChats() async {
-    // if (await networkInfo.isConnected) {
+    if (await networkInfo.isConnected) {
       try {
         final result = await remoteDataSource.getAllChats();
         return Right(result);
       } catch (e) {
         return Left(ServerFailure(message: e.toString()));
       }
-    // } else {
-    //   return Left(ServerFailure(message: "No Internet Connection"));
-    // }
+    } else {
+      return Left(ServerFailure(message: "No Internet Connection"));
+    }
   }
 
   @override
   Future<Either<Failure, List<MessageEntity>>> fetchMessages(
       {required String? chatId}) async {
-    // if (await networkInfo.isConnected) {
+    if (await networkInfo.isConnected) {
       try {
         final result = await remoteDataSource.fetchMessages(chatId: chatId);
         return Right(result);
       } catch (e) {
         return Left(ServerFailure(message: e.toString()));
       }
-    // } else {
-    //   return Left(ServerFailure(message: "No Internet Connection"));
-    // }
+    } else {
+      return Left(ServerFailure(message: "No Internet Connection"));
+    }
   }
 
   @override
