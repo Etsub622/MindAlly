@@ -20,6 +20,7 @@ dotenv.config();
 import answerRoutes from "./routes/qanda/answerRoutes.js";
 import questionRoutes from "./routes/qanda/questionRoutes.js";
 // import answerRoutes from "./routes/q&a/answerRoutes.js";
+import {scheduleRoutes} from "./routes/scheduler/scheduleRoutes.js";
 
 const app = express();
 const httpServer = createServer(app);
@@ -52,7 +53,11 @@ app.use("/api/chat", chatRoutes);
 
 app.use("/api/questions", questionRoutes);
 app.use("/api/answers", answerRoutes);
+
 app.use("/api/Payment", paymentRoutes);
+
+app.use("/api/schedule", scheduleRoutes);
+
 
 // Initialize database and Socket.IO
 connectDB();
