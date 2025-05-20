@@ -2,17 +2,19 @@ import express from "express";
 import dotenv from "dotenv";
 import bodyParser from "body-parser";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import { createServer } from "http";
 import { initializeSocket } from "./socket.js";
 import { connectDB } from "./db.js";
 import userRoutes from "./routes/authenticaionRoutes/userAuth.js";
 import otpRoutes from "./routes/authenticaionRoutes/otpRoutes.js";
-import googleRoutes from "./routes/authenticaionRoutes/loginwithGoogle.js";
+// import googleRoutes from "./routes/authenticaionRoutes/loginwithGoogle.js";
 import patientRoutes from "./routes/profile/profile.js";
 import therapistRoutes from "./routes/profile/therapist.js";
 import chatRoutes from "./routes/chat/chatRoutes.js";
 import { resourceRoutes } from "./routes/resource/resourceRoutes.js";
 import { setIo } from "./controller/chat/chatController.js";
+import paymentRoutes from "./routes/Payment/pay.js";
 
 dotenv.config();
 import answerRoutes from "./routes/qanda/answerRoutes.js";
@@ -25,6 +27,7 @@ const httpServer = createServer(app);
 
 // Middleware
 app.use(bodyParser.json());
+app.use(cookieParser());
 app.use(cors({
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type"],
@@ -39,7 +42,7 @@ app.get("/", (req, res) => {
 // Routes
 app.use("/api/user", userRoutes);
 app.use("/api/otp", otpRoutes);
-app.use("/api/google", googleRoutes);
+// app.use("/api/google", googleRoutes);
 
 app.use("/api/patients", patientRoutes);
 app.use("/api/therapists", therapistRoutes);
@@ -50,7 +53,11 @@ app.use("/api/chat", chatRoutes);
 
 app.use("/api/questions", questionRoutes);
 app.use("/api/answers", answerRoutes);
+
+app.use("/api/Payment", paymentRoutes);
+
 app.use("/api/schedule", scheduleRoutes);
+
 
 // Initialize database and Socket.IO
 connectDB();
@@ -62,6 +69,7 @@ const PORT = process.env.PORT || 3000;
 httpServer.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
 
 
 
@@ -103,3 +111,4 @@ httpServer.listen(PORT, () => {
 //         user: req.user,
 //     });
 // });
+
