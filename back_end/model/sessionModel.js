@@ -12,6 +12,8 @@ const sessionSchema = new mongoose.Schema(
       enum: ["Pending", "Confirmed", "Completed", "Cancelled"],
       default: "Pending",
     },
+    meeting_token: { type: String, required: true },
+    meeting_id: { type: String, required: true },
   },
   { timestamps: true }
 );
