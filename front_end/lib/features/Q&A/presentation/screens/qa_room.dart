@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:front_end/core/common_widget.dart/snack_bar.dart';
 import 'package:front_end/features/Q&A/presentation/bloc/bloc/answer_bloc.dart';
 import 'package:front_end/features/Q&A/presentation/bloc/bloc/question_bloc.dart';
@@ -9,6 +12,7 @@ import 'package:front_end/features/Q&A/presentation/screens/question_creation.da
 import 'package:front_end/features/Q&A/presentation/screens/update_question.dart';
 import 'package:front_end/features/Q&A/presentation/widget/question_card.dart';
 import 'package:front_end/features/Q&A/presentation/widget/search_box.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class QARoom extends StatefulWidget {
   const QARoom({super.key});
@@ -18,10 +22,14 @@ class QARoom extends StatefulWidget {
 }
 
 class _QARoomState extends State<QARoom> {
+  String? currentUserId;
+  String? currentUserRole;
+
   @override
   void initState() {
     super.initState();
     context.read<QuestionBloc>().add(GetQuestionEvent());
+    _loadCurrentUserId();
   }
 
   final List<String> questionCategory = const [
@@ -32,6 +40,22 @@ class _QARoomState extends State<QARoom> {
     'Trauma',
     'SelfLove'
   ];
+
+final FlutterSecureStorage _secureStorage = FlutterSecureStorage();
+ void _loadCurrentUserId() async {
+    final userJson = await _secureStorage.read(key: 'user_profile');
+    if (userJson != null) {
+      final userMap = json.decode(userJson);
+      setState(() {
+        print('userMap: $userMap');
+        currentUserId = userMap["_id"] ?? '';
+        currentUserRole = userMap["role"];
+      });
+    } else {
+      print('No user profile found in secure storage');
+    }
+  }
+
 
   String? selectedCategory;
 
@@ -56,7 +80,7 @@ class _QARoomState extends State<QARoom> {
                     child: DropdownButton<String>(
                       value: selectedCategory,
                       hint: const Padding(
-                        padding:  EdgeInsets.only(left: 15.0),
+                        padding: EdgeInsets.only(left: 15.0),
                         child: Text(
                           'Filter by category',
                           style: TextStyle(
@@ -196,6 +220,9 @@ class _QARoomState extends State<QARoom> {
                           onDelete: () {
                             _showDeleteDialog(context, question.id);
                           },
+                          currentUserId: currentUserId ?? '',
+                          ownerId: question.creatorId,
+                          role: currentUserRole ?? '',
                         );
                       },
                     );

@@ -8,6 +8,7 @@ class QuestionModel extends QuestionEntity {
     required super.studentName,
     required super.studentProfile,
     required super.category,
+    required super.creatorId,
   });
 
   factory QuestionModel.fromJson(Map<String, dynamic> json) {
@@ -17,6 +18,7 @@ class QuestionModel extends QuestionEntity {
       description: json['description'],
       studentName: json['studentName'],
       studentProfile: json['studentProfile'],
+      creatorId:json['creatorId'],
       category: List<String>.from(json['category']),
       
     );
@@ -40,6 +42,7 @@ class QuestionModel extends QuestionEntity {
       studentName: super.studentName,
       studentProfile: super.studentProfile,
       category: super.category,
+      creatorId:super.creatorId,
     );
   }
 }

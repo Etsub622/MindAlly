@@ -23,6 +23,7 @@ class QuestionRepoImpl implements QuestionRepository {
           studentName: question.studentName,
           studentProfile: question.studentProfile,
           title: question.title,
+          creatorId: question.creatorId,
         );
         final res = await remoteDatasource.addQuestion(newQuestion);
         print(res);
@@ -98,6 +99,7 @@ class QuestionRepoImpl implements QuestionRepository {
           studentName: question.studentName,
           studentProfile: question.studentProfile,
           title: question.title,
+          creatorId: question.creatorId,
         );
         final res = await remoteDatasource.updateQuestion(newQuestion, id);
         return right(res);

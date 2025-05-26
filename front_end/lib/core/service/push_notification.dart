@@ -101,7 +101,7 @@ Future<void> showNotification(RemoteMessage msg) async {
       print(json.encode({'userId': userId, 'token': fcmToken}));
       if (authToken != null && userId != null) {
         final response = await http.post(
-          Uri.parse('http://192.168.31.220:8000/api/notifications/save-token'),
+          Uri.parse('http://192.168.78.220:8000/api/notifications/save-token'),
           headers: {
             'Authorization': 'Bearer $authToken',
             'Content-Type': 'application/json',

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front_end/core/common_widget.dart/circular_indicator.dart';
@@ -9,6 +11,7 @@ import 'package:front_end/features/resource/presentation/widget/custom_formfield
 import 'package:multi_select_flutter/chip_display/multi_select_chip_display.dart';
 import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UpdateQuestionBottomSheet extends StatefulWidget {
   final QuestionEntity questionEntity;
@@ -45,6 +48,7 @@ class _UpdateQuestionBottomSheetState extends State<UpdateQuestionBottomSheet> {
     descriptionController =
         TextEditingController(text: widget.questionEntity.description);
     selectedCategories = widget.questionEntity.category;
+    _getStudentId();
   }
 
   @override
@@ -54,7 +58,17 @@ class _UpdateQuestionBottomSheetState extends State<UpdateQuestionBottomSheet> {
     super.dispose();
   }
 
-  void _updateQuestion() {
+  Future<String> _getStudentId() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userJson = prefs.getString('user_profile');
+    if (userJson != null) {
+      final userMap = json.decode(userJson);
+      return userMap["_id"] ?? '';
+    }
+    return '';
+  }
+
+  void _updateQuestion() async {
     final updatedQuestion = QuestionEntity(
       id: widget.questionEntity.id,
       title: titleController.text.trim(),
@@ -62,6 +76,7 @@ class _UpdateQuestionBottomSheetState extends State<UpdateQuestionBottomSheet> {
       category: selectedCategories,
       studentName: widget.questionEntity.studentName,
       studentProfile: widget.questionEntity.studentProfile,
+      creatorId: await _getStudentId(),
     );
     print('updatedQuestion:$updatedQuestion');
     context

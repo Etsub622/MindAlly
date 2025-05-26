@@ -7,8 +7,12 @@ class QuestionCard extends StatefulWidget {
   final List<String> category;
   final String profileImage;
   final void Function() onPressed;
-  final VoidCallback onUpdate;
-  final VoidCallback onDelete;
+  final VoidCallback? onUpdate;
+  final VoidCallback? onDelete;
+  final String currentUserId;
+  final String ownerId;
+  final String role;
+
 
   const QuestionCard({
     required this.name,
@@ -17,8 +21,11 @@ class QuestionCard extends StatefulWidget {
     required this.category,
     required this.profileImage,
     required this.onPressed,
-    required this.onDelete,
-    required this.onUpdate,
+    this.onDelete,
+    this.onUpdate,
+    required this.currentUserId,
+    required this.ownerId,
+    required this.role,
     super.key,
   });
 
@@ -69,23 +76,25 @@ class _QuestionCardState extends State<QuestionCard> {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                PopupMenuButton<String>(
-                  icon: Icon(Icons.more_vert, color: Colors.grey[700]),
-                  onSelected: (value) {
-                    if (value == 'update') {
-                      widget.onUpdate();
-                    } else if (value == 'delete') {
-                      widget.onDelete();
-                    }
-                  },
-                  itemBuilder: (context) => [
-                    PopupMenuItem(value: 'update', child: Text('Edit')),
-                    PopupMenuItem(
-                        value: 'delete',
-                        child: Text('Delete',
-                            style: TextStyle(color: Colors.red))),
-                  ],
-                ),
+                if ((widget.role == 'professional') ||
+                    (widget.currentUserId == widget.ownerId))
+                  PopupMenuButton<String>(
+                    icon: Icon(Icons.more_vert, color: Colors.grey[700]),
+                    onSelected: (value) {
+                      if (value == 'update') {
+                        widget.onUpdate!();
+                      } else if (value == 'delete') {
+                        widget.onDelete!();
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      PopupMenuItem(value: 'update', child: Text('Edit')),
+                      PopupMenuItem(
+                          value: 'delete',
+                          child: Text('Delete',
+                              style: TextStyle(color: Colors.red))),
+                    ],
+                  ),
               ],
             ),
             SizedBox(height: 10),
@@ -154,6 +163,7 @@ class _QuestionCardState extends State<QuestionCard> {
               }).toList(),
             ),
             SizedBox(height: 5),
+            if (widget.role == 'professional')
             Align(
               alignment: Alignment.centerRight,
               child: IconButton(

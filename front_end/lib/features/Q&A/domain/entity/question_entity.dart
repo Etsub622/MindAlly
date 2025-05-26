@@ -1,4 +1,3 @@
-
 import 'package:equatable/equatable.dart';
 
 class QuestionEntity extends Equatable {
@@ -8,6 +7,7 @@ class QuestionEntity extends Equatable {
   final String studentName;
   final String studentProfile;
   final List<String> category;
+  final String creatorId;
   QuestionEntity({
     required this.id,
     required this.title,
@@ -15,6 +15,7 @@ class QuestionEntity extends Equatable {
     required this.studentName,
     required this.studentProfile,
     required this.category,
+    required this.creatorId,
   });
   @override
   List<Object> get props {
@@ -25,7 +26,7 @@ class QuestionEntity extends Equatable {
       studentName,
       studentProfile,
       category,
-
+      creatorId,
     ];
   }
 }

@@ -56,7 +56,7 @@ class _ChatPageState extends State<ChatPage> {
       }
 
       final String backendUrl =
-          'http://192.168.31.220:8000/api/notifications/sendUserNotification';
+          'http://192.168.78.220:8000/api/notifications/sendUserNotification';
       final data = {
         'receiverId': widget.receiver.id,
         'senderId': userId,

@@ -65,7 +65,8 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       final user = await client.post(url,
           body: jsonEncode(studentModel.toJson()),
           headers: {'Content-Type': 'application/json'});
-
+      print('statusCode: ${user.statusCode}');
+      print('response: ${user.body}');
       if (user.statusCode == 200) {
         final jsonResponse = jsonDecode(user.body);
         final token = jsonResponse['token'];
@@ -73,6 +74,8 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
         // Save the token to SharedPreferences
         final sharedPreferences = await SharedPreferences.getInstance();
         await sharedPreferences.setString('token_key', token);
+        await sharedPreferences.setString(
+            'user_profile', json.encode(jsonResponse['user']));
         if (jsonResponse['user'] == null) {
           throw ServerException(message: 'User data is null');
         }
@@ -85,6 +88,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
         throw ServerException(message: 'Failed to sign up');
       }
     } catch (e) {
+      print('error:${e.toString()}');
       throw ServerException(
           message: 'Unexpected error occured: ${e.toString()}');
     }
@@ -119,7 +123,8 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       if (user.statusCode == 200) {
         final responseJson = jsonDecode(user.body);
         print('responseJson: $responseJson');
-        final token = responseJson['token'];
+        print('statusCode: ${user.statusCode}');
+        // final token = responseJson['accessToken'];
 
         if (responseJson['user'] == null) {
           throw ServerException(message: 'User data is null');
