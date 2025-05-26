@@ -7,6 +7,7 @@ import 'package:front_end/core/injection/injections.dart' as di;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await di.init();
+
   runApp(MultiBlocProvider(
       providers: MultiBLOCProvider.blocProvider, child: const MyApp()));
 }
