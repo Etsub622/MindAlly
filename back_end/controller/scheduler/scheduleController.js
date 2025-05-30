@@ -29,10 +29,10 @@ export const bookSession = async (req, res) => {
   return `${h}:${m}`;
 }
   try {
-    const { userId, therapistId, date, startTime, endTime } = req.body;
+    const { userId, therapistId, date, startTime, endTime, meeting_id, meeting_token } = req.body;
 
     // Validate required fields
-    if (!userId || !therapistId || !date || !startTime || !endTime) {
+    if (!userId || !therapistId || !date || !startTime || !endTime || !meeting_id || !meeting_token) {
       return res.status(400).json({ message: 'All fields are required.' });
     }
 
@@ -68,14 +68,14 @@ const sessionEnd = new Date(`${date}T${parsedEnd}:00`);
       therapistId,
       date,
       startTime,
-      status: { $nin: ['completed', 'cancelled'] },
+      status: { $nin: ['Completed', 'Cancelled'] },
     });
 
     if (existingSession) {
       return res.status(400).json({ message: "This time slot is already booked." });
     }
 
-    const session = new Session({ userId, therapistId, date, startTime, endTime });
+    const session = new Session({ userId, therapistId, date, startTime, endTime, meeting_id, meeting_token });
     await session.save();
 
     res.status(201).json({ message: "Session booked successfully", session });
@@ -108,32 +108,23 @@ export const getSessionById = async (req, res) => {
   }
 };
 
+// Cancel a session & notify via WebSocket
 export const cancelSession = async (req, res) => {
   try {
     const { sessionId } = req.params;
-
     const session = await Session.findById(sessionId);
-    if (!session) {
-      return res.status(404).json({ message: "Session not found" });
-    }
+    if (!session) return res.status(404).json({ message: "Session not found" });
 
-    if (session.status === 'cancelled') {
-      return res.status(400).json({ message: "Session is already cancelled." });
-    }
-
-    session.status = 'Cancelled';
+    session.status = "Cancelled";
     await session.save();
 
-    // Optional: Notify both sides
-    // sendAppNotification(session.userId, "Your session has been cancelled.");
-    // sendAppNotification(session.therapistId, "A session has been cancelled.");
+    io.emit("sessionCancelled", session);
 
-    res.status(200).json({ message: "Session cancelled successfully.", session });
+    res.status(200).json({ message: "Session cancelled", session });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 export const getUserSessionsByStatus = async (req, res) => {
   const { status } = req.query;
@@ -157,13 +148,13 @@ export const getTherapistSessionsByStatus = async (req, res) => {
 };
 
 export const confirmSession = async (req, res) => {
-  const session = await Session.findByIdAndUpdate(req.params.sessionId, { status: 'confirmed' }, { new: true });
+  const session = await Session.findByIdAndUpdate(req.params.sessionId, { status: 'Confirmed' }, { new: true });
   if (!session) return res.status(404).send('Session not found');
   res.json(session);
 };
 
 export const completeSession = async (req, res) => {
-  const session = await Session.findByIdAndUpdate(req.params.sessionId, { status: 'completed' }, { new: true });
+  const session = await Session.findByIdAndUpdate(req.params.sessionId, { status: 'Completed' }, { new: true });
   if (!session) return res.status(404).send('Session not found');
   res.json(session);
 };
@@ -188,60 +179,24 @@ export const markCompletedAutomatically = async () => {
 
   // Step 1: Mark past-day sessions as completed
   await Session.updateMany(
-    { date: { $lt: formattedDate }, status: { $ne: 'completed' } },
-    { status: 'completed' }
+    { date: { $lt: formattedDate }, status: { $ne: 'Completed' } },
+    { status: 'Completed' }
   );
 
   // Step 2: Get today's sessions and mark if their endTime (converted) is <= now
   const todaysSessions = await Session.find({
     date: formattedDate,
-    status: { $ne: 'completed' }
+    status: { $ne: 'Completed' }
   });
 
   for (const session of todaysSessions) {
     const endTimeConverted = convertTo24HourFormat(session.endTime);
     if (endTimeConverted <= nowTime24h) {
-      session.status = 'completed';
+      session.status = 'Completed';
       await session.save();
     }
   }
 };
-
-export const addTimeTrack = async (req, res) => {
-  try {
-    const { sessionId } = req.params;
-    const { joinedAt, leftAt } = req.body;
-
-    const session = await Session.findById(sessionId);
-    if (!session) {
-      return res.status(404).json({ message: 'Session not found' });
-    }
-
-    if (!joinedAt || !leftAt) {
-      return res.status(400).json({ message: 'Both joinedAt and leftAt timestamps are required' });
-    }
-
-    session.timeTracks.push({ joinedAt: new Date(joinedAt), leftAt: new Date(leftAt) });
-    await session.save();
-
-    res.status(200).json({ message: 'Time track added', session });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-export const getTimeTracks = async (req, res) => {
-  try {
-    const session = await Session.findById(req.params.sessionId).select('timeTracks');
-    if (!session) {
-      return res.status(404).json({ message: 'Session not found' });
-    }
-    res.status(200).json({ timeTracks: session.timeTracks });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
 
 // Auto-run every 60s
 setInterval(markCompletedAutomatically, 60000);
