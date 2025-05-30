@@ -108,23 +108,32 @@ export const getSessionById = async (req, res) => {
   }
 };
 
-// Cancel a session & notify via WebSocket
 export const cancelSession = async (req, res) => {
   try {
     const { sessionId } = req.params;
-    const session = await Session.findById(sessionId);
-    if (!session) return res.status(404).json({ message: "Session not found" });
 
-    session.status = "Cancelled";
+    const session = await Session.findById(sessionId);
+    if (!session) {
+      return res.status(404).json({ message: "Session not found" });
+    }
+
+    if (session.status === 'cancelled') {
+      return res.status(400).json({ message: "Session is already cancelled." });
+    }
+
+    session.status = 'Cancelled';
     await session.save();
 
-    io.emit("sessionCancelled", session);
+    // Optional: Notify both sides
+    // sendAppNotification(session.userId, "Your session has been cancelled.");
+    // sendAppNotification(session.therapistId, "A session has been cancelled.");
 
-    res.status(200).json({ message: "Session cancelled", session });
+    res.status(200).json({ message: "Session cancelled successfully.", session });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 export const getUserSessionsByStatus = async (req, res) => {
   const { status } = req.query;
@@ -197,6 +206,42 @@ export const markCompletedAutomatically = async () => {
     }
   }
 };
+
+export const addTimeTrack = async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const { joinedAt, leftAt } = req.body;
+
+    const session = await Session.findById(sessionId);
+    if (!session) {
+      return res.status(404).json({ message: 'Session not found' });
+    }
+
+    if (!joinedAt || !leftAt) {
+      return res.status(400).json({ message: 'Both joinedAt and leftAt timestamps are required' });
+    }
+
+    session.timeTracks.push({ joinedAt: new Date(joinedAt), leftAt: new Date(leftAt) });
+    await session.save();
+
+    res.status(200).json({ message: 'Time track added', session });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const getTimeTracks = async (req, res) => {
+  try {
+    const session = await Session.findById(req.params.sessionId).select('timeTracks');
+    if (!session) {
+      return res.status(404).json({ message: 'Session not found' });
+    }
+    res.status(200).json({ timeTracks: session.timeTracks });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 
 // Auto-run every 60s
 setInterval(markCompletedAutomatically, 60000);
