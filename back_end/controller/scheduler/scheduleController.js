@@ -29,10 +29,10 @@ export const bookSession = async (req, res) => {
   return `${h}:${m}`;
 }
   try {
-    const { userId, therapistId, date, startTime, endTime, meeting_id, meeting_token } = req.body;
+    const { userId, therapistId, createrId, date, startTime, endTime, meeting_id, meeting_token } = req.body;
 
     // Validate required fields
-    if (!userId || !therapistId || !date || !startTime || !endTime || !meeting_id || !meeting_token) {
+    if (!userId || !therapistId || !date || !startTime || !endTime || !meeting_id || !meeting_token || !createrId) {
       return res.status(400).json({ message: 'All fields are required.' });
     }
 
@@ -75,7 +75,7 @@ const sessionEnd = new Date(`${date}T${parsedEnd}:00`);
       return res.status(400).json({ message: "This time slot is already booked." });
     }
 
-    const session = new Session({ userId, therapistId, date, startTime, endTime, meeting_id, meeting_token });
+    const session = new Session({ userId, therapistId, createrId, date, startTime, endTime, meeting_id, meeting_token });
     await session.save();
 
     res.status(201).json({ message: "Session booked successfully", session });
@@ -118,7 +118,7 @@ export const cancelSession = async (req, res) => {
     session.status = "Cancelled";
     await session.save();
 
-    io.emit("sessionCancelled", session);
+    // io.emit("sessionCancelled", session);
 
     res.status(200).json({ message: "Session cancelled", session });
   } catch (error) {

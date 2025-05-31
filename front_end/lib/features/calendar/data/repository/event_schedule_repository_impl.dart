@@ -20,16 +20,16 @@ class EventScheduleRepositoryImpl extends EventScheduleRepository {
 
   @override
   Future<Either<Failure, List<EventEntity>>> getEventSchedules() async {
-    if (await networkInfo.isConnected) {
+    // if (await networkInfo.isConnected) {
       try {
         final eventSchedules = await remoteDataSource.getEventSchedules();
         return Right(eventSchedules);
       } catch (e) {
         return Left(ServerFailure(message: e.toString()));
       }
-    } else {
-      return Left(NetworkFailure(message: "Network is not connected"));
-    }
+    // } else {
+    //   return Left(NetworkFailure(message: "Network is not connected"));
+    // }
   }
 
   @override
@@ -39,25 +39,44 @@ class EventScheduleRepositoryImpl extends EventScheduleRepository {
 
   @override
   Future<Either<Failure, EventEntity>> addEventSchedule(EventEntity eventEntity) async {
-    if (await networkInfo.isConnected) {
+    // if (await networkInfo.isConnected) {
       try {
         final event = await remoteDataSource.addEventSchedule(eventEntity as EventModel);
         return Right(event);
       } catch (e) {
         return Left(ServerFailure(message:e.toString()));
       }
-    } else {
-      return Left(NetworkFailure(message: "Network is not connected"));
-    }
+    // } else {
+    //   return Left(NetworkFailure(message: "Network is not connected"));
+    // }
   }
 
   @override
   Future<Either<Failure, void>> updateEventSchedule(EventEntity eventEntity) async {
-    throw UnimplementedError();
+    // if (await networkInfo.isConnected) {
+      try {
+        final event = await remoteDataSource.updateEventSchedule(eventEntity.id);
+        return Right(event);
+      } catch (e) {
+        return Left(ServerFailure(message:e.toString()));
+      }
+    // } else {
+    //   return Left(NetworkFailure(message: "Network is not connected"));
+    // }
   }
+ 
 
   @override
   Future<Either<Failure, void>> deleteEventSchedule(String calendarId) async {
-    throw UnimplementedError();
+     // if (await networkInfo.isConnected) {
+      try {
+        final event = await remoteDataSource.deleteEventSchedule(calendarId);
+        return Right(event);
+      } catch (e) {
+        return Left(ServerFailure(message:e.toString()));
+      }
+    // } else {
+    //   return Left(NetworkFailure(message: "Network is not connected"));
+    // }
   }
 }

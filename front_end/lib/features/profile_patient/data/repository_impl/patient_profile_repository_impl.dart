@@ -21,7 +21,7 @@ class PatientProfileRepositoryImpl extends PatientProfileRepository {
 
   @override
   Future<Either<Failure, PatientModel>> getPatient({required String id}) async {
-    if (await networkInfo.isConnected) {
+    // if (await networkInfo.isConnected) {
       try {
         final patient = await remoteDatasource.getPatient(id: id);
         return Right(patient);
@@ -31,11 +31,11 @@ class PatientProfileRepositoryImpl extends PatientProfileRepository {
         return Left(ServerFailure(message: e.toString()));
       }
     }
-    return Left(NetworkFailure(message: "No internet connection"));
-  }
+    // return Left(NetworkFailure(message: "No internet connection"));
+  // }
   @override
   Future<Either<Failure, UpdatePatientModel>> updatePatient({required UpdatePatientModel patient}) async {
-    if (await networkInfo.isConnected) {
+    // if (await networkInfo.isConnected) {
       try {
         final updatedPatient = await remoteDatasource.updatePatient(patient: patient);
         return Right(updatedPatient);
@@ -44,14 +44,14 @@ class PatientProfileRepositoryImpl extends PatientProfileRepository {
       } catch (e) {
         return Left(ServerFailure(message: "Something went wrong"));
       }
-    }
-    return Left(NetworkFailure(message: "No internet connection"));
+    // }
+    // return Left(NetworkFailure(message: "No internet connection"));
    
   }
 
   @override
   Future<Either<Failure, Null>> deletePatient({required String id}) async {
-    if (await networkInfo.isConnected) {
+    // if (await networkInfo.isConnected) {
       try {
         await remoteDatasource.deletePatient(id: id);
         return const Right(null);
@@ -60,8 +60,8 @@ class PatientProfileRepositoryImpl extends PatientProfileRepository {
       } catch (e) {
         return Left(ServerFailure(message: "Something went wrong"));
       }
-    }
-    return Left(NetworkFailure(message: "No internet connection"));
+    // }
+    // return Left(NetworkFailure(message: "No internet connection"));
   }
   
 }

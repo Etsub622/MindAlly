@@ -9,7 +9,7 @@ class StudentResponseModel extends StudentDataResponse {
 
   factory StudentResponseModel.fromJson(Map<String, dynamic> json) {
     return StudentResponseModel(
-      token: json["token"],
+      token: json["accessToken"],
       message: json["message"],
       studentData: StudentDataModel.fromJson(json["user"]),
     );

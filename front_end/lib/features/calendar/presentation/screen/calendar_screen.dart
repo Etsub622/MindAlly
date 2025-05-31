@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:front_end/features/calendar/domain/entity/event_entity.dart';
 import 'package:front_end/features/calendar/presentation/bloc/get_events/get_events_bloc.dart';
 import 'package:front_end/features/calendar/presentation/widget/waiting_dialog.dart';
@@ -16,17 +19,20 @@ class DateTimePicker extends StatefulWidget {
 }
 
 class _DateTimePickerState extends State<DateTimePicker> {
+  final _storage = const FlutterSecureStorage();
   DateTime _focusedDay = DateTime.now();
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime? _selectedDay;
   Map<DateTime, List<EventEntity>> events = {};
   late final ValueNotifier<List<EventEntity>> _selectedEvents;
+  String userId = '';
 
   @override
   void initState() {
     super.initState();
     _selectedDay = _focusedDay;
     _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
+    fetchUserId();
     context.read<GetScheduledEventsBloc>().add(GetScheduledEventsEvent());
   }
 
@@ -50,6 +56,17 @@ class _DateTimePickerState extends State<DateTimePicker> {
       });
     }
   }
+  
+  Future<void> fetchUserId() async {
+    final userCredential = await _storage.read(key: "user_profile") ?? '';
+    if (userCredential.isNotEmpty) {
+      final body = jsonDecode(userCredential);
+      setState(() {
+        userId = body["_id"].toString();
+      });
+    }
+  }
+
 
   bool _isDayEnabled(DateTime day) {
     final today = DateTime.now();
@@ -293,6 +310,8 @@ class _DateTimePickerState extends State<DateTimePicker> {
                                           MaterialPageRoute(
                                             builder: (context) => WaitingDialog(
                                               event: event,
+                                              userId: userId,
+                                              isTherapist: event.therapistId == userId,
                                             ),
                                           ),
                                         ),

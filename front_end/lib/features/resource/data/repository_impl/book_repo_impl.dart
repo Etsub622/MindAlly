@@ -15,7 +15,7 @@ class BookRepoImpl implements BookRepository {
   @override
   Future<Either<Failure, String>> addBook(BookEntity book) async {
     print('is inknkkkkkkkkkkkkkk');
-    if (await networkInfo.isConnected) {
+    // if (await networkInfo.isConnected) {
       print('uguguguiiguu');
       try {
         final newBook = BookModel(
@@ -32,30 +32,30 @@ class BookRepoImpl implements BookRepository {
       } on ServerException {
         return (Left(ServerFailure(message: 'server failure')));
       }
-    } else {
-      return Left(
-          NetworkFailure(message: 'You are not connected to the internet.'));
-    }
+    // } else {
+    //   return Left(
+    //       NetworkFailure(message: 'You are not connected to the internet.'));
+    // }
   }
 
   @override
   Future<Either<Failure, String>> deleteBook(String id) async {
-    if (await networkInfo.isConnected) {
+    // if (await networkInfo.isConnected) {
       try {
         final res = await remoteDatasource.deleteBook(id);
         return Right(res);
       } on ServerException {
         return Left(ServerFailure(message: 'server failure'));
       }
-    } else {
-      return Left(
-          NetworkFailure(message: 'You are not connected to the internet.'));
-    }
+    // } else {
+    //   return Left(
+    //       NetworkFailure(message: 'You are not connected to the internet.'));
+    // }
   }
 
   @override
   Future<Either<Failure, List<BookEntity>>> getBooks() async {
-    if (await networkInfo.isConnected) {
+    // if (await networkInfo.isConnected) {
       try {
         final res = await remoteDatasource.getBooks();
         final bookEntities = res.map((book) => book.toEntity()).toList();
@@ -63,30 +63,30 @@ class BookRepoImpl implements BookRepository {
       } on ServerException {
         return Left(ServerFailure(message: 'server failure'));
       }
-    } else {
-      return Left(
-          NetworkFailure(message: 'You are not connected to the internet.'));
-    }
+    // } else {
+    //   return Left(
+    //       NetworkFailure(message: 'You are not connected to the internet.'));
+    // }
   }
 
   @override
   Future<Either<Failure, List<BookEntity>>> searchBook(String title) async {
-    if (await networkInfo.isConnected) {
+    // if (await networkInfo.isConnected) {
       try {
         final res = await remoteDatasource.searchBooks(title);
         return Right(res);
       } on ServerException {
         return Left(ServerFailure(message: 'server failure'));
       }
-    } else {
-      return Left(
-          NetworkFailure(message: 'you are not corrected to the internet.'));
-    }
+    // } else {
+    //   return Left(
+    //       NetworkFailure(message: 'you are not corrected to the internet.'));
+    // }
   }
 
   @override
   Future<Either<Failure, String>> updateBook(BookEntity book, String id) async {
-    if (await networkInfo.isConnected) {
+    // if (await networkInfo.isConnected) {
       try {
         final updatedBook = BookModel(
             id: '',
@@ -101,25 +101,25 @@ class BookRepoImpl implements BookRepository {
       } on ServerException {
         return Left(ServerFailure(message: 'server failure'));
       }
-    } else {
-      return Left(
-          NetworkFailure(message: 'you are not connected to the internet.'));
-    }
+    // } else {
+    //   return Left(
+    //       NetworkFailure(message: 'you are not connected to the internet.'));
+    // }
   }
 
   @override
   Future<Either<Failure, BookEntity>> getSingleBook(String id) async {
-    if (await networkInfo.isConnected) {
+    // if (await networkInfo.isConnected) {
       try {
         final res = await remoteDatasource.getSingleBook(id);
         return Right(res);
       } on ServerException {
         return Left(ServerFailure(message: 'server failure'));
       }
-    } else {
-      return Left(
-          NetworkFailure(message: 'you are not connected to the internet.'));
-    }
+    // } else {
+    //   return Left(
+    //       NetworkFailure(message: 'you are not connected to the internet.'));
+    // }
   }
 
   @override
