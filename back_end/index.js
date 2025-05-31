@@ -103,3 +103,5 @@ httpServer.listen(PORT, () => {
 //         user: req.user,
 //     });
 // });
+
+export { io };
