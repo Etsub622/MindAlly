@@ -21,6 +21,7 @@ import answerRoutes from "./routes/qanda/answerRoutes.js";
 import questionRoutes from "./routes/qanda/questionRoutes.js";
 // import answerRoutes from "./routes/q&a/answerRoutes.js";
 import {scheduleRoutes} from "./routes/scheduler/scheduleRoutes.js";
+import fileUploadRoutes from './routes/upload/fileUpload.js';
 
 const app = express();
 const httpServer = createServer(app);
@@ -57,6 +58,8 @@ app.use("/api/answers", answerRoutes);
 app.use("/api/Payment", paymentRoutes);
 
 app.use("/api/schedule", scheduleRoutes);
+app.use("/uploads", express.static("uploads"));
+app.use("/api/upload", fileUploadRoutes);
 
 
 // Initialize database and Socket.IO
