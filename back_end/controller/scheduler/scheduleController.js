@@ -231,8 +231,8 @@ export const autoCancelUnconfirmedSessions = async () => {
 
       console.log(`❌ Session ${session._id} cancelled`);
 
-      sendAppNotification(session.userId, "Your session was cancelled because it wasn't confirmed 30 minutes in advance.");
-      sendAppNotification(session.therapistId, "A pending session was cancelled due to no confirmation.");
+      // sendAppNotification(session.userId, "Your session was cancelled because it wasn't confirmed 30 minutes in advance.");
+      // sendAppNotification(session.therapistId, "A pending session was cancelled due to no confirmation.");
     }
   }
 };
