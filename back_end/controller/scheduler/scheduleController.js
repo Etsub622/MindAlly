@@ -221,22 +221,25 @@ function convertTo24HourFormat(time12h) {
 
 export const autoCancelUnconfirmedSessions = async () => {
   const now = new Date();
-  const thirtyMinFromNow = new Date(now.getTime() + 30 * 60000);
-  const formattedDate = thirtyMinFromNow.toISOString().split('T')[0];
-  const time24 = `${String(thirtyMinFromNow.getHours()).padStart(2, '0')}:${String(thirtyMinFromNow.getMinutes()).padStart(2, '0')}`;
+  console.log(`[AUTO-CHECK] Running at ${now.toISOString()}`);
 
-  const sessions = await Session.find({
-    date: formattedDate,
-    status: 'pending'
-  });
+  const sessions = await Session.find({ status: 'Pending' });
+  console.log(`[AUTO-CHECK] Found ${sessions.length} pending sessions`);
 
   for (const session of sessions) {
-    const sessionStart = convertTo24HourFormat(session.startTime);
-    if (sessionStart === time24) {
-      session.status = 'cancelled';
+    const sessionStartString = `${session.date}T${convertTo24HourFormat(session.startTime)}:00`;
+    const sessionDateTime = new Date(sessionStartString);
+    const diffMs = sessionDateTime - now;
+    const diffMins = Math.round(diffMs / 60000);
+
+    console.log(`🕓 Session: ${session._id}, Starts: ${sessionStartString}, Diff: ${diffMins} mins`);
+
+    if (diffMins <= 30) {
+      session.status = 'Cancelled';
       await session.save();
 
-      // Send in-app notifications
+      console.log(`❌ Session ${session._id} cancelled`);
+
       sendAppNotification(session.userId, "Your session was cancelled because it wasn't confirmed 30 minutes in advance.");
       sendAppNotification(session.therapistId, "A pending session was cancelled due to no confirmation.");
     }
