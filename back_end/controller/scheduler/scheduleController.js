@@ -1,5 +1,6 @@
 import { Session } from "../../model/sessionModel.js";
 import { Therapist } from "../../model/therapistModel.js";
+import { sendAppNotification } from '../../utils/notification.js';
 
 // Fetch therapist availability
 export const getAvailableSlots = async (req, res) => {
@@ -112,19 +113,29 @@ export const getSessionById = async (req, res) => {
 export const cancelSession = async (req, res) => {
   try {
     const { sessionId } = req.params;
-    const session = await Session.findById(sessionId);
-    if (!session) return res.status(404).json({ message: "Session not found" });
 
-    session.status = "Cancelled";
+    const session = await Session.findById(sessionId);
+    if (!session) {
+      return res.status(404).json({ message: "Session not found" });
+    }
+
+    if (session.status === 'cancelled') {
+      return res.status(400).json({ message: "Session is already cancelled." });
+    }
+
+    session.status = 'cancelled';
     await session.save();
 
-    io.emit("sessionCancelled", session);
+    // // Optional: Notify both sides
+    // sendAppNotification(session.userId, "Your session has been cancelled.");
+    // sendAppNotification(session.therapistId, "A session has been cancelled.");
 
-    res.status(200).json({ message: "Session cancelled", session });
+    res.status(200).json({ message: "Session cancelled successfully.", session });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 export const getUserSessionsByStatus = async (req, res) => {
   const { status } = req.query;
@@ -198,6 +209,44 @@ export const markCompletedAutomatically = async () => {
   }
 };
 
+function convertTo24HourFormat(time12h) {
+  const [time, modifier] = time12h.trim().toLowerCase().split(' ');
+  let [hours, minutes] = time.split(':').map(Number);
+
+  if (modifier === 'pm' && hours !== 12) hours += 12;
+  if (modifier === 'am' && hours === 12) hours = 0;
+
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+}
+
+export const autoCancelUnconfirmedSessions = async () => {
+  const now = new Date();
+  const thirtyMinFromNow = new Date(now.getTime() + 30 * 60000);
+  const formattedDate = thirtyMinFromNow.toISOString().split('T')[0];
+  const time24 = `${String(thirtyMinFromNow.getHours()).padStart(2, '0')}:${String(thirtyMinFromNow.getMinutes()).padStart(2, '0')}`;
+
+  const sessions = await Session.find({
+    date: formattedDate,
+    status: 'pending'
+  });
+
+  for (const session of sessions) {
+    const sessionStart = convertTo24HourFormat(session.startTime);
+    if (sessionStart === time24) {
+      session.status = 'cancelled';
+      await session.save();
+
+      // Send in-app notifications
+      sendAppNotification(session.userId, "Your session was cancelled because it wasn't confirmed 30 minutes in advance.");
+      sendAppNotification(session.therapistId, "A pending session was cancelled due to no confirmation.");
+    }
+  }
+};
+
+
 // Auto-run every 60s
 setInterval(markCompletedAutomatically, 60000);
+
+setInterval(autoCancelUnconfirmedSessions, 60000);
+
 

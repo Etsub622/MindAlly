@@ -8,6 +8,7 @@ import {
   confirmSession,
   completeSession,
   getSessionById,
+  cancelSession,
 } from '../../controller/scheduler/scheduleController.js'
 
 const router = express.Router();
@@ -20,6 +21,7 @@ router.get('/therapist/:therapistId/sessions', getTherapistSessionsByStatus);
 router.patch('/:sessionId/confirm', confirmSession);
 router.patch('/:sessionId/complete', completeSession);
 router.get('/:sessionId', getSessionById);
+router.patch('/:sessionId/cancel', cancelSession);
 
 
 export { router as scheduleRoutes };
