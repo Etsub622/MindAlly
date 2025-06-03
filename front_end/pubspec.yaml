@@ -43,7 +43,7 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
-  http: ^1.2.2
+  http: ^1.4.0
   get_it: ^8.0.3
   shared_preferences: ^2.3.4
   jwt_decode: ^0.3.1
@@ -61,8 +61,11 @@ dependencies:
   flutter_animate: ^4.5.2
   url_launcher: ^6.3.1
   badges: ^3.1.2
-  firebase_messaging: ^15.2.5
-  flutter_local_notifications: ^19.0.0
+  table_calendar: ^3.2.0
+  videosdk: ^2.1.2
+  # stream_video: ^0.8.4
+  # stream_video_flutter: ^0.8.2
+  # stream_video_push_notification: ^0.8.4
 
 dev_dependencies:
   flutter_test:

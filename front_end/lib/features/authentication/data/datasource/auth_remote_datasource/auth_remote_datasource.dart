@@ -121,6 +121,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
           body: jsonEncode(loginModel.toJson()),
           headers: {'Content-Type': 'application/json'});
       if (user.statusCode == 200) {
+        print(" login succccc");
         final responseJson = jsonDecode(user.body);
         print('responseJson: $responseJson');
         print('statusCode: ${user.statusCode}');
@@ -134,9 +135,11 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
         return studentResponse;
       } else {
         final errorMessage = jsonDecode(user.body);
+         print(" login failed $errorMessage");
         throw ServerException(message: errorMessage?['error']);
       }
     } catch (e) {
+      print(" login failed ${e.toString()}");
       throw ServerException(
           message: 'Unexpected error occurred: ${e.toString()}');
     }

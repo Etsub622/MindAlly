@@ -2,6 +2,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:front_end/features/calendar/data/model/event_model.dart';
+import 'package:front_end/features/calendar/presentation/bloc/add_event/add_events_bloc.dart';
+import 'package:front_end/features/calendar/presentation/screen/meeting/api_call.dart';
 import 'package:front_end/features/chat/presentation/bloc/chat/chat_bloc.dart';
 import 'package:front_end/features/chat/data/models/single_chat_model.dart';
 import 'package:front_end/features/chat/domain/entities/message_entity.dart';
@@ -9,10 +12,12 @@ import 'package:front_end/features/profile_patient/domain/entities/user_entity.d
 import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
 
 class ChatPage extends StatefulWidget {
   final String? chatId;
   final UserEntity receiver;
+
   const ChatPage({super.key, required this.chatId, required this.receiver});
 
   @override
@@ -34,11 +39,14 @@ class _ChatPageState extends State<ChatPage> {
     fetchUserId();
   }
 
-  fetchUserId() async {
+  Future<void> fetchUserId() async {
     final userCredential = await _storage.read(key: "user_profile") ?? '';
-
-    final body = await json.decode(userCredential);
-    userId = body["_id"].toString();
+    if (userCredential.isNotEmpty) {
+      final body = jsonDecode(userCredential);
+      setState(() {
+        userId = body["_id"].toString();
+      });
+    }
   }
 
   @override
@@ -248,22 +256,23 @@ class _ChatPageState extends State<ChatPage> {
             Expanded(
                 child: TextField(
               controller: _messageController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 hintText: "Type a message",
-                hintStyle: TextStyle(color: Colors.grey),
+                hintStyle: TextStyle(color: Colors.grey[600]),
                 border: InputBorder.none,
               ),
-              style: const TextStyle(color: Colors.white),
-            )),
-            const SizedBox(
-              width: 10,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Colors.blue[900],
+                  ),
             ),
-            GestureDetector(
-              onTap: _sendMessage,
-              child: const Icon(
-                Icons.send,
-                color: Colors.white,
-              ),
+          ),
+          const SizedBox(width: 12),
+          GestureDetector(
+            onTap: _sendMessage,
+            child: Icon(
+              Icons.send,
+              color: Colors.blue[700],
+              size: 28,
             ),
           ],
         ));

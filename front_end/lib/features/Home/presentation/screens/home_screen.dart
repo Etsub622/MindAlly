@@ -33,22 +33,24 @@ class _HomeScreenState extends State<HomeScreen> {
         child: widget.role == "patient"
             ? BlocBuilder<GetMatchedTherapistsBloc, GetMatchedTherapistsState>(
                 builder: (context, state) {
-                if (state is GetMatchedTherapistsLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (state is GetMatchedTherapistsEmpty) {
-                  return const Center(child: Text("No Therapists Found"));
-                } else if (state is GetMatchedTherapistsLoaded) {
-                  return ListView.builder(
-                      itemCount: state.therapistList.length,
-                      itemBuilder: (context, index) {
-                        final therapist = state.therapistList[index];
-                        return TherapistProfileWidget(
-                            therapist: therapist, upperContext: context);
-                      });
-                } else {
-                  return const Center(child: Text("Error to load therapists"));
-                }
-              })
+                  if (state is GetMatchedTherapistsLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (state is GetMatchedTherapistsEmpty) {
+                    return const Center(child: Text("No Therapists Found"));
+                  } else if (state is GetMatchedTherapistsLoaded) {
+                    return ListView.builder(
+                        itemCount: state.therapistList.length,
+                        itemBuilder: (context, index) {
+                          final therapist = state.therapistList[index];
+                          return TherapistProfileWidget(
+                              therapist: therapist, upperContext: context);
+                        });
+                  } else {
+                    return const Center(
+                        child: Text("Error to load therapists"));
+                  }
+                },
+              )
             : const Center(child: Text("Welcome Therapist")),
       ),
       floatingActionButton: FloatingActionButton(

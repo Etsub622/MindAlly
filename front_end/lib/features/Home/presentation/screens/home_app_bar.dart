@@ -5,6 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:front_end/core/routes/app_path.dart';
 import 'package:front_end/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:front_end/features/calendar/presentation/screen/calendar_screen.dart';
 import 'package:front_end/features/profile_patient/presentation/bloc/get_patient_bloc/get_patient_bloc.dart';
 import 'package:front_end/features/profile_patient/presentation/screens/update_profile_screen.dart';
 import 'package:front_end/features/profile_therapist/presentation/bloc/get_therapist_bloc/get_therapist_bloc.dart';
@@ -14,7 +15,7 @@ import 'package:go_router/go_router.dart';
 class AppbarHome extends StatefulWidget implements PreferredSizeWidget {
   final String userId;
   final String role;
-  
+
   const AppbarHome({super.key, required this.userId, required this.role});
 
   @override
@@ -37,8 +38,6 @@ class _AppbarHomeState extends State<AppbarHome> {
     }
   }
 
-  
-
   String cutUsername(String username) {
     if (username.length > 10) {
       username = '${username.substring(0, 10)}...';
@@ -59,33 +58,35 @@ class _AppbarHomeState extends State<AppbarHome> {
       listener: (context, state) {
         if (state is UserLogoutState) {
           if (state.status == AuthStatus.loaded) {
-            // ScaffoldMessenger.of(context).showSnackBar(
-            //   SnackBar(content: Text(state.message)),
-            // );
             GoRouter.of(context).go(AppPath.login);
-          } else if (state.status == AuthStatus.error) {
-            // ScaffoldMessenger.of(context).showSnackBar(
-            //   SnackBar(content: Text(state.message)),
-            // );
           }
         }
       },
-      child: Padding(
-        padding: const EdgeInsets.only(left: 8, top: 45, bottom: 16, right: 8),
-        child: Row(
-          children: [
-            Expanded(
-              child: widget.role == "therapist"
-                      ? BlocBuilder<TherapistProfileBloc, GetTherapistState>(
-                          builder: (context, state) => buildProfileContent(context, state),
-                        )
-                      : BlocBuilder<PatientProfileBloc, GetPatientState>(
-                          builder: (context, state) => buildProfileContent(context, state),
-                        ),
-            ),
-            const SizedBox(width: 15),
-          ],
-        ),
+      child: AppBar(
+        toolbarHeight: 110,
+        title: widget.role == "therapist"
+            ? BlocBuilder<TherapistProfileBloc, GetTherapistState>(
+                builder: (context, state) => buildProfileContent(context, state),
+              )
+            : BlocBuilder<PatientProfileBloc, GetPatientState>(
+                builder: (context, state) => buildProfileContent(context, state),
+              ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const DateTimePicker(),
+                  ),
+        );
+            },
+            icon: const Icon(Icons.calendar_month_sharp),
+          ),
+          const SizedBox(width: 8),
+        ],
+        elevation: 0,
+        backgroundColor: Theme.of(context).colorScheme.surface,
       ),
     );
   }
@@ -107,11 +108,7 @@ class _AppbarHomeState extends State<AppbarHome> {
       return buildProfileUI(context, userName, profilePicture, hasPassword, email);
     } else if ((widget.role == "therapist" && state is GetTherapistError) ||
         (widget.role == "patient" && state is GetPatientError)) {
-      // WidgetsBinding.instance.addPostFrameCallback((_) {
-      //   context.read<AuthBloc>().add(LogoutEvent());
-      // });
       return buildProfileUI(context, "userName", "profilePicture", true, "email");
-      // return const SizedBox();
     } else {
       return const Center(child: CircularProgressIndicator());
     }
@@ -119,6 +116,7 @@ class _AppbarHomeState extends State<AppbarHome> {
 
   Widget buildProfileUI(BuildContext context, String userName, String profilePicture, bool hasPassword, String email) {
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         InkWell(
           onTap: () {
@@ -145,7 +143,7 @@ class _AppbarHomeState extends State<AppbarHome> {
           },
           child: CircleAvatar(
             backgroundColor: Theme.of(context).brightness != Brightness.dark
-                ? const Color(0xeEBEEF55)
+                ? const Color(0xEEBEEF55)
                 : Colors.black,
             backgroundImage: CachedNetworkImageProvider(
               profilePicture,
@@ -162,7 +160,6 @@ class _AppbarHomeState extends State<AppbarHome> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 10),
             Text('👋', style: Theme.of(context).textTheme.bodySmall),
             Text('Hello, ${cutUsername(userName)}', style: Theme.of(context).textTheme.bodySmall),
           ],
