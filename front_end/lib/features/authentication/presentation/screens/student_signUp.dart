@@ -131,6 +131,7 @@ class _StudentSignUpState extends State<StudentSignUp> {
                   height: 30,
                 ),
                 CustomTextField(
+                  key: const ValueKey('full_name_field'),
                   text: "full name",
                   controller: nameController,
                   validator: (value) {
@@ -144,6 +145,7 @@ class _StudentSignUpState extends State<StudentSignUp> {
                   height: 20,
                 ),
                 CustomTextField(
+                  key: const ValueKey('email_field'),
                   text: "email",
                   controller: emailController,
                   validator: _validateEmail,
@@ -152,6 +154,7 @@ class _StudentSignUpState extends State<StudentSignUp> {
                   height: 20,
                 ),
                 CustomTextField(
+                  key: const ValueKey('password_field'),
                   text: "password",
                   controller: passwordController,
                   isPassword: true,
@@ -159,6 +162,7 @@ class _StudentSignUpState extends State<StudentSignUp> {
                 ),
                 const SizedBox(height: 20),
                 CustomTextField(
+                  key: const ValueKey('confirm_password_field'),
                   text: "confirm password",
                   controller: confirmPasswordController,
                   isPassword: true,
@@ -173,6 +177,8 @@ class _StudentSignUpState extends State<StudentSignUp> {
                   height: 20,
                 ),
                 CustomTextField(
+                  key: const ValueKey('phone_field'),
+                  
                   text: "Phone Number",
                   controller: phoneController,
                   validator: (value) {
@@ -186,6 +192,7 @@ class _StudentSignUpState extends State<StudentSignUp> {
                   height: 20,
                 ),
                 CustomTextField(
+                  key: const ValueKey('college_field'),
                   text: "College",
                   controller: college,
                   validator: (value) {
@@ -199,6 +206,7 @@ class _StudentSignUpState extends State<StudentSignUp> {
                   height: 40,
                 ),
                 CustomButton(
+                  key: const ValueKey('sign_up_button'),
                   wdth: double.infinity,
                   rad: 10,
                   hgt: 50,
@@ -222,6 +230,7 @@ class _StudentSignUpState extends State<StudentSignUp> {
                 Align(
                   alignment: Alignment.bottomRight,
                   child: GestureDetector(
+                     key: const ValueKey('login_redirect'),
                     onTap: () {
                       context.go(AppPath.patientOnboard);
                     },

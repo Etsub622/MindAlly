@@ -38,8 +38,7 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocConsumer<AuthBloc, AuthState>(
-        builder: (context, state) {
+      body: BlocConsumer<AuthBloc, AuthState>(builder: (context, state) {
         if (state is AuthLoading) {
           return const CircularIndicator();
         } else {
@@ -89,11 +88,14 @@ class _LoginState extends State<Login> {
                 SizedBox(
                   height: 40,
                 ),
-                CustomTextField(text: "email", controller: emailController),
+                CustomTextField(
+                key: const ValueKey('email_field'),
+                  text: "email", controller: emailController),
                 SizedBox(
                   height: 20,
                 ),
                 CustomTextField(
+                    key: const ValueKey('password_field'),
                     text: "password",
                     sign: Icon(Icons.remove_red_eye),
                     controller: passwordController,
@@ -119,6 +121,7 @@ class _LoginState extends State<Login> {
                   height: 40,
                 ),
                 CustomButton(
+                  key: const ValueKey('login_button'),
                   wdth: double.infinity,
                   rad: 10,
                   hgt: 50,

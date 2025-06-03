@@ -71,14 +71,14 @@ class _WaitingDialogState extends State<WaitingDialog> with TickerProviderStateM
     // check meeting id is not null or invaild
     // if meeting id is vaild then navigate to MeetingScreen with meetingId,token
     if (meetingId.isNotEmpty && re.hasMatch(meetingId)) {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => MeetingScreen(
-            meetingId: meetingId,
-            token: meetingToken,
-          ),
-        ),
-      );
+      // Navigator.of(context).push(
+      //   MaterialPageRoute(
+      //     builder: (context) => MeetingScreen(
+      //       meetingId: meetingId,
+      //       token: meetingToken,
+      //     ),
+      //   ),
+      // );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text("Please enter valid meeting id"),
