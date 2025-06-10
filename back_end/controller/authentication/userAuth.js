@@ -10,7 +10,7 @@ import { generateAccessToken, generateRefreshToken, hashedPassword } from "../..
 const registerTherapist = async (req, res) => {
     try {
 
-        const { fullName, email, password, specialization , certificate } = req.body
+        const { fullName, email, password, specialization , certificate} = req.body
         
     
     const hashedPass= await hashedPassword(password)
@@ -27,7 +27,7 @@ const registerTherapist = async (req, res) => {
     })
     
         await therapist.save()
-        const token =generateJWT(therapist._id ,therapist.Role)
+        const token =generateAccessToken(therapist._id ,therapist.Role)
         res.status(200).json({
             message: "Therapist signup",
             token,
