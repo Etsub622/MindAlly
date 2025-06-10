@@ -22,6 +22,7 @@ router.patch('/:sessionId/confirm', confirmSession);
 router.patch('/:sessionId/complete', completeSession);
 router.patch('/:sessionId/cancel', cancelSession);
 router.get('/:sessionId', getSessionById);
+router.patch('/:sessionId/cancel', cancelSession);
 
 
 export { router as scheduleRoutes };
