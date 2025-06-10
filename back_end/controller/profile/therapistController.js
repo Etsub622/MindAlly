@@ -102,6 +102,7 @@ export const getTopTherapists = async (req, res) => {
     if (!user) return res.status(404).json({ message: "User not found" });
 
     const therapists = await Therapist.find();
+    
 
     const userData = {
       preferred_modality: user.preferred_modality || "",
@@ -126,6 +127,7 @@ export const getTopTherapists = async (req, res) => {
     }));
 
     const inputData = { user: userData, therapists: therapistsData };
+
 
     const pythonProcess = spawn('python3', ['therapist_matching/therapist_matcher.py']);
     let output = '';

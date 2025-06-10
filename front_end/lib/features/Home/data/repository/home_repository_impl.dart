@@ -14,15 +14,15 @@ class HomeRepositoryImpl extends HomeRespository{
 
   @override
   Future<Either<Failure, List<UpdateTherapistModel>>> getMatchedTherapist({required String patientId})async {
-    if(await networkInfo.isConnected){
+    // if(await networkInfo.isConnected){
       try {
         final result = await homeRemoteDataSource.getMatchedTherapist(patientId: patientId);
         return Right(result);
       } catch (e) {
         return Left(ServerFailure(message: e.toString()));
       }
-    }else{
-      return Left(NetworkFailure(message: 'No internet connection'));
-    }
+    // }else{
+    //   return Left(NetworkFailure(message: 'No internet connection'));
+    // }
   }
 }

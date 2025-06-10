@@ -72,7 +72,7 @@ class AuthRepoImpl implements AuthRepository {
   @override
   Future<Either<Failure, String>> studentSignUp(
       StudentSignupEntity studentSignUp) async {
-    if (await networkInfo.isConnected) {
+    // if (await networkInfo.isConnected) {
       try {
         final user = StudentSignupModel(
             id: studentSignUp.id,
@@ -87,10 +87,10 @@ class AuthRepoImpl implements AuthRepository {
       } on ServerException {
         return Left(ServerFailure(message: 'Server Failure'));
       }
-    } else {
-      return Left(
-          NetworkFailure(message: 'You are not connected to the internet'));
-    }
+    // } else {
+    //   return Left(
+    //       NetworkFailure(message: 'You are not connected to the internet'));
+    // }
   }
 
   @override

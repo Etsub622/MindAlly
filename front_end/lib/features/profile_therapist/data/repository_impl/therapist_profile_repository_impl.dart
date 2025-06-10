@@ -20,7 +20,7 @@ class TherapistProfileRepositoryImpl extends TherapistProfileRepository {
   TherapistProfileRepositoryImpl(
     {required this.remoteDatasource, required this.networkInfo, required this.localDatasource});  @override
   Future<Either<Failure, TherapistModel>> getTherapist({required String id}) async {
-    if (await networkInfo.isConnected) {
+    // if (await networkInfo.isConnected) {
       try {
         final therapist = await remoteDatasource.getTherapist(id: id);
         return Right(therapist);
@@ -30,13 +30,13 @@ class TherapistProfileRepositoryImpl extends TherapistProfileRepository {
         return Left(ServerFailure(message: e.toString()));
       }
     }
-    return Left(NetworkFailure(message: "No internet connection"));
-  }
+  //   // return Left(NetworkFailure(message: "No internet connection"));
+  // }
 
 
   @override
   Future<Either<Failure, TherapistModel>> createTherapist({required TherapistModel therapist}) async {
-    if (await networkInfo.isConnected) {
+    // if (await networkInfo.isConnected) {
       try {
         final createdTherapist = await remoteDatasource.createTherapist(therapist: therapist);
         return Right(createdTherapist);
@@ -45,13 +45,13 @@ class TherapistProfileRepositoryImpl extends TherapistProfileRepository {
       } catch (e) {
         return Left(ServerFailure(message: "Something went wrong"));
       }
-    }
-    return Left(NetworkFailure(message: "No internet connection"));
+    // }
+    // return Left(NetworkFailure(message: "No internet connection"));
   }
 
   @override
   Future<Either<Failure, UpdateTherapistModel>> updateTherapist({required UpdateTherapistModel therapist}) async {
-    if (await networkInfo.isConnected) {
+    // if (await networkInfo.isConnected) {
       try {
         final updatedTherapist = await remoteDatasource.updateTherapist(therapist: therapist);
         return Right(updatedTherapist);
@@ -60,14 +60,14 @@ class TherapistProfileRepositoryImpl extends TherapistProfileRepository {
       } catch (e) {
         return Left(ServerFailure(message: "Something went wrong"));
       }
-    }
-    return Left(NetworkFailure(message: "No internet connection"));
+    // }
+    // return Left(NetworkFailure(message: "No internet connection"));
    
   }
 
   @override
   Future<Either<Failure, Null>> deleteTherapist({required String id}) async {
-    if (await networkInfo.isConnected) {
+    // if (await networkInfo.isConnected) {
       try {
         await remoteDatasource.deleteTherapist(id: id);
         return const Right(null);
@@ -76,8 +76,8 @@ class TherapistProfileRepositoryImpl extends TherapistProfileRepository {
       } catch (e) {
         return Left(ServerFailure(message: "Something went wrong"));
       }
-    }
-    return Left(NetworkFailure(message: "No internet connection"));
+    // }
+    // return Left(NetworkFailure(message: "No internet connection"));
   }
 
 }

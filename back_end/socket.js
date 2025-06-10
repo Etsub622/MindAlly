@@ -1,6 +1,7 @@
 import { Server } from "socket.io";
 import { ChatHistory } from "./model/chatsModel.js";
 import { Message } from "./model/messagesModel.js";
+import { Session } from "./model/sessionModel.js";
 import mongoose from "mongoose";
 
 let io;
@@ -33,7 +34,6 @@ export const initializeSocket = (httpServer) => {
       try {
         let finalChatId = chatId;
 
-        // Check for an existing chat between senderId and receiverId
         let existingChat = await ChatHistory.findOne({
           $or: [
             { senderId, receiverId },
@@ -42,7 +42,6 @@ export const initializeSocket = (httpServer) => {
         });
 
         if (existingChat) {
-          // Reuse the existing chat
           finalChatId = existingChat.chatId;
           await ChatHistory.updateOne(
             { chatId: finalChatId },
@@ -55,7 +54,6 @@ export const initializeSocket = (httpServer) => {
             }
           );
         } else if (!finalChatId) {
-          // Create a new chat if none exists and no chatId is provided
           const newChat = new ChatHistory({
             senderId,
             receiverId,
@@ -68,7 +66,6 @@ export const initializeSocket = (httpServer) => {
           finalChatId = newChat.chatId;
         }
 
-        // Save the message
         const newMessage = new Message({
           conversationId: finalChatId,
           senderId,
@@ -79,7 +76,6 @@ export const initializeSocket = (httpServer) => {
         });
         await newMessage.save();
 
-        // Emit the new message to the chat room
         io.to(finalChatId).emit("newMessage", {
           senderId,
           message,
@@ -89,7 +85,6 @@ export const initializeSocket = (httpServer) => {
           isRead: false,
         });
 
-        // Notify the sender of the chatId
         socket.emit("messageSent", { chatId: finalChatId });
       } catch (error) {
         console.error("Error saving Socket.IO message:", error);
@@ -98,6 +93,58 @@ export const initializeSocket = (httpServer) => {
         } else {
           socket.emit("messageError", { error: error.message });
         }
+      }
+    });
+
+    // Handle check-in event
+    socket.on("checkIn", async ({ sessionId, userId, isTherapist }) => {
+      try {
+        const session = await Session.findById(sessionId);
+        if (!session) {
+          socket.emit("checkInError", { error: "Session not found" });
+          return;
+        }
+
+        // Determine the next index (based on the last check-in index)
+        const checkInArray = isTherapist ? session.therapistCheckInTimes : session.patientCheckInTimes;
+        const nextIndex = checkInArray.length > 0 ? checkInArray[checkInArray.length - 1].index + 1 : 1;
+
+        const updateField = isTherapist
+          ? { $push: { therapistCheckInTimes: { index: nextIndex, time: new Date() } } }
+          : { $push: { patientCheckInTimes: { index: nextIndex, time: new Date() } } };
+
+        await Session.updateOne({ _id: sessionId }, updateField);
+        console.log(`Check-in recorded for ${isTherapist ? "therapist" : "patient"} in session ${sessionId} at index ${nextIndex}`);
+        socket.emit("checkInSuccess", { sessionId, userId, index: nextIndex });
+      } catch (error) {
+        console.error("Error recording check-in:", error);
+        socket.emit("checkInError", { error: error.message });
+      }
+    });
+
+    // Handle check-out event
+    socket.on("checkOut", async ({ sessionId, userId, isTherapist }) => {
+      try {
+        const session = await Session.findById(sessionId);
+        if (!session) {
+          socket.emit("checkOutError", { error: "Session not found" });
+          return;
+        }
+
+        // Use the latest check-in index for the check-out
+        const checkInArray = isTherapist ? session.therapistCheckInTimes : session.patientCheckInTimes;
+        const latestIndex = checkInArray.length > 0 ? checkInArray[checkInArray.length - 1].index : 1;
+
+        const updateField = isTherapist
+          ? { $push: { therapistCheckOutTimes: { index: latestIndex, time: new Date() } } }
+          : { $push: { patientCheckOutTimes: { index: latestIndex, time: new Date() } } };
+
+        await Session.updateOne({ _id: sessionId }, updateField);
+        console.log(`Check-out recorded for ${isTherapist ? "therapist" : "patient"} in session ${sessionId} at index ${latestIndex}`);
+        socket.emit("checkOutSuccess", { sessionId, userId, index: latestIndex });
+      } catch (error) {
+        console.error("Error recording check-out:", error);
+        socket.emit("checkOutError", { error: error.message });
       }
     });
 
