@@ -7,7 +7,8 @@ import bcrypt from "bcrypt";
 // Create a new therapist
 export const createTherapist = async (req, res) => {
   const { FullName, Email, Password, modality, Certificate, Bio, Fee, Rating, verified } = req.body;
-  print(req.body);
+  // print(req.body);
+  console.log(req.body);
 
   try {
     const existingTherapist = await Therapist.findOne({ Email });
@@ -27,7 +28,8 @@ export const createTherapist = async (req, res) => {
       verified,
     });
 
-    print(newTherapist);
+    // print(newTherapist);
+    console.log(newTherapist);
 
     await newTherapist.save();
     
@@ -181,6 +183,19 @@ export const getTopTherapists = async (req, res) => {
       patient_id,
       top_therapists: enrichedTherapists
     });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// Get all therapists whose documents are not approved (verified = false or not set)
+export const getUnapprovedTherapists = async (req, res) => {
+  try {
+    const unapprovedTherapists = await Therapist.find({
+      $or: [{ verified: false }, { verified: { $exists: false } }]
+    });
+
+    res.json(unapprovedTherapists);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
