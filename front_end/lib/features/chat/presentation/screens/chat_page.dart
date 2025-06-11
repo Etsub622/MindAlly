@@ -8,6 +8,7 @@ import 'package:front_end/core/service/api_call.dart';
 import 'package:front_end/features/chat/presentation/bloc/chat/chat_bloc.dart';
 import 'package:front_end/features/chat/data/models/single_chat_model.dart';
 import 'package:front_end/features/chat/domain/entities/message_entity.dart';
+import 'package:front_end/features/payment/presentation/screens/payment_screen.dart';
 import 'package:front_end/features/profile_patient/domain/entities/user_entity.dart';
 import 'package:intl/intl.dart';
 
@@ -26,6 +27,7 @@ class _ChatPageState extends State<ChatPage> {
   final _storage = const FlutterSecureStorage();
   String? currentChatId;
   String userId = "";
+  String userEmail = "";
 
   @override
   void initState() {
@@ -42,6 +44,7 @@ class _ChatPageState extends State<ChatPage> {
       final body = jsonDecode(userCredential);
       setState(() {
         userId = body["_id"].toString();
+        userEmail = body["Email"].toString();
       });
     }
   }
@@ -242,6 +245,7 @@ class _ChatPageState extends State<ChatPage> {
                                   selectedTime != null &&
                                   selectedDuration != null
                               ? () async {
+                                EventModel? event;
                                   // call api to create meeting and then navigate to MeetingScreen with meetingId,token
                                   await createMeeting().then((meetingId) {
                                     if (!context.mounted) return;
@@ -263,7 +267,7 @@ class _ChatPageState extends State<ChatPage> {
                                         DateFormat('hh:mm a')
                                             .format(endDateTime);
 
-                                    final event = EventModel(
+                                    event = EventModel(
                                       id: '',
                                       patientId: widget.receiver.role == "therapist" ? userId : widget.receiver.id,
                                       therapistId: widget.receiver.role == "therapist" ? widget.receiver.id : userId,
@@ -278,13 +282,31 @@ class _ChatPageState extends State<ChatPage> {
                                       meetingId: meetingId,
                                       meetingToken: token,
                                     );
-                                    context.read<AddScheduledEventsBloc>().add(
-                                          AddScheduledEventsEvent(
-                                              eventEntity: event),
-                                        );
-                                  });
 
-                                  Navigator.of(context).pop();
+                                   
+                                  });
+                              if(widget.receiver.role == "patient") {
+                                      context.read<AddScheduledEventsBloc>().add(
+                                          AddScheduledEventsEvent(eventEntity: event!),
+                                        );
+                                        Navigator.pop(context);
+                                    }else{
+                                      Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => PaymentScreen(
+                                                therapistEmail: widget.receiver.role == "therapist" ? widget.receiver.email : userEmail,
+                                                patientEmail: widget.receiver.role == "therapist" ? userEmail : widget.receiver.email,
+                                                sessionHour: selectedDuration! / 60,
+                                                event: event!,
+                                                chatId: currentChatId ?? '',
+                                                receiver: widget.receiver,
+                                              ),
+                                            ),
+                                  );
+                                    }
+                                  
+                                              
                                 }
                               : null,
                           style: ElevatedButton.styleFrom(

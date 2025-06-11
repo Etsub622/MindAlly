@@ -4,6 +4,10 @@ import 'package:front_end/features/calendar/domain/entity/event_entity.dart';
 import 'package:front_end/features/calendar/presentation/bloc/delete_event/delete_events_bloc.dart';
 import 'package:front_end/features/calendar/presentation/bloc/get_events/get_events_bloc.dart';
 import 'package:front_end/features/calendar/presentation/bloc/update_event/update_events_bloc.dart';
+import 'package:front_end/features/payment/presentation/screens/payment_screen.dart';
+import 'package:front_end/features/profile_patient/domain/entities/user_entity.dart';
+import 'package:front_end/features/profile_patient/presentation/bloc/get_patient_bloc/get_patient_bloc.dart';
+import 'package:front_end/features/profile_therapist/presentation/bloc/get_therapist_bloc/get_therapist_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
@@ -12,12 +16,16 @@ class WaitingDialog extends StatelessWidget {
   final EventEntity event;
   final String userId;
   final bool isTherapist;
+  final String? chatId;
+  final String userEmail;
 
   const WaitingDialog({
     super.key,
     required this.event,
     required this.userId,
     required this.isTherapist,
+    this.chatId,
+    required this.userEmail,
   });
 
   bool _isCreator() {
@@ -62,14 +70,58 @@ class WaitingDialog extends StatelessWidget {
           },
         ),
       ],
-      child: Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: isPending && isCreator
-              ? _buildWaitingShimmer(context)
-              : _buildMeetingDetails(context, isPending, isCreator),
-        ),
+      child: BlocBuilder<PatientProfileBloc, GetPatientState>(
+        bloc: isTherapist ? context.read<PatientProfileBloc>() : null,
+        builder: (context, patientState) {
+          return BlocBuilder<TherapistProfileBloc, GetTherapistState>(
+            bloc: !isTherapist ? context.read<TherapistProfileBloc>() : null,
+            builder: (context, therapistState) {
+              UserEntity? receiver;
+              if (isTherapist && patientState is GetPatientLoaded) {
+                receiver = UserEntity(
+                  id: patientState.patient.id,
+                  name: patientState.patient.name,
+                  email: patientState.patient.email,
+                  hasPassword: patientState.patient.hasPassword,
+                  role: patientState.patient.role,
+                );
+              } else if (!isTherapist && therapistState is GetTherapistLoaded) {
+                receiver = UserEntity(
+                  id: therapistState.therapist.id,
+                  name: therapistState.therapist.name,
+                  email: therapistState.therapist.email,
+                  hasPassword: therapistState.therapist.hasPassword,
+                  role: therapistState.therapist.role,
+                );
+              }
+
+              if ((isTherapist && patientState is GetPatientLoading) ||
+                  (!isTherapist && therapistState is GetTherapistLoading)) {
+                return _buildWaitingShimmer(context);
+              }
+
+              if (receiver == null) {
+                // Trigger data fetch if not yet loaded
+                if (isTherapist) {
+                  context.read<PatientProfileBloc>().add(GetPatientLoadEvent(patientId: event.patientId));
+                } else {
+                  context.read<TherapistProfileBloc>().add(GetTherapistLoadEvent(therapistId: event.therapistId));
+                }
+                return _buildWaitingShimmer(context);
+              }
+
+              return Dialog(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: isPending && isCreator
+                      ? _buildWaitingShimmer(context)
+                      : _buildMeetingDetails(context, isPending, isCreator, receiver),
+                ),
+              );
+            },
+          );
+        },
       ),
     );
   }
@@ -134,7 +186,7 @@ class WaitingDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildMeetingDetails(BuildContext context, bool isPending, bool isCreator) {
+  Widget _buildMeetingDetails(BuildContext context, bool isPending, bool isCreator, UserEntity receiver) {
     final dateTime = DateFormat('yyyy-MM-dd hh:mm a').parse(
       '${event.date} ${event.startTime.replaceAll(RegExp(r'am|pm', caseSensitive: false), event.startTime.contains('AM') ? 'AM' : 'PM')}',
     );
@@ -171,11 +223,26 @@ class WaitingDialog extends StatelessWidget {
             children: [
               ElevatedButton(
                 onPressed: () {
-                  context.read<UpdateScheduledEventsBloc>().add(
-                        UpdateScheduledEventsEvent(
-                          eventEntity: event.copyWith(status: "Confirmed"),
-                        ),
-                      );
+                  isTherapist
+                      ? context.read<UpdateScheduledEventsBloc>().add(
+                          UpdateScheduledEventsEvent(
+                            eventEntity: event.copyWith(status: "Confirmed"),
+                          ),
+                        )
+                      : Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PaymentScreen(
+                              therapistEmail: !isTherapist ? receiver.email : userEmail,
+                              patientEmail: !isTherapist ? userEmail : receiver.email,
+                              sessionHour: event.endTime == "00:00" ? 1 : double.parse(event.endTime.split(':')[0]) - double.parse(event.startTime.split(':')[0]),
+                              event: event,
+                              chatId: chatId,
+                              receiver: receiver,
+                            ),
+                          ),
+                        );
+                  // Removed duplicate UpdateScheduledEventsEvent call
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue[700],
