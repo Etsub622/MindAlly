@@ -41,7 +41,7 @@ class EventScheduleRepositoryImpl extends EventScheduleRepository {
   Future<Either<Failure, EventEntity>> addEventSchedule(EventEntity eventEntity) async {
     // if (await networkInfo.isConnected) {
       try {
-        final event = await remoteDataSource.addEventSchedule(eventEntity as EventModel);
+        final event = await remoteDataSource.addEventSchedule(eventEntity);
         return Right(event);
       } catch (e) {
         return Left(ServerFailure(message:e.toString()));
@@ -55,7 +55,7 @@ class EventScheduleRepositoryImpl extends EventScheduleRepository {
   Future<Either<Failure, void>> updateEventSchedule(EventEntity eventEntity) async {
     // if (await networkInfo.isConnected) {
       try {
-        final event = await remoteDataSource.updateEventSchedule(eventEntity.id);
+        final event = await remoteDataSource.updateEventSchedule(eventEntity.id, eventEntity.price);
         return Right(event);
       } catch (e) {
         return Left(ServerFailure(message:e.toString()));

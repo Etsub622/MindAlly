@@ -79,7 +79,8 @@ class _MeetingScreenState extends State<MeetingScreen> {
 
   void _setupSocketListeners() {
     socketService.socket.on("checkInSuccess", (data) {
-      if (data["userId"] == widget.userId && data["sessionId"] == widget.sessionId) {
+      if (data["userId"] == widget.userId &&
+          data["sessionId"] == widget.sessionId) {
         setState(() {
           _checkInIndex = data["index"];
         });
@@ -158,7 +159,8 @@ class _MeetingScreenState extends State<MeetingScreen> {
           socketService.socket.emit("checkOut", {
             "sessionId": widget.sessionId,
             "userId": participantId,
-            "isTherapist": participants[participantId]?.displayName == "Therapist",
+            "isTherapist":
+                participants[participantId]?.displayName == "Therapist",
           });
         }
       }
@@ -205,7 +207,8 @@ class _MeetingScreenState extends State<MeetingScreen> {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: GridView.builder(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       crossAxisSpacing: 10,
                       mainAxisSpacing: 10,

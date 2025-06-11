@@ -15,6 +15,7 @@ const sessionSchema = new mongoose.Schema(
     },
     meeting_token: { type: String, required: true },
     meeting_id: { type: String, required: true },
+    price: { type: Number, required: true }, // Price of the session
     patientCheckInTimes: [
       {
         index: { type: Number, required: true }, // Sequence number for the check-in

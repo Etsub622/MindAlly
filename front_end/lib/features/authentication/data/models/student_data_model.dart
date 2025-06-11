@@ -15,7 +15,7 @@ class StudentResponseModel extends StudentDataResponse {
     );
   }
 
-  Map<String, dynamic> toJson(){
+  Map<String, dynamic> toJson() {
     return {
       '_id': studentData.id,
       'FullName': studentData.fullName,
@@ -26,9 +26,9 @@ class StudentResponseModel extends StudentDataResponse {
       'Gender': studentData.gender,
       'ProfileImage': studentData.profileImage,
       'Role': studentData.role,
-      'token':token,
-      'message':message
-  };
+      'token': token,
+      'message': message
+    };
   }
 }
 
@@ -57,7 +57,7 @@ class StudentDataModel extends StudentUserEntity {
       gender: json['Gender'] ?? "",
       profileImage: json['ProfileImage'] ?? "",
       role: json['Role'] ?? "",
-      collage:json['collage'] ?? "",
+      collage: json['collage'] ?? "",
     );
   }
 

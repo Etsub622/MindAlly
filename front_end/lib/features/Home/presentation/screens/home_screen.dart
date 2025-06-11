@@ -19,7 +19,8 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     if (widget.role == "patient") {
-      BlocProvider.of<GetMatchedTherapistsBloc>(context).add(GetMatchedTherapistsLoadEvent(patientId: widget.userId));
+      BlocProvider.of<GetMatchedTherapistsBloc>(context)
+          .add(GetMatchedTherapistsLoadEvent(patientId: widget.userId));
     }
   }
 
@@ -41,10 +42,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         itemCount: state.therapistList.length,
                         itemBuilder: (context, index) {
                           final therapist = state.therapistList[index];
-                          return TherapistProfileWidget(therapist: therapist, upperContext: context);
+                          return TherapistProfileWidget(
+                              therapist: therapist, upperContext: context);
                         });
                   } else {
-                    return const Center(child: Text("Error to load therapists"));
+                    return const Center(
+                        child: Text("Error to load therapists"));
                   }
                 },
               )

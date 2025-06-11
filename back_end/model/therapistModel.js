@@ -47,7 +47,8 @@ const therapistschema = new mongoose.Schema({
         default:"therapist"
     },
     verified: {
-        type:Boolean
+        type:Boolean,
+        default: false,
     },
     specialities: {
         type: Array

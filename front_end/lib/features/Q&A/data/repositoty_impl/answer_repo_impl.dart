@@ -21,6 +21,7 @@ class AnswerRepoImpl implements AnswerRepository {
           answer: answer.answer,
           therapistName: answer.therapistName,
           therapistProfile: answer.therapistProfile,
+          ownerId: answer.ownerId,
         );
         final res = await remoteDatasource.addAnswer(newAnswer);
         return right(res);
@@ -77,6 +78,7 @@ class AnswerRepoImpl implements AnswerRepository {
           answer: answer.answer,
           therapistName: answer.therapistName,
           therapistProfile: answer.therapistProfile,
+          ownerId: answer.ownerId,
         );
         final res = await remoteDatasource.updateAnswer(newAnswer, id);
         return right(res);

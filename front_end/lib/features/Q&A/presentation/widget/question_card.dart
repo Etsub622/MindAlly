@@ -7,8 +7,11 @@ class QuestionCard extends StatefulWidget {
   final List<String> category;
   final String profileImage;
   final void Function() onPressed;
-  final VoidCallback onUpdate;
-  final VoidCallback onDelete;
+  final VoidCallback? onUpdate;
+  final VoidCallback? onDelete;
+  final String currentUserId;
+  final String ownerId;
+  final String role;
 
   const QuestionCard({
     required this.name,
@@ -17,8 +20,11 @@ class QuestionCard extends StatefulWidget {
     required this.category,
     required this.profileImage,
     required this.onPressed,
-    required this.onDelete,
-    required this.onUpdate,
+    this.onDelete,
+    this.onUpdate,
+    required this.currentUserId,
+    required this.ownerId,
+    required this.role,
     super.key,
   });
 
@@ -31,6 +37,8 @@ class _QuestionCardState extends State<QuestionCard> {
 
   @override
   Widget build(BuildContext context) {
+    print(
+        'role: ${widget.role}, currentUserId: ${widget.currentUserId}, ownerId: ${widget.ownerId}');
     return AnimatedContainer(
       duration: Duration(milliseconds: 300),
       curve: Curves.easeInOut,
@@ -69,23 +77,25 @@ class _QuestionCardState extends State<QuestionCard> {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                PopupMenuButton<String>(
-                  icon: Icon(Icons.more_vert, color: Colors.grey[700]),
-                  onSelected: (value) {
-                    if (value == 'update') {
-                      widget.onUpdate();
-                    } else if (value == 'delete') {
-                      widget.onDelete();
-                    }
-                  },
-                  itemBuilder: (context) => [
-                    PopupMenuItem(value: 'update', child: Text('Edit')),
-                    PopupMenuItem(
-                        value: 'delete',
-                        child: Text('Delete',
-                            style: TextStyle(color: Colors.red))),
-                  ],
-                ),
+                if ((widget.role == 'therapist') ||
+                    (widget.currentUserId == widget.ownerId))
+                  PopupMenuButton<String>(
+                    icon: Icon(Icons.more_vert, color: Colors.grey[700]),
+                    onSelected: (value) {
+                      if (value == 'update') {
+                        widget.onUpdate!();
+                      } else if (value == 'delete') {
+                        widget.onDelete!();
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      PopupMenuItem(value: 'update', child: Text('Edit')),
+                      PopupMenuItem(
+                          value: 'delete',
+                          child: Text('Delete',
+                              style: TextStyle(color: Colors.red))),
+                    ],
+                  ),
               ],
             ),
             SizedBox(height: 10),
@@ -94,44 +104,51 @@ class _QuestionCardState extends State<QuestionCard> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             SizedBox(height: 8),
-            AnimatedCrossFade(
-              duration: Duration(milliseconds: 250),
-              crossFadeState: _isExpanded
-                  ? CrossFadeState.showSecond
-                  : CrossFadeState.showFirst,
-              firstChild: Text(
+            if (widget.content.length > 100) ...[
+              AnimatedCrossFade(
+                duration: Duration(milliseconds: 250),
+                crossFadeState: _isExpanded
+                    ? CrossFadeState.showSecond
+                    : CrossFadeState.showFirst,
+                firstChild: Text(
+                  widget.content,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: Colors.grey[700]),
+                ),
+                secondChild: Text(
+                  widget.content,
+                  style: TextStyle(color: Colors.grey[700]),
+                ),
+              ),
+              SizedBox(height: 8),
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _isExpanded = !_isExpanded;
+                  });
+                },
+                child: Row(
+                  children: [
+                    Text(
+                      _isExpanded ? 'Read less' : 'Read more',
+                      style: TextStyle(
+                          color: Colors.blue, fontWeight: FontWeight.w500),
+                    ),
+                    Icon(
+                      _isExpanded ? Icons.expand_less : Icons.expand_more,
+                      color: Color.fromARGB(239, 130, 5, 220),
+                      size: 18,
+                    ),
+                  ],
+                ),
+              ),
+            ] else ...[
+              Text(
                 widget.content,
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
                 style: TextStyle(color: Colors.grey[700]),
               ),
-              secondChild: Text(
-                widget.content,
-                style: TextStyle(color: Colors.grey[700]),
-              ),
-            ),
-            SizedBox(height: 8),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  _isExpanded = !_isExpanded;
-                });
-              },
-              child: Row(
-                children: [
-                  Text(
-                    _isExpanded ? 'Read less' : 'Read more',
-                    style: TextStyle(
-                        color: Colors.blue, fontWeight: FontWeight.w500),
-                  ),
-                  Icon(
-                    _isExpanded ? Icons.expand_less : Icons.expand_more,
-                    color: Color.fromARGB(239, 130, 5, 220),
-                    size: 18,
-                  ),
-                ],
-              ),
-            ),
+            ],
             SizedBox(height: 7),
             Wrap(
               spacing: 6,
@@ -153,7 +170,6 @@ class _QuestionCardState extends State<QuestionCard> {
                 );
               }).toList(),
             ),
-            SizedBox(height: 5),
             Align(
               alignment: Alignment.centerRight,
               child: IconButton(

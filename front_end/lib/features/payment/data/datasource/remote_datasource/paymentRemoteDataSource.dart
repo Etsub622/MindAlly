@@ -6,6 +6,7 @@ import 'package:front_end/core/config/config_key.dart';
 
 abstract class PaymentRemoteDataSource {
   Future<String> initiatePayment(PaymentRequestModel request);
+  Future<String> withdrawPayment(String email, double amount);
 }
 
 class PaymentRemoteDataSourceImpl implements PaymentRemoteDataSource {
@@ -23,6 +24,30 @@ class PaymentRemoteDataSourceImpl implements PaymentRemoteDataSource {
         url,
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(request.toJson()),
+      );
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> decodedBody = jsonDecode(response.body);
+        return decodedBody["data"]["checkout_url"];
+      } else {
+        throw ServerException(
+            message: 'Failed to initiate payment:${response.statusCode}');
+      }
+    } catch (e) {
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<String> withdrawPayment(String email, double amount) async {
+    try {
+      var url = Uri.parse('$baseUrl/withdraw');
+      final response = await client.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          "email": email,
+          "amount": amount,
+        }),
       );
       if (response.statusCode == 200) {
         final Map<String, dynamic> decodedBody = jsonDecode(response.body);

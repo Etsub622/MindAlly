@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1068192959140",
+    "project_id": "mindally-826b9",
+    "storage_bucket": "mindally-826b9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1068192959140:android:07d684b8f061e01b967431",
+        "android_client_info": {
+          "package_name": "com.mentalhealth.mindally"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCVSz-WoQubBa9jzlMJPI4pf8aXZwkjEIU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

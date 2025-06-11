@@ -12,6 +12,7 @@ abstract class ArticleRemoteDatasource {
   Future<String> deleteArticle(String id);
   Future<List<ArticleModel>> searchArticles(String title);
   Future<ArticleModel> getSingleArticle(String id);
+  Future<List<ArticleModel>> searchArticleByCategory(String category);
 }
 
 class ArticleRemoteDataSourceImpl implements ArticleRemoteDatasource {
@@ -150,5 +151,30 @@ class ArticleRemoteDataSourceImpl implements ArticleRemoteDatasource {
     } catch (e) {
       throw ServerException(message: e.toString());
     }
+  }
+  
+  @override
+  Future<List<ArticleModel>> searchArticleByCategory(String category) async{
+  try{
+    var url = Uri.parse('$baseUrl/category/$category');
+    final response = await client.get(url, headers: {
+      'Content-Type': 'application/json',
+    });
+    if (response.statusCode == 200) {
+      final List<dynamic> articleJson = json.decode(response.body);
+      if (articleJson.isEmpty) {
+        return [];
+      } else {
+        return articleJson.map((jsonItem) {
+          return ArticleModel.fromJson(jsonItem as Map<String, dynamic>);
+        }).toList();
+      }
+    } else {
+      throw ServerException(
+          message: 'Failed to get articles by category:${response.statusCode}');
+    }
+  } catch (e) {
+    throw ServerException(message: e.toString());
+  }
   }
 }

@@ -17,6 +17,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
 import 'package:multi_select_flutter/chip_display/multi_select_chip_display.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AddVideo extends StatefulWidget {
   const AddVideo({super.key});
@@ -29,8 +30,7 @@ class _AddVideoState extends State<AddVideo> {
   TextEditingController imageController = TextEditingController();
   TextEditingController linkController = TextEditingController();
   TextEditingController titleController = TextEditingController();
-  TextEditingController profilePictureController = TextEditingController();
-  TextEditingController nameController = TextEditingController();
+
   List<String> selectedCategories = [];
 
   List<String> categoryOption = const [
@@ -41,6 +41,41 @@ class _AddVideoState extends State<AddVideo> {
     'Trauma',
     'SelfLove'
   ];
+  Future<String> _getTherapistId() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userJson = prefs.getString('user_profile');
+    if (userJson != null) {
+      final userMap = json.decode(userJson);
+      print('userMap in _getTherapistId: $userMap');
+      return userMap['_id'] ?? '';
+    }
+    print('No user profile found in shared preferences (id)');
+    return '';
+  }
+
+  Future<String> _getTherapistName() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userJson = prefs.getString('user_profile');
+    if (userJson != null) {
+      final userMap = json.decode(userJson);
+      print('userMap in _getTherapistName: $userMap');
+      return userMap['FullName'] ?? '';
+    }
+    print('No user profile found in shared preferences (name)');
+    return '';
+  }
+
+  Future<String> _getTherapistProfile() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userJson = prefs.getString('user_profile');
+    if (userJson != null) {
+      final userMap = json.decode(userJson);
+      print('userMap in _getTherapistId: $userMap');
+      return userMap['ProfileImage'] ?? '';
+    }
+    print('No user profile found in shared preferences (id)');
+    return '';
+  }
 
   // Pick images from the device
   File? _imageFile;
@@ -80,13 +115,18 @@ class _AddVideoState extends State<AddVideo> {
   }
 
   void _uploadVideo(BuildContext context) async {
+    final ownerId = await _getTherapistId();
+    final profilePicture = await _getTherapistProfile();
+    final name = await _getTherapistName();
     final uploadedVideo = VideoModel(
         id: '',
         type: "Video",
         title: titleController.text,
         link: linkController.text,
-        profilePicture: profilePictureController.text,
-        name: nameController.text,
+        profilePicture:
+            'https://i.pinimg.com/736x/db/72/9a/db729ac99d3ea99d014c83a88000ed93.jpg',
+        name: name,
+        ownerId: ownerId,
         image: _imageUrl!,
         categories: selectedCategories);
     print(uploadedVideo);
@@ -97,9 +137,7 @@ class _AddVideoState extends State<AddVideo> {
   @override
   void dispose() {
     imageController.dispose();
-    nameController.dispose();
     titleController.dispose();
-    profilePictureController.dispose();
     linkController.dispose();
     super.dispose();
   }
@@ -119,6 +157,8 @@ class _AddVideoState extends State<AddVideo> {
         if (state is VideoAdded) {
           const snack = SnackBar(content: Text('Video added successfully'));
           ScaffoldMessenger.of(context).showSnackBar(snack);
+          Navigator.of(context).pop();
+          context.read<VideoBloc>().add(GetVideoEvent());
         } else if (state is VideoError) {
           final snack = errorsnackBar('Try again later');
           ScaffoldMessenger.of(context).showSnackBar(snack);
@@ -188,15 +228,6 @@ class _AddVideoState extends State<AddVideo> {
               SizedBox(
                 height: 15,
               ),
-              CustomFormField(
-                  text: 'profile', controller: profilePictureController),
-              SizedBox(
-                height: 15,
-              ),
-              CustomFormField(text: 'name', controller: nameController),
-              SizedBox(
-                height: 15,
-              ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: MultiSelectDialogField<String>(
@@ -209,8 +240,8 @@ class _AddVideoState extends State<AddVideo> {
                         width: 1.0),
                     borderRadius: BorderRadius.circular(15),
                   ),
-                  buttonText: const Text('Book Category'),
-                  title: const Text('Book Category'),
+                  buttonText: const Text('video Category'),
+                  title: const Text('Video Category'),
                   selectedColor: Colors.blue,
                   buttonIcon: const Icon(
                     Icons.arrow_drop_down,
@@ -244,9 +275,8 @@ class _AddVideoState extends State<AddVideo> {
                 text: "Upload Video",
                 onPressed: () async {
                   if (titleController.text.isNotEmpty &&
-                      nameController.text.isNotEmpty &&
-                      profilePictureController.text.isNotEmpty &&
                       linkController.text.isNotEmpty) {
+                    await _uploadImage();
                     _uploadVideo(context);
                   }
                 },

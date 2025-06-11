@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:front_end/core/common_widget.dart/snack_bar.dart';
 import 'package:front_end/features/Q&A/presentation/bloc/bloc/answer_bloc.dart';
 import 'package:front_end/features/Q&A/presentation/bloc/bloc/question_bloc.dart';
@@ -9,19 +12,30 @@ import 'package:front_end/features/Q&A/presentation/screens/question_creation.da
 import 'package:front_end/features/Q&A/presentation/screens/update_question.dart';
 import 'package:front_end/features/Q&A/presentation/widget/question_card.dart';
 import 'package:front_end/features/Q&A/presentation/widget/search_box.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class QARoom extends StatefulWidget {
-  const QARoom({super.key});
+  final String? questionId;
+  final String currentUserRole;
+  const QARoom({
+    super.key,
+    this.questionId,
+    required this.currentUserRole,
+  });
 
   @override
   State<QARoom> createState() => _QARoomState();
 }
 
 class _QARoomState extends State<QARoom> {
+  String? currentUserId;
+  String? currentUserRole;
+
   @override
   void initState() {
     super.initState();
     context.read<QuestionBloc>().add(GetQuestionEvent());
+    _loadCurrentUserId();
   }
 
   final List<String> questionCategory = const [
@@ -32,6 +46,21 @@ class _QARoomState extends State<QARoom> {
     'Trauma',
     'SelfLove'
   ];
+
+  void _loadCurrentUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userJson = prefs.getString('user_profile');
+    if (userJson != null) {
+      final userMap = json.decode(userJson);
+      setState(() {
+        print('userMap: $userMap');
+        currentUserId = userMap["_id"] ?? '';
+        currentUserRole = userMap["Role"];
+      });
+    } else {
+      print('No user profile found in shared preferences');
+    }
+  }
 
   String? selectedCategory;
 
@@ -56,7 +85,7 @@ class _QARoomState extends State<QARoom> {
                     child: DropdownButton<String>(
                       value: selectedCategory,
                       hint: const Padding(
-                        padding:  EdgeInsets.only(left: 15.0),
+                        padding: EdgeInsets.only(left: 15.0),
                         child: Text(
                           'Filter by category',
                           style: TextStyle(
@@ -106,6 +135,7 @@ class _QARoomState extends State<QARoom> {
           IconButton(
             onPressed: () {
               showModalBottomSheet(
+                // isScrollControlled: true,
                 context: context,
                 builder: (context) {
                   return CreateQuestionBottomSheet();
@@ -163,6 +193,8 @@ class _QARoomState extends State<QARoom> {
                       itemCount: questions.length,
                       itemBuilder: (context, index) {
                         final question = questions[index];
+                        print('question:$question');
+                        print('createdId:${question.creatorId}');
                         return QuestionCard(
                           name: question.studentName,
                           title: question.title,
@@ -173,14 +205,16 @@ class _QARoomState extends State<QARoom> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    CommentRoom(questionId: question.id),
+                                builder: (context) => CommentRoom(
+                                    currentUserRole: currentUserRole ?? '',
+                                    questionId: question.id),
                               ),
                             );
                           },
                           onUpdate: () {
                             showModalBottomSheet(
                               context: context,
+                              isScrollControlled: true,
                               builder: (context) {
                                 return UpdateQuestionBottomSheet(
                                   questionEntity: question,
@@ -196,6 +230,9 @@ class _QARoomState extends State<QARoom> {
                           onDelete: () {
                             _showDeleteDialog(context, question.id);
                           },
+                          currentUserId: currentUserId ?? '',
+                          ownerId: question.creatorId,
+                          role: currentUserRole ?? '',
                         );
                       },
                     );

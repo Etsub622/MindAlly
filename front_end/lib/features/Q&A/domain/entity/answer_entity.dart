@@ -6,16 +6,18 @@ class AnswerEntity extends Equatable {
   final String therapistName;
   final String therapistProfile;
   final String questionId;
+  final String ownerId;
   AnswerEntity({
     required this.id,
     required this.answer,
     required this.therapistName,
     required this.therapistProfile,
     required this.questionId,
+    required this.ownerId,  
   });
 
   @override
   List<Object?> get props {
-    return [id, answer, therapistName, therapistProfile, questionId];
+    return [id, answer, therapistName, therapistProfile, questionId, ownerId];
   }
 }

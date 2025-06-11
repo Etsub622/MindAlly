@@ -2,14 +2,15 @@ import 'package:front_end/core/config/config_key.dart';
 import 'package:front_end/core/error/exception.dart';
 import 'package:front_end/core/util/get_user_credential.dart';
 import 'package:front_end/features/calendar/data/model/event_model.dart';
+import 'package:front_end/features/calendar/domain/entity/event_entity.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 
 abstract class EventScheduleRemoteDataSource {
   Future<List<EventModel>> getEventSchedules();
-  Future<EventModel> addEventSchedule(EventModel event);
-  Future<bool> updateEventSchedule(String sessionId);
+  Future<EventModel> addEventSchedule(EventEntity event);
+  Future<bool> updateEventSchedule(String sessionId, double? price);
   Future<bool> deleteEventSchedule(String sessionId);
 
 }
@@ -28,7 +29,9 @@ class EventScheduleRemoteDataSourceImpl implements EventScheduleRemoteDataSource
     
     const  baseUrl = '${ConfigKey.baseUrl}/schedule';
 
-    final String endpoint = role == 'patient'
+    final String endpoint = role == 'admin'
+        ? '$baseUrl/admin/sessions'
+        :  role == 'patient'
         ? '$baseUrl/user/$userId/sessions'
         : '$baseUrl/therapist/$userId';
 
@@ -49,7 +52,7 @@ class EventScheduleRemoteDataSourceImpl implements EventScheduleRemoteDataSource
     }
   }
   @override
-  Future<EventModel> addEventSchedule(EventModel event) async {
+  Future<EventModel> addEventSchedule(EventEntity event) async {
     const String endpoint = 'http://10.0.2.2:8000/api/schedule/book';
 
     try {
@@ -65,6 +68,7 @@ class EventScheduleRemoteDataSourceImpl implements EventScheduleRemoteDataSource
           'endTime': event.endTime,
           'meeting_id':event.meetingId,
           "meeting_token": event.meetingToken,
+          "price": event.price,
         }),
       );
 
@@ -80,13 +84,16 @@ class EventScheduleRemoteDataSourceImpl implements EventScheduleRemoteDataSource
   }
 
    @override
-  Future<bool> updateEventSchedule(String sessionId) async {
+  Future<bool> updateEventSchedule(String sessionId, double? price) async {
     String endpoint = 'http://10.0.2.2:8000/api/schedule/$sessionId/confirm';
 
     try {
       final response = await client.patch(
         Uri.parse(endpoint),
         headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'price': price,
+        }),
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
