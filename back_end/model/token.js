@@ -9,7 +9,7 @@ const tokenSchema = new mongoose.Schema({
   userModel: {
     type: String,
     required: true,
-    enum: ["Patient", "Therapist"]
+    enum: ["Patient", "Therapist", "Admin"]
   },
   refreshToken: {
     type: String,

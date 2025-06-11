@@ -55,9 +55,7 @@ class CalendarInjection {
 
   sl.registerFactory(() => DeleteScheduledEventsBloc(
       deleteScheduledEventsUsecase: sl()));
-
-  sl.registerFactory(() => GetScheduledEventsBloc(
-      getScheduledEventsUsecase: sl()));
+  sl.registerFactory(() => GetScheduledEventsBloc(getScheduledEventsUsecase: sl<GetEventScheduleUsecase>()));
 
   sl.registerFactory(() => GetScheduledEventBloc(
       getSingleScheduledEventUsecase: sl()));

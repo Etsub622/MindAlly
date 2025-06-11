@@ -13,12 +13,13 @@ class EventEntity extends Equatable {
   final String status;
   final DateTime createdAt;
   final DateTime updatedAt;
+  double price;
   final List<dynamic> patientCheckInTimes;
   final List<dynamic> patientCheckOutTimes;
   final List<dynamic> therapistCheckInTimes;
   final List<dynamic> therapistCheckOutTimes;
 
-  const EventEntity({
+  EventEntity({
     required this.id,
     required this.patientId,
     required this.therapistId,
@@ -31,6 +32,7 @@ class EventEntity extends Equatable {
     required this.status,
     required this.createdAt,
     required this.updatedAt,
+    required this.price,
     this.patientCheckInTimes = const [],
     this.patientCheckOutTimes = const [],
     this.therapistCheckInTimes = const [],
@@ -50,6 +52,7 @@ class EventEntity extends Equatable {
     String? status,
     DateTime? createdAt,
     DateTime? updatedAt,
+    double? price,
     List<Map<String, dynamic>>? patientCheckInTimes,
     List<Map<String, dynamic>>? patientCheckOutTimes,
     List<Map<String, dynamic>>? therapistCheckInTimes,
@@ -68,6 +71,7 @@ class EventEntity extends Equatable {
       status: status ?? this.status,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      price: price ?? this.price,
       patientCheckInTimes: patientCheckInTimes ?? this.patientCheckInTimes,
       patientCheckOutTimes: patientCheckOutTimes ?? this.patientCheckOutTimes,
       therapistCheckInTimes: therapistCheckInTimes ?? this.therapistCheckInTimes,
@@ -78,5 +82,5 @@ class EventEntity extends Equatable {
 
 
   @override
-  List<Object?> get props => [id, patientId, therapistId,createrId, date, startTime, endTime, status, createdAt, updatedAt];
+  List<Object?> get props => [id, patientId, therapistId,createrId, date, startTime, endTime, status, createdAt, updatedAt, price];
 }

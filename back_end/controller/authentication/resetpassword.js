@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Patient } from "../../model/patientModel.js";
 import { Therapist } from "../../model/therapistModel.js";
+import { Admin } from "../../model/adminModel.js";
 import { hashedPassword } from "../../utils/authUtils.js";
 import { Otp } from "../../model/otpModel.js";
 
@@ -19,7 +20,7 @@ const resetPassword = async (req, res) => {
 
         const decoded = jwt.verify(token, process.env.ACCESS_SECRET);
         const { id, role } = decoded;
-        const userModel = role === "patient" ? Patient : Therapist;
+        const userModel = role === "admin" ? Admin : role === "patient" ? Patient : Therapist;
         const user = await userModel.findById(id);
        
          if (!user) {
@@ -92,7 +93,7 @@ const forgotPassword = async (req, res) => {
         const decoded = jwt.verify(resetToken, process.env.ACCESS_SECRET);
         const { email } = decoded;
       
-        const userModel = await Patient.findOne({ Email: email }) || await Therapist.findOne({ Email:email });
+        const userModel = await Patient.findOne({ Email: email }) || await Therapist.findOne({ Email:email }) || Admin.findOne({ Email:email });
 
 
         if (!userModel) {
