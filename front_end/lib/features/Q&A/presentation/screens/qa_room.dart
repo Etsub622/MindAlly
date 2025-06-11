@@ -15,7 +15,13 @@ import 'package:front_end/features/Q&A/presentation/widget/search_box.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class QARoom extends StatefulWidget {
-  const QARoom({super.key});
+  final String? questionId;
+  final String currentUserRole;
+  const QARoom({
+    super.key,
+    this.questionId,
+    required this.currentUserRole,
+  });
 
   @override
   State<QARoom> createState() => _QARoomState();
@@ -41,21 +47,20 @@ class _QARoomState extends State<QARoom> {
     'SelfLove'
   ];
 
-final FlutterSecureStorage _secureStorage = FlutterSecureStorage();
- void _loadCurrentUserId() async {
-    final userJson = await _secureStorage.read(key: 'user_profile');
+  void _loadCurrentUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userJson = prefs.getString('user_profile');
     if (userJson != null) {
       final userMap = json.decode(userJson);
       setState(() {
         print('userMap: $userMap');
         currentUserId = userMap["_id"] ?? '';
-        currentUserRole = userMap["role"];
+        currentUserRole = userMap["Role"];
       });
     } else {
-      print('No user profile found in secure storage');
+      print('No user profile found in shared preferences');
     }
   }
-
 
   String? selectedCategory;
 
@@ -130,6 +135,7 @@ final FlutterSecureStorage _secureStorage = FlutterSecureStorage();
           IconButton(
             onPressed: () {
               showModalBottomSheet(
+                // isScrollControlled: true,
                 context: context,
                 builder: (context) {
                   return CreateQuestionBottomSheet();
@@ -187,6 +193,8 @@ final FlutterSecureStorage _secureStorage = FlutterSecureStorage();
                       itemCount: questions.length,
                       itemBuilder: (context, index) {
                         final question = questions[index];
+                        print('question:$question');
+                        print('createdId:${question.creatorId}');
                         return QuestionCard(
                           name: question.studentName,
                           title: question.title,
@@ -197,14 +205,16 @@ final FlutterSecureStorage _secureStorage = FlutterSecureStorage();
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    CommentRoom(questionId: question.id),
+                                builder: (context) => CommentRoom(
+                                    currentUserRole: currentUserRole ?? '',
+                                    questionId: question.id),
                               ),
                             );
                           },
                           onUpdate: () {
                             showModalBottomSheet(
                               context: context,
+                              isScrollControlled: true,
                               builder: (context) {
                                 return UpdateQuestionBottomSheet(
                                   questionEntity: question,

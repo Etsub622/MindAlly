@@ -13,14 +13,13 @@ class QuestionModel extends QuestionEntity {
 
   factory QuestionModel.fromJson(Map<String, dynamic> json) {
     return QuestionModel(
-      id: json['_id'],
-      title: json['title'],
-      description: json['description'],
-      studentName: json['studentName'],
-      studentProfile: json['studentProfile'],
-      creatorId:json['creatorId'],
-      category: List<String>.from(json['category']),
-      
+      id: json['_id'] ?? '',
+      title: json['title'] ?? '',
+      description: json['description'] ?? '',
+      studentName: json['studentName'] ?? '',
+      studentProfile: json['studentProfile'] ?? '',
+      creatorId: json['creatorId'] ?? '',
+      category: List<String>.from(json['category']) ?? [],
     );
   }
 
@@ -31,6 +30,7 @@ class QuestionModel extends QuestionEntity {
       'studentName': super.studentName,
       'studentProfile': super.studentProfile,
       'category': super.category,
+      'creatorId': super.creatorId,
     };
   }
 
@@ -42,7 +42,7 @@ class QuestionModel extends QuestionEntity {
       studentName: super.studentName,
       studentProfile: super.studentProfile,
       category: super.category,
-      creatorId:super.creatorId,
+      creatorId: super.creatorId,
     );
   }
 }

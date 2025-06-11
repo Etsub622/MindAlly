@@ -6,12 +6,18 @@ class VideoCard extends StatelessWidget {
   final VideoEntity video;
   final VoidCallback onUpdate;
   final VoidCallback onDelete;
+   final String currentUserId;
+  final String ownerId;
+  final String role;
 
   const VideoCard({
     super.key,
     required this.video,
     required this.onDelete,
     required this.onUpdate,
+    required this.currentUserId,
+    required this.ownerId,
+    required this.role,
   });
 
   Future<void> _launchURL(BuildContext context) async {
@@ -147,7 +153,7 @@ class VideoCard extends StatelessWidget {
                 ],
               ),
             ),
-
+            if(currentUserId == ownerId && role == 'therapist')
             PopupMenuButton<String>(
               icon: Icon(Icons.more_vert, color: Colors.grey.shade600),
               onSelected: (value) {

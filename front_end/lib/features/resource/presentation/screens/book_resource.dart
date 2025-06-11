@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front_end/features/resource/domain/entity/book_entity.dart';
@@ -5,22 +7,55 @@ import 'package:front_end/features/resource/presentation/bloc/book_bloc/bloc/boo
 import 'package:front_end/features/resource/presentation/screens/add_book.dart';
 import 'package:front_end/features/resource/presentation/screens/update_book.dart';
 import 'package:front_end/features/resource/presentation/widget/book_card.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class BookResource extends StatefulWidget {
-  const BookResource({super.key});
+  final String? currentUserRole;
+  const BookResource({super.key, this.currentUserRole});
 
   @override
   State<BookResource> createState() => _BookResourceState();
 }
 
 class _BookResourceState extends State<BookResource> {
+  String? currentUserId;
+  String? currentUserRole;
   final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     context.read<BookBloc>().add(GetBookEvent());
+    _loadCurrentUserId();
   }
+
+  void _loadCurrentUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userJson = prefs.getString('user_profile');
+    if (userJson != null) {
+      final userMap = json.decode(userJson);
+      setState(() {
+        print('userMap: $userMap');
+
+        currentUserId = userMap["_id"] ?? '';
+        currentUserRole = userMap["Role"];
+        print('userId:$currentUserId');
+        print('role : $currentUserRole');
+      });
+    } else {
+      print('No user profile found in shared preferences');
+    }
+  }
+
+  List<String> bookCategories = const [
+    'Depression',
+    'Anxiety',
+    'OCD',
+    'General',
+    'Trauma',
+    'SelfLove'
+  ];
+  String? selectedCategory;
 
   @override
   Widget build(BuildContext context) {
@@ -33,39 +68,36 @@ class _BookResourceState extends State<BookResource> {
           backgroundColor: Colors.white,
           elevation: 0,
           title: Container(
+            height: 40,
             decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 226, 225, 225),
-              borderRadius: BorderRadius.circular(20),
+              color: const Color(0xFFE2E1E1),
+              borderRadius: BorderRadius.circular(30),
             ),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
                 Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 20),
-                    child: TextField(
-                      controller: _searchController,
-                      decoration: InputDecoration(
-                        hintText: 'Search for books..',
-                        hintStyle: const TextStyle(
-                          color: Color.fromARGB(239, 130, 5, 220),
-                        ),
-                        border: InputBorder.none,
-                        contentPadding:
-                            const EdgeInsets.symmetric(vertical: 10.0),
-                      ),
-                      style: const TextStyle(
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: const InputDecoration(
+                      hintText: 'Search for books...',
+                      hintStyle: TextStyle(
                         color: Color.fromARGB(239, 130, 5, 220),
                       ),
-                      onSubmitted: (query) {
-                        if (query.isNotEmpty) {
-                          context.read<BookBloc>().add(SearchEvent(query));
-                        }
-                      },
+                      border: InputBorder.none,
                     ),
+                    style: const TextStyle(
+                      color: Color.fromARGB(239, 130, 5, 220),
+                    ),
+                    onSubmitted: (query) {
+                      if (query.isNotEmpty) {
+                        context.read<BookBloc>().add(SearchEvent(query));
+                      }
+                    },
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.search, size: 27, color: Colors.grey),
+                  icon: const Icon(Icons.search, size: 24, color: Colors.grey),
                   onPressed: () {
                     final query = _searchController.text;
                     if (query.isNotEmpty) {
@@ -78,14 +110,40 @@ class _BookResourceState extends State<BookResource> {
           ),
           actions: [
             IconButton(
-              icon: const Icon(
-                Icons.refresh,
-                color: Color.fromARGB(239, 130, 5, 220),
-                size: 25,
-              ),
+              icon: const Icon(Icons.refresh,
+                  color: Color.fromARGB(239, 130, 5, 220)),
               onPressed: () {
                 _searchController.clear();
                 context.read<BookBloc>().add(GetBookEvent());
+              },
+            ),
+            PopupMenuButton<String>(
+              icon: const Icon(Icons.filter_list,
+                  color: Color.fromARGB(239, 130, 5, 220)),
+              onOpened: () {
+               
+                FocusScope.of(context).unfocus();
+              },
+              onSelected: (String newValue) {
+                setState(() {
+                  selectedCategory = newValue;
+                });
+                context
+                    .read<BookBloc>()
+                    .add(SearchBookByCategoryEvent(newValue));
+              },
+              itemBuilder: (BuildContext context) {
+                return bookCategories.map((String category) {
+                  return PopupMenuItem<String>(
+                    value: category,
+                    child: Text(
+                      category,
+                      style: const TextStyle(
+                        color: Color.fromARGB(239, 130, 5, 220),
+                      ),
+                    ),
+                  );
+                }).toList();
               },
             ),
           ],
@@ -146,6 +204,7 @@ class _BookResourceState extends State<BookResource> {
                             author: book.author,
                             imageUrl: book.image,
                             categories: book.categories,
+                            ownerId: book.ownerId,
                             onUpdate: (updatedBookMap) {
                               final updatedBook = BookEntity(
                                 type: book.type,
@@ -154,6 +213,7 @@ class _BookResourceState extends State<BookResource> {
                                 author: updatedBookMap['author'] as String,
                                 image: updatedBookMap['imageUrl'] as String,
                                 categories: book.categories,
+                                ownerId: book.ownerId,
                               );
                               context
                                   .read<BookBloc>()
@@ -172,6 +232,9 @@ class _BookResourceState extends State<BookResource> {
                       _showDeleteDialog(context, book.id);
                     },
                     book: book,
+                    currentUserId: currentUserId ?? '',
+                    ownerId: book.ownerId,
+                    role: currentUserRole ?? '',
                   );
                 },
               );
@@ -179,16 +242,19 @@ class _BookResourceState extends State<BookResource> {
             return const Center(child: Text('Something went wrong!'));
           },
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => AddBook()),
-            );
-          },
-          child: const Icon(Icons.add),
-          backgroundColor: Colors.purple,
-        ),
+        floatingActionButton:
+            (currentUserId != null && currentUserRole == 'therapist')
+                ? FloatingActionButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => AddBook()),
+                      );
+                    },
+                    child: const Icon(Icons.add),
+                    backgroundColor: Colors.purple,
+                  )
+                : null,
       ),
     );
   }

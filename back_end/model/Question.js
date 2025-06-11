@@ -5,6 +5,7 @@ const questionSchema = new mongoose.Schema({
   description: { type: String, required: true },
   studentName: { type: String, required: true },
   studentProfile: { type: String, required: true },
+  creatorId: { type: String, required: true },
   category: { type: [String], required: true },
 },
 { timestamps: true });

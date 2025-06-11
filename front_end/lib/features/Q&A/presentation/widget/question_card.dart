@@ -13,7 +13,6 @@ class QuestionCard extends StatefulWidget {
   final String ownerId;
   final String role;
 
-
   const QuestionCard({
     required this.name,
     required this.title,
@@ -38,6 +37,8 @@ class _QuestionCardState extends State<QuestionCard> {
 
   @override
   Widget build(BuildContext context) {
+    print(
+        'role: ${widget.role}, currentUserId: ${widget.currentUserId}, ownerId: ${widget.ownerId}');
     return AnimatedContainer(
       duration: Duration(milliseconds: 300),
       curve: Curves.easeInOut,
@@ -76,7 +77,7 @@ class _QuestionCardState extends State<QuestionCard> {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                if ((widget.role == 'professional') ||
+                if ((widget.role == 'therapist') ||
                     (widget.currentUserId == widget.ownerId))
                   PopupMenuButton<String>(
                     icon: Icon(Icons.more_vert, color: Colors.grey[700]),
@@ -103,44 +104,51 @@ class _QuestionCardState extends State<QuestionCard> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             SizedBox(height: 8),
-            AnimatedCrossFade(
-              duration: Duration(milliseconds: 250),
-              crossFadeState: _isExpanded
-                  ? CrossFadeState.showSecond
-                  : CrossFadeState.showFirst,
-              firstChild: Text(
+            if (widget.content.length > 100) ...[
+              AnimatedCrossFade(
+                duration: Duration(milliseconds: 250),
+                crossFadeState: _isExpanded
+                    ? CrossFadeState.showSecond
+                    : CrossFadeState.showFirst,
+                firstChild: Text(
+                  widget.content,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: Colors.grey[700]),
+                ),
+                secondChild: Text(
+                  widget.content,
+                  style: TextStyle(color: Colors.grey[700]),
+                ),
+              ),
+              SizedBox(height: 8),
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _isExpanded = !_isExpanded;
+                  });
+                },
+                child: Row(
+                  children: [
+                    Text(
+                      _isExpanded ? 'Read less' : 'Read more',
+                      style: TextStyle(
+                          color: Colors.blue, fontWeight: FontWeight.w500),
+                    ),
+                    Icon(
+                      _isExpanded ? Icons.expand_less : Icons.expand_more,
+                      color: Color.fromARGB(239, 130, 5, 220),
+                      size: 18,
+                    ),
+                  ],
+                ),
+              ),
+            ] else ...[
+              Text(
                 widget.content,
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
                 style: TextStyle(color: Colors.grey[700]),
               ),
-              secondChild: Text(
-                widget.content,
-                style: TextStyle(color: Colors.grey[700]),
-              ),
-            ),
-            SizedBox(height: 8),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  _isExpanded = !_isExpanded;
-                });
-              },
-              child: Row(
-                children: [
-                  Text(
-                    _isExpanded ? 'Read less' : 'Read more',
-                    style: TextStyle(
-                        color: Colors.blue, fontWeight: FontWeight.w500),
-                  ),
-                  Icon(
-                    _isExpanded ? Icons.expand_less : Icons.expand_more,
-                    color: Color.fromARGB(239, 130, 5, 220),
-                    size: 18,
-                  ),
-                ],
-              ),
-            ),
+            ],
             SizedBox(height: 7),
             Wrap(
               spacing: 6,
@@ -162,8 +170,6 @@ class _QuestionCardState extends State<QuestionCard> {
                 );
               }).toList(),
             ),
-            SizedBox(height: 5),
-            if (widget.role == 'professional')
             Align(
               alignment: Alignment.centerRight,
               child: IconButton(

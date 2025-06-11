@@ -6,16 +6,24 @@ class BookItem extends StatelessWidget {
   final BookEntity book;
   final VoidCallback onUpdate;
   final VoidCallback onDelete;
+  final String currentUserId;
+  final String ownerId;
+  final String role;
 
   const BookItem(
       {required this.book,
       required this.onDelete,
       required this.onUpdate,
+      required this.currentUserId,
+      required this.ownerId,
+      required this.role,
       Key? key})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    print(
+        'BookItem: currentUserId: $currentUserId, ownerId: $ownerId, role: $role');
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(
@@ -58,26 +66,27 @@ class BookItem extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    PopupMenuButton<String>(
-                      icon: Icon(Icons.more_vert),
-                      onSelected: (value) {
-                        if (value == 'update') {
-                          onUpdate();
-                        } else if (value == 'delete') {
-                          onDelete();
-                        }
-                      },
-                      itemBuilder: (context) => [
-                        PopupMenuItem(
-                          value: 'update',
-                          child: Text('Update'),
-                        ),
-                        PopupMenuItem(
-                          value: 'delete',
-                          child: Text('Delete'),
-                        ),
-                      ],
-                    ),
+                    if (currentUserId == ownerId && role == 'therapist')
+                      PopupMenuButton<String>(
+                        icon: Icon(Icons.more_vert),
+                        onSelected: (value) {
+                          if (value == 'update') {
+                            onUpdate();
+                          } else if (value == 'delete') {
+                            onDelete();
+                          }
+                        },
+                        itemBuilder: (context) => [
+                          PopupMenuItem(
+                            value: 'update',
+                            child: Text('Update'),
+                          ),
+                          PopupMenuItem(
+                            value: 'delete',
+                            child: Text('Delete'),
+                          ),
+                        ],
+                      ),
                   ],
                 ),
                 SizedBox(height: 4),

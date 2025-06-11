@@ -44,6 +44,7 @@ class _ProfileAboutInfoState extends State<ProfileAboutInfo> {
   void _showUpdateModal(BuildContext context) {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       builder: (context) {
         return Container(
           height: MediaQuery.of(context).size.height * 0.45,

@@ -30,7 +30,8 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       final user = await client.post(url,
           body: jsonEncode(professionalModel.toJson()),
           headers: {'Content-Type': 'application/json'});
-
+      print(professionalModel.toJson());
+      print('statusCode: ${user.statusCode}');
       if (user.statusCode == 200) {
         final jsonResponse = jsonDecode(user.body);
         final token = jsonResponse['token'];
@@ -135,7 +136,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
         return studentResponse;
       } else {
         final errorMessage = jsonDecode(user.body);
-         print(" login failed $errorMessage");
+        print(" login failed $errorMessage");
         throw ServerException(message: errorMessage?['error']);
       }
     } catch (e) {

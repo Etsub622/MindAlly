@@ -7,6 +7,7 @@ class ArticleEntity extends Equatable {
   final String link;
   final String logo;
   final String type;
+  final String ownerId;
   final List<String> categories;
 
   ArticleEntity({
@@ -16,6 +17,7 @@ class ArticleEntity extends Equatable {
     required this.link,
     required this.logo,
     required this.type,
+    required this.ownerId,
     required this.categories,
   });
   @override
@@ -28,6 +30,7 @@ class ArticleEntity extends Equatable {
       logo,
       type,
       categories,
+      ownerId,
     ];
   }
 }

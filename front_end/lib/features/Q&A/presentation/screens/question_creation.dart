@@ -44,12 +44,13 @@ class _CreateQuestionBottomSheetState extends State<CreateQuestionBottomSheet> {
   Future<String> _getStudentName() async {
     final prefs = await SharedPreferences.getInstance();
     final userJson = prefs.getString('user_profile');
-    print('userJson: $userJson');
     if (userJson != null) {
       final userMap = json.decode(userJson);
+      print('userMap in _getStudentName: $userMap');
       return userMap['FullName'] ?? '';
     }
-    return 'hmmm';
+    print('No user profile found in shared preferences (name)');
+    return '';
   }
 
   Future<String> _getStudentId() async {
@@ -57,8 +58,10 @@ class _CreateQuestionBottomSheetState extends State<CreateQuestionBottomSheet> {
     final userJson = prefs.getString('user_profile');
     if (userJson != null) {
       final userMap = json.decode(userJson);
-      return userMap["_id"] ?? '';
+      print('userMap in _getStudentId: $userMap');
+      return userMap['_id'] ?? '';
     }
+    print('No user profile found in shared preferences (id)');
     return '';
   }
 
@@ -74,11 +77,14 @@ class _CreateQuestionBottomSheetState extends State<CreateQuestionBottomSheet> {
         title: title,
         description: description,
         studentName: name,
-        creatorId:creatorId,
+        creatorId: creatorId,
         studentProfile:
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR2uz88opUkCosnT3sNx3yyBB_GAhOiejbUAg&s",
         category: selectedCategories,
       );
+
+      print('creatorId: ${questionEntity.creatorId}');
+      print('userName: ${questionEntity.studentName}');
 
       context.read<QuestionBloc>().add(AddQuestionEvent(questionEntity));
     } else {
