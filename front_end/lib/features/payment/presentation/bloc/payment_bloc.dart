@@ -1,42 +1,32 @@
-import 'package:bloc/bloc.dart';
-import 'package:front_end/features/Payment/domain/entity/payment_entity.dart';
-import 'package:front_end/features/Payment/domain/usecase/initiate_payment_usecase.dart';
-import 'package:front_end/features/Payment/domain/usecase/verify_payment_usecase.dart';
-import 'package:meta/meta.dart';
+import 'package:equatable/equatable.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:front_end/features/payment/data/model/payment_request_model.dart';
+import 'package:front_end/features/payment/domain/usecase/initiate_payment_use_case.dart';
 
 part 'payment_event.dart';
 part 'payment_state.dart';
 
 class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
-  final InitiatePaymentUsecase initiatePaymentUsecase;
-  final VerifyPaymentUsecase verifyPaymentUsecase;
+  final InitiatePaymentUseCase initiatePaymentUseCase;
 
-  PaymentBloc({
-    required this.initiatePaymentUsecase,
-    required this.verifyPaymentUsecase,
+  PaymentBloc(this.initiatePaymentUseCase) : super(PaymentInitial()) {
+    on<InitiatePaymentEvent>(_onInitiatePayment);
+  }
 
-  }) : super(PaymentInitial()) {
- on<InitiatePaymentEvent>((event, emit) async {
-      emit(PaymentLoading());
-
-      final result =
-          await initiatePaymentUsecase(InitiateParams(event.paymentEntity));
-
-      result.fold(
-        (failure) => emit(PaymentError(failure.message)),
-        (checkoutUrl) => emit(PaymentInitiated(checkoutUrl)),
+  Future<void> _onInitiatePayment(
+      InitiatePaymentEvent event, Emitter<PaymentState> emit) async {
+    emit(PaymentLoading());
+      final payment = PaymentRequestModel(
+        therapistEmail: event.therapistEmail,
+        patientEmail: event.patientEmail,
+        sessionHour: event.sessionHour,
+        pricePerHr: event.pricePerHr,
       );
-    });
-
-    on<VerifyPaymentEvent>((event, emit) async {
-      emit(PaymentLoading());
-
-      final result = await verifyPaymentUsecase(VerifyParams(event.txRef));
-
-      result.fold(
-        (failure) => emit(PaymentError(failure.message)),
-        (message) => emit(PaymentVerified(message)),
+      final checkoutUrl = await initiatePaymentUseCase(payment);
+      checkoutUrl.fold(
+        (failure) => emit(PaymentFailure(error: failure.message)),
+        (checkoutUrl) => emit(PaymentSuccess(checkoutUrl: checkoutUrl)),
       );
-    });
+     
   }
 }
