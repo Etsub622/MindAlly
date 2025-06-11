@@ -6,6 +6,7 @@ import 'package:front_end/core/injection/book_injection.dart';
 import 'package:front_end/core/injection/calendar_injection.dart';
 import 'package:front_end/core/injection/chat_injection.dart';
 import 'package:front_end/core/injection/home_injection.dart';
+import 'package:front_end/core/injection/payment_injection.dart';
 import 'package:front_end/core/injection/profile_injection.dart';
 import 'package:front_end/core/injection/question_injection.dart';
 import 'package:front_end/core/injection/video_injection.dart';
@@ -36,4 +37,5 @@ Future<void> init() async {
   AnswerInjection().init(); 
   HomeInjection().init();
   CalendarInjection().init();
+  PaymentInjection().init();
 }

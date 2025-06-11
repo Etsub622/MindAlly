@@ -64,6 +64,7 @@ dependencies:
   table_calendar: ^3.2.0
   videosdk: ^2.1.2
   shimmer: ^3.0.0
+  webview_flutter: ^4.13.0
   # stream_video: ^0.8.4
   # stream_video_flutter: ^0.8.2
   # stream_video_push_notification: ^0.8.4

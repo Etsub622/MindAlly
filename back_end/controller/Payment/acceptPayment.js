@@ -112,12 +112,12 @@ const headers = {
 
 const acceptPayment = async (req, res) => {
     try {
-        const { therapistEmail, patientEmail, sessionDuration} = req.body;
+        const { therapistEmail, patientEmail, sessionDuration, pricePerHr} = req.body;
 
         const therapist = await Therapist.findOne({ Email: therapistEmail });
         if (!therapist) return res.status(404).json({ error: "Therapist not found" });
 
-        const amount = therapist.Fee * sessionDuration; 
+        const amount = pricePerHr * sessionDuration; 
         // const amount = Fee * sessionDuration; 
         const tx_ref = uuidv4();
 
