@@ -281,6 +281,7 @@ class _ChatPageState extends State<ChatPage> {
                                       updatedAt: DateTime.now(), 
                                       meetingId: meetingId,
                                       meetingToken: token,
+                                      price: 0.0,
                                     );
 
                                    
@@ -301,6 +302,7 @@ class _ChatPageState extends State<ChatPage> {
                                                 event: event!,
                                                 chatId: currentChatId ?? '',
                                                 receiver: widget.receiver,
+                                                isCreate: true,
                                               ),
                                             ),
                                   );

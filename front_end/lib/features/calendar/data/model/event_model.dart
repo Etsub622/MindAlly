@@ -14,6 +14,7 @@ class EventModel extends EventEntity {
     required super.status,
     required super.createdAt,
     required super.updatedAt,
+    required super.price,
     super.patientCheckInTimes = const [],
     super.patientCheckOutTimes = const [],
     super.therapistCheckInTimes = const [],
@@ -34,6 +35,7 @@ class EventModel extends EventEntity {
       meetingToken: json['meeting_token'],
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
+      price: json['price']?.toDouble() ?? 0.0,
       patientCheckInTimes: (json['patientCheckInTimes'] as List<dynamic>?)?.map((e) => {
             'index': e['index'],
             'time': DateTime.parse(e['time']),
@@ -67,6 +69,7 @@ class EventModel extends EventEntity {
       'meeting_id': meetingId,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
+      'price': price,
       'patientCheckInTimes': patientCheckInTimes.map((e) => {
             'index': e['index'],
             'time': e['time'].toIso8601String(),

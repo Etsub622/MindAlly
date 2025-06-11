@@ -30,7 +30,9 @@ export const bookSession = async (req, res) => {
   return `${h}:${m}`;
 }
   try {
-    const { userId, therapistId, createrId, date, startTime, endTime, meeting_id, meeting_token } = req.body;
+    const { userId, therapistId, createrId, date, startTime, endTime, meeting_id, meeting_token, price } = req.body;
+     
+    const sessionPrice = price !== undefined ? price : 0.0;
 
     // Validate required fields
     if (!userId || !therapistId || !date || !startTime || !endTime || !meeting_id || !meeting_token || !createrId) {
@@ -76,8 +78,8 @@ const sessionEnd = new Date(`${date}T${parsedEnd}:00`);
     if (existingSession) {
       return res.status(400).json({ message: "This time slot is already booked." });
     }
-
-    const session = new Session({ userId, therapistId, createrId, date, startTime, endTime, meeting_id, meeting_token });
+   console.log(`Booking session for user ${sessionPrice}`);
+    const session = new Session({ userId, therapistId, createrId, date, startTime, endTime, meeting_id, meeting_token, price: sessionPrice, });
     await session.save();
 
     res.status(201).json({ message: "Session booked successfully", session });
@@ -97,6 +99,24 @@ export const getUserSessions = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+export const getAllUserSessions = async (req, res) => {
+  try {
+    // Define the filter object
+    const filter = { status: 'Completed' };
+
+    // Fetch sessions with the specified status
+    const sessions = await Session.find(filter);
+
+    // Return the sessions
+    res.json(sessions);
+  } catch (error) {
+    console.error('Error fetching sessions:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+
 
 export const getSessionById = async (req, res) => {
   try {
@@ -162,7 +182,19 @@ export const getTherapistSessionsByStatus = async (req, res) => {
 };
 
 export const confirmSession = async (req, res) => {
-  const session = await Session.findByIdAndUpdate(req.params.sessionId, { status: 'Confirmed' }, { new: true });
+  const updateData = { status: 'Confirmed' };
+  
+  // Conditionally add price to updateData if provided in request body
+  if (req.body.price !== undefined) {
+    updateData.price = req.body.price;
+  }
+
+  const session = await Session.findByIdAndUpdate(
+    req.params.sessionId, 
+    updateData, 
+    { new: true }
+  );
+  
   if (!session) return res.status(404).send('Session not found');
   res.json(session);
 };

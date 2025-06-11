@@ -6,18 +6,48 @@ import 'package:front_end/features/payment/presentation/widget/webview_screen.da
 import 'package:front_end/features/profile_patient/domain/entities/user_entity.dart';
 import '../bloc/payment_bloc.dart';
 
-class PaymentScreen extends StatelessWidget {
-  final String therapistEmail;
+class PaymentScreen extends StatefulWidget {
+    final String therapistEmail;
   final String patientEmail;
   final double sessionHour;
   final EventEntity event;
   final String? chatId;
   final UserEntity receiver;
+  final bool isCreate;
 
-  const PaymentScreen({super.key, required this.therapistEmail, required this.patientEmail, required this.event, required this.sessionHour, this.chatId,required this.receiver});
+  const PaymentScreen({super.key, required this.therapistEmail, required this.patientEmail, required this.event, required this.sessionHour, this.chatId,required this.receiver, required this.isCreate});
+
+  @override
+  State<PaymentScreen> createState() => _PaymentScreenState();
+}
+
+class _PaymentScreenState extends State<PaymentScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final _formKey = GlobalKey<FormState>();
+    final _pricePerHrController = TextEditingController();
+
+
+    @override
+  void dispose() {
+    _pricePerHrController.dispose();
+    super.dispose();
+  }
+
+  void _submitForm() {
+    if (_formKey.currentState!.validate()) {
+      final bloc = context.read<PaymentBloc>();
+      bloc.add(InitiatePaymentEvent(
+        therapistEmail: widget.therapistEmail,
+        patientEmail: widget.patientEmail,
+        sessionHour: widget.sessionHour,
+        pricePerHr: double.parse(_pricePerHrController.text),
+      ));
+    }
+  }
+
+
     return Scaffold(
       appBar: AppBar(title: const Text('Patient Payment')),
       body: Padding(
@@ -28,16 +58,59 @@ class PaymentScreen extends StatelessWidget {
                 Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => WebViewScreen(url: state.checkoutUrl, event: event, chatId: chatId, receiver: receiver),
+                  builder: (context) => WebViewScreen(url: state.checkoutUrl, event: widget.event, chatId: widget.chatId, receiver: widget.receiver, isCreate: widget.isCreate, price: widget.sessionHour *  double.parse(_pricePerHrController.text)),
                 ),
               );
             }
           },
-          child: PaymentForm(
-            therapistEmail: therapistEmail,
-            patientEmail: patientEmail,
-            sessionHour: sessionHour,
+          child: Form(
+      key: _formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Please insert the price per hour for the session. The session hour is ${widget.sessionHour} hours."),
+          TextFormField(
+            controller: _pricePerHrController,
+            decoration: const InputDecoration(labelText: 'Price per Hour (ETB)'),
+            keyboardType: TextInputType.number,
+            validator: (value) {
+              if (value == null || value.isEmpty) return 'Required';
+              if (double.tryParse(value) == null || double.parse(value) <= 0) {
+                return 'Must be a positive number';
+              }
+              return null;
+            },
           ),
+          const SizedBox(height: 16),
+          BlocBuilder<PaymentBloc, PaymentState>(
+            builder: (context, state) {
+              if (state is PaymentLoading) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              return ElevatedButton(
+                onPressed: _submitForm,
+                child: const Text('Initiate Payment'),
+              );
+            },
+          ),
+          BlocBuilder<PaymentBloc, PaymentState>(
+            builder: (context, state) {
+              if (state is PaymentFailure) {
+                return Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Text(
+                    state.error,
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                );
+              }
+              return const SizedBox.shrink(); // Return empty widget if not PaymentFailure
+            },
+          ),
+        ],
+          
+      ),
+    ),
         ),
       ),
     );

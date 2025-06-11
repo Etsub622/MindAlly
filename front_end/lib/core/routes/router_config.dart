@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:front_end/core/routes/app_path.dart';
 import 'package:front_end/features/Home/presentation/screens/home_navigation_screen.dart';
 import 'package:front_end/features/Home/presentation/screens/therapist_detail_screen.dart';
+import 'package:front_end/features/admin/admin_screen.dart';
 import 'package:front_end/features/authentication/presentation/screens/forgot_password.dart';
 import 'package:front_end/features/authentication/presentation/screens/login.dart';
 import 'package:front_end/features/authentication/presentation/screens/otp.dart';
@@ -56,7 +57,7 @@ final routes = <GoRoute>[
       }),
        GoRoute(
       path: AppPath.bookResource,
-      builder: (context, state) => BookResource ()),
+      builder: (context, state) => BookResource()),
   GoRoute(
       path: AppPath.otp,
       builder: (context, state) {
@@ -83,6 +84,11 @@ final routes = <GoRoute>[
     name:"calendar",
     path: AppPath.calendar,
     builder: (BuildContext context, GoRouterState state) => const CalendarScreen()
+  ),
+  GoRoute(
+    name:"admin",
+    path: AppPath.admin,
+    builder: (BuildContext context, GoRouterState state) => const AdminDashboardScreen()
   ),
   GoRoute(
       path: '/therapistDetails',

@@ -5,6 +5,9 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:front_end/core/utils/constants.dart';
 import 'package:front_end/core/routes/app_path.dart';
 import 'package:front_end/features/Home/presentation/screens/home_screen.dart';
+import 'package:front_end/features/admin/admin_screen.dart';
+import 'package:front_end/features/admin/events_admin_screen.dart';
+import 'package:front_end/features/admin/unapproved_therapists_screen.dart';
 import 'package:front_end/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:front_end/features/chat/presentation/screens/chat_room.dart';
 import 'package:front_end/features/Q&A/presentation/screens/qa_room.dart';
@@ -86,16 +89,23 @@ class _HomeNavigationScreenState extends State<HomeNavigationScreen> {
               body: Center(child: Text("Logging out...")),
             );
           }
+          List<StatefulWidget>  screens = [];
 
-          final screens = [
+          role != "admin" ?
+           screens = [
             HomeScreen(role: role!, userId: userId!),
             QARoom(
               currentUserRole: role!,
             ),
             const ResourceRoom(),
             const ChatRoom(),
+          ]
+          :
+          screens = [
+            EventsAdminScreen(),
+            UnapprovedTherapistsScreen(),
           ];
-
+          
           return Scaffold(
             body: Center(
               child: Stack(
@@ -116,7 +126,9 @@ class _HomeNavigationScreenState extends State<HomeNavigationScreen> {
                     index = newIndex;
                   });
                 },
-                items: [
+                items: 
+                role != "admin" ?
+                [
                   BottomNavigationBarItem(
                     icon: index == 0
                         ? Image.asset(
@@ -149,6 +161,21 @@ class _HomeNavigationScreenState extends State<HomeNavigationScreen> {
                             width: 30, height: 40, AppImage.chatUnselected),
                     label: 'Chat',
                   ),
+                ]
+                :[
+                   BottomNavigationBarItem(
+                    icon: index == 0
+                        ? Image.asset(width: 30, height: 40, AppImage.resourceSelected)
+                        : Image.asset(width: 30, height: 40, AppImage.resourceUnselected),
+                    label: 'events',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: index == 1
+                        ? Image.asset(width: 30, height: 40, AppImage.chatSelected)
+                        : Image.asset(width: 30, height: 40, AppImage.chatUnselected),
+                    label: 'therapist',
+                  ),
+
                 ],
               ),
             ),

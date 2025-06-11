@@ -29,6 +29,21 @@ class PaymentRepositoryImpl extends PaymentRepository  {
     // }
 
   }
+  
+  @override
+  Future<Either<Failure, String>> withdrawPayment(String email, double amount) async {
+    // if (await networkInfo.isConnected) {
+      try {
+        final result = await paymentRemoteDataSource.withdrawPayment(email, amount);
+        return Right(result);
+      } catch (e) {
+        return Left(ServerFailure(message: e.toString()));
+      }
+    // } else {
+    //   return Left(ServerFailure(message: "No Internet Connection"));
+    // }
+
+  }
 }
 
 

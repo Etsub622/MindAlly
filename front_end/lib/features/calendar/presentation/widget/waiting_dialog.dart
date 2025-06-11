@@ -239,6 +239,7 @@ class WaitingDialog extends StatelessWidget {
                               event: event,
                               chatId: chatId,
                               receiver: receiver,
+                              isCreate:false,
                             ),
                           ),
                         );

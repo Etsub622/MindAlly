@@ -99,24 +99,8 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   Future<StudentResponseModel> logIn(LoginModel loginModel) async {
     try {
       final sharedPreferences = await SharedPreferences.getInstance();
-      // final loginLocalDataSource =
-      //     LoginLocalDataSourceImpl(sharedPreferences: sharedPreferences);
-      // final token = await loginLocalDataSource.getToken();
-
-      // // Decode the token to get the role
-      // Map<String, dynamic> payload = JwtDecoder.decode(token);
-      // String role = payload['role'];
-      // print(role);
-      // print('token:$token');
 
       var url = Uri.parse('$baseUrl/user/Login');
-      // if (role == 'patient') {
-      //   url = Uri.parse('$baseUrl/Login');
-      // } else if (role == 'therapist') {
-      //   url = Uri.parse('$baseUrl/therapist/therapistLogin');
-      // } else {
-      //   url = '';
-      // }
 
       final user = await client.post(url,
           body: jsonEncode(loginModel.toJson()),
