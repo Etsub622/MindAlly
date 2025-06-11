@@ -11,14 +11,14 @@ import 'package:intl/intl.dart';
 
 enum EventStatus { Pending, Completed, Confirm }
 
-class DateTimePicker extends StatefulWidget {
-  const DateTimePicker({super.key});
+class CalendarScreen extends StatefulWidget {
+  const CalendarScreen({super.key});
 
   @override
-  State<DateTimePicker> createState() => _DateTimePickerState();
+  State<CalendarScreen> createState() => _CalendarScreenState();
 }
 
-class _DateTimePickerState extends State<DateTimePicker> {
+class _CalendarScreenState extends State<CalendarScreen> {
   final _storage = const FlutterSecureStorage();
   DateTime _focusedDay = DateTime.now();
   CalendarFormat _calendarFormat = CalendarFormat.month;
@@ -26,6 +26,7 @@ class _DateTimePickerState extends State<DateTimePicker> {
   Map<DateTime, List<EventEntity>> events = {};
   late final ValueNotifier<List<EventEntity>> _selectedEvents;
   String userId = '';
+  String userEmail = '';
 
   @override
   void initState() {
@@ -44,7 +45,13 @@ class _DateTimePickerState extends State<DateTimePicker> {
 
   List<EventEntity> _getEventsForDay(DateTime day) {
     final normalizedDay = DateTime(day.year, day.month, day.day);
-    return events[normalizedDay] ?? [];
+    if (!events.containsKey(normalizedDay)) {
+      return [];
+    }
+    final List<EventEntity> eventForDay = events[normalizedDay] != null
+        ? events[normalizedDay]!.where((event) => event.status != "Cancelled").toList()
+        : [];
+    return eventForDay;
   }
 
   void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
@@ -63,6 +70,7 @@ class _DateTimePickerState extends State<DateTimePicker> {
       final body = jsonDecode(userCredential);
       setState(() {
         userId = body["_id"].toString();
+        userEmail = body["Email"].toString();
       });
     }
   }
@@ -311,7 +319,9 @@ class _DateTimePickerState extends State<DateTimePicker> {
                                             builder: (context) => WaitingDialog(
                                               event: event,
                                               userId: userId,
-                                              isTherapist: event.therapistId == userId,
+                                              isTherapist: event.therapistId == userId, 
+                                              userEmail: userEmail,
+                                              
                                             ),
                                           ),
                                         ),

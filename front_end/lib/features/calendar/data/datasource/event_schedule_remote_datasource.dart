@@ -111,7 +111,7 @@ class EventScheduleRemoteDataSourceImpl implements EventScheduleRemoteDataSource
       if (response.statusCode == 200 || response.statusCode == 201) {
         return true;
       } else {
-        throw ServerException(message: 'Failed to   session: ${response.statusCode}');
+        throw ServerException(message: 'Failed to cancel session: ${response.statusCode}');
       }
     } catch (e) {
       throw ServerException(message: 'Network error: $e');

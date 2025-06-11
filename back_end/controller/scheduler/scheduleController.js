@@ -114,17 +114,18 @@ export const getSessionById = async (req, res) => {
 export const cancelSession = async (req, res) => {
   try {
     const { sessionId } = req.params;
+    console.log(`Cancelling session with ID: ${sessionId}`);
 
     const session = await Session.findById(sessionId);
     if (!session) {
       return res.status(404).json({ message: "Session not found" });
     }
 
-    if (session.status === 'cancelled') {
+    if (session.status === 'Cancelled') {
       return res.status(400).json({ message: "Session is already cancelled." });
     }
 
-    session.status = 'cancelled';
+    session.status = 'Cancelled';
     await session.save();
 
     // // Optional: Notify both sides
@@ -214,10 +215,8 @@ export const markCompletedAutomatically = async () => {
 
 export const autoCancelUnconfirmedSessions = async () => {
   const now = new Date();
-  console.log(`[AUTO-CHECK] Running at ${now.toISOString()}`);
 
   const sessions = await Session.find({ status: 'Pending' });
-  console.log(`[AUTO-CHECK] Found ${sessions.length} pending sessions`);
 
   for (const session of sessions) {
     const sessionStartString = `${session.date}T${convertTo24HourFormat(session.startTime)}:00`;

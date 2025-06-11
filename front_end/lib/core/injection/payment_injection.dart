@@ -1,45 +1,44 @@
+
 import 'package:front_end/core/injection/injections.dart';
-import 'package:front_end/core/network/network.dart';
-import 'package:front_end/features/Payment/data/datasources/payment_datasource.dart';
-import 'package:front_end/features/Payment/data/repo_impl/payment_repo_impl.dart';
-import 'package:front_end/features/Payment/domain/repository/payment_repository.dart';
-import 'package:front_end/features/Payment/domain/usecase/initiate_payment_usecase.dart';
-import 'package:front_end/features/Payment/domain/usecase/verify_payment_usecase.dart';
-import 'package:front_end/features/Payment/presentation/bloc/payment_bloc.dart';
+import 'package:front_end/features/payment/data/datasource/remote_datasource/paymentRemoteDataSource.dart';
+import 'package:front_end/features/payment/data/repository_impl/paymentRepositoryImpl.dart';
+import 'package:front_end/features/payment/domain/repository/paymentRepository.dart';
+import 'package:front_end/features/payment/domain/usecase/initiate_payment_use_case.dart';
+import 'package:front_end/features/payment/presentation/bloc/payment_bloc.dart';
 import 'package:http/http.dart' as http;
 
 class PaymentInjection {
   void init() {
+    print('PaymentInjection initialized');
     try {
       // Data Source
-      sl.registerLazySingleton<PaymentDatasource>(
-        () => PaymentRemoteRepoImpl(sl<http.Client>()),
+      sl.registerLazySingleton<PaymentRemoteDataSource>(
+        () => PaymentRemoteDataSourceImpl(sl<http.Client>()),
       );
 
       // Repository
-      sl.registerLazySingleton<PaymentRepository>(() => PaymentRepoImpl(
-            sl<NetworkInfo>(),
-            sl<PaymentDatasource>(),
-          ));
-
-      // Use Cases
-      sl.registerLazySingleton<VerifyPaymentUsecase>(
-        () => VerifyPaymentUsecase(sl<PaymentRepository>()),
+      sl.registerLazySingleton<PaymentRepository>(
+        () => PaymentRepositoryImpl(
+          paymentRemoteDataSource:sl(),
+          networkInfo: sl()
+        ),
       );
 
-      sl.registerLazySingleton<InitiatePaymentUsecase>(
-        () => InitiatePaymentUsecase(sl<PaymentRepository>()),
+      // Use Cases
+      sl.registerLazySingleton<InitiatePaymentUseCase>(
+        () => InitiatePaymentUseCase(sl<PaymentRepository>()),
       );
 
       // Bloc
       sl.registerFactory<PaymentBloc>(
         () => PaymentBloc(
-          initiatePaymentUsecase: sl<InitiatePaymentUsecase>(),
-          verifyPaymentUsecase: sl<VerifyPaymentUsecase>(),
+          sl<InitiatePaymentUseCase>(),
         ),
       );
+
+      print("Payment dependencies registered successfully");
     } catch (e) {
-      print("Error registering payment dependencies: $e");
+      print("Error registering Payment dependencies: $e");
       rethrow;
     }
   }
