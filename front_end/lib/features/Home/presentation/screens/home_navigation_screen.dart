@@ -8,6 +8,7 @@ import 'package:front_end/features/Home/presentation/screens/home_screen.dart';
 import 'package:front_end/features/admin/admin_screen.dart';
 import 'package:front_end/features/admin/events_admin_screen.dart';
 import 'package:front_end/features/admin/unapproved_therapists_screen.dart';
+import 'package:front_end/features/approve_therapist/presentation/screen/therapist_list_page.dart';
 import 'package:front_end/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:front_end/features/chat/presentation/screens/chat_room.dart';
 import 'package:front_end/features/Q&A/presentation/screens/qa_room.dart';
@@ -103,7 +104,7 @@ class _HomeNavigationScreenState extends State<HomeNavigationScreen> {
           :
           screens = [
             EventsAdminScreen(),
-            UnapprovedTherapistsScreen(),
+            TherapistListPage(),
           ];
           
           return Scaffold(

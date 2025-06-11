@@ -28,25 +28,20 @@ class AuthRepoImpl implements AuthRepository {
   @override
   Future<Either<Failure, StudentResponseModel>> login(LoginEntity login) async {
     if (await networkInfo.isConnected) {
-      try {
-        final user = LoginModel(
-            id: login.id, email: login.email, password: login.password);
-        final response = await authRemoteDatasource.logIn(user);
+    try {
+      final user = LoginModel(
+          id: login.id, email: login.email, password: login.password);
+      final response = await authRemoteDatasource.logIn(user);
 
-        await loginLocalDataSource
-            .setStudentUser(response.studentData as StudentDataModel);
-        await loginLocalDataSource.cacheUser(response.token);
-        final resData = response.toJson();
-        // ...existing code...
-        await loginLocalDataSource.cacheUserData(
-          userCredentialModel:
-              (response.studentData as StudentDataModel).toJson(),
-        );
-// ...existing code...
-        return Right(response);
-      } on ServerException {
-        return Left(ServerFailure(message: 'Server Failure'));
-      }
+      await loginLocalDataSource
+          .setStudentUser(response.studentData as StudentDataModel);
+      await loginLocalDataSource.cacheUser(response.token);
+      final resData = response.toJson();
+      await loginLocalDataSource.cacheUserData(userCredentialModel: resData);
+      return Right(response);
+    } on ServerException {
+      return Left(ServerFailure(message: 'Server Failure'));
+    }
     } else {
       return Left(
           NetworkFailure(message: 'You are not connected to the internet'));

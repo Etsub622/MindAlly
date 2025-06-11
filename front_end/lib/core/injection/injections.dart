@@ -9,6 +9,7 @@ import 'package:front_end/core/injection/home_injection.dart';
 import 'package:front_end/core/injection/payment_injection.dart';
 import 'package:front_end/core/injection/profile_injection.dart';
 import 'package:front_end/core/injection/question_injection.dart';
+import 'package:front_end/core/injection/verify_injection.dart';
 import 'package:front_end/core/injection/video_injection.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import '../network/network.dart';
@@ -38,4 +39,5 @@ Future<void> init() async {
   HomeInjection().init();
   CalendarInjection().init();
   PaymentInjection().init();
+  VerifyInjection().init();
 }

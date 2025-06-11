@@ -132,7 +132,7 @@ export const getTopTherapists = async (req, res) => {
     const inputData = { user: userData, therapists: therapistsData };
 
 
-    const pythonProcess = spawn('python3', ['therapist_matching/therapist_matcher.py']);
+    const pythonProcess = spawn('python', ['therapist_matching/therapist_matcher.py']);
     let output = '';
     let errorOutput = '';
 
@@ -190,14 +190,27 @@ export const getTopTherapists = async (req, res) => {
   }
 };
 
-// Get all therapists whose documents are not approved (verified = false or not set)
+// Get all therapists whose documents are not approved (Role: "pending_therapist")
 export const getUnapprovedTherapists = async (req, res) => {
   try {
     const unapprovedTherapists = await Therapist.find({
-      $or: [{ verified: false }, { verified: { $exists: false } }]
+      Role: "pending_therapist"
     });
 
     res.json(unapprovedTherapists);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// Get all therapists whose documents are approved (Role: "therapist")
+export const getApprovedTherapists = async (req, res) => {
+  try {
+    const approvedTherapists = await Therapist.find({
+      Role: "therapist"
+    });
+
+    res.json(approvedTherapists);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

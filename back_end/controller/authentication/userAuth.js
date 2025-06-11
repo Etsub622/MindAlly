@@ -22,7 +22,7 @@ const registerTherapist = async (req, res) => {
       modality:specialization,
       Password: hashedPass,
       Certificate: certificate,
-      Role: "therapist",
+      Role: "pending_therapist",
       verified:false
       
     })

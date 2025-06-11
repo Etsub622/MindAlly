@@ -6,6 +6,7 @@ import {
   deleteTherapist,
   getTopTherapists,
   getUnapprovedTherapists,
+  getApprovedTherapists,
 } from "../../controller/profile/therapistController.js";
 import { verifyToken } from "../../middlewares/authMiddleware.js";
 
@@ -13,6 +14,7 @@ const router = express.Router();
 
 router.post("/", createTherapist);
 router.get("/unapproved", getUnapprovedTherapists);
+router.get("/approvedTherapists", getApprovedTherapists)
 router.get("/:therapist_id", getTherapist);
 router.put("/:therapist_id", verifyToken, updateTherapist);
 router.delete("/:therapist_id", verifyToken, deleteTherapist);
