@@ -14,7 +14,14 @@ class PaymentScreen extends StatelessWidget {
   final String? chatId;
   final UserEntity receiver;
 
-  const PaymentScreen({super.key, required this.therapistEmail, required this.patientEmail, required this.event, required this.sessionHour, this.chatId,required this.receiver});
+  const PaymentScreen(
+      {super.key,
+      required this.therapistEmail,
+      required this.patientEmail,
+      required this.event,
+      required this.sessionHour,
+      this.chatId,
+      required this.receiver});
 
   @override
   Widget build(BuildContext context) {
@@ -25,10 +32,14 @@ class PaymentScreen extends StatelessWidget {
         child: BlocListener<PaymentBloc, PaymentState>(
           listener: (context, state) {
             if (state is PaymentSuccess) {
-                Navigator.push(
+              Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => WebViewScreen(url: state.checkoutUrl, event: event, chatId: chatId, receiver: receiver),
+                  builder: (context) => WebViewScreen(
+                      url: state.checkoutUrl,
+                      event: event,
+                      chatId: chatId,
+                      receiver: receiver),
                 ),
               );
             }
