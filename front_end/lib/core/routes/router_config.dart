@@ -82,7 +82,7 @@ final routes = <GoRoute>[
   GoRoute(
     name:"calendar",
     path: AppPath.calendar,
-    builder: (BuildContext context, GoRouterState state) => const DateTimePicker()
+    builder: (BuildContext context, GoRouterState state) => const CalendarScreen()
   ),
   GoRoute(
       path: '/therapistDetails',

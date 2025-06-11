@@ -10,6 +10,7 @@ import 'package:front_end/features/Q&A/presentation/bloc/bloc/answer_bloc.dart';
 import 'package:front_end/features/Q&A/presentation/bloc/bloc/question_bloc.dart';
 import 'package:front_end/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:front_end/features/chat/presentation/bloc/chat_list/chat_list_bloc.dart';
+import 'package:front_end/features/payment/presentation/bloc/payment_bloc.dart';
 import 'package:front_end/features/resource/presentation/bloc/book_bloc/bloc/book_bloc.dart';
 import 'package:front_end/features/resource/presentation/bloc/video_bloc/bloc/video_bloc.dart';
 import 'package:front_end/features/resource/presentation/bloc/article_bloc/bloc/article_bloc.dart';
@@ -70,6 +71,9 @@ class MultiBLOCProvider {
     BlocProvider<UpdateScheduledEventsBloc>(
       create: (_) => sl<UpdateScheduledEventsBloc>()
     ),
+  BlocProvider<PaymentBloc>(
+      create: (_) => sl<PaymentBloc>()
+    )
 
   ];
 }

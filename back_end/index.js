@@ -71,7 +71,7 @@ httpServer.listen(PORT, () => {
 });
 
 
-
+export { io };
 
 // app.use(session({
 //     secret: "secret",
