@@ -44,6 +44,9 @@ class ArticleInjection {
       sl.registerLazySingleton<GetSingleArticleUsecase>(
         () => GetSingleArticleUsecase(sl<ArticleRepository>()),
       );
+      sl.registerLazySingleton<GetArticleByCategoryUsecase>(
+        () => GetArticleByCategoryUsecase(sl<ArticleRepository>()),
+      );
 
       // Bloc
       sl.registerFactory<ArticleBloc>(
@@ -53,7 +56,9 @@ class ArticleInjection {
           deleteArticleUsecase: sl<DeleteArticleUsecase>(),
           updateArticleUsecase: sl<UpdateArticleUsecase>(),
           searchArticleUsecase: sl<SearchArticleUsecase>(),
-          getSingleArticleUsecase: sl<GetSingleArticleUsecase>()
+          getSingleArticleUsecase: sl<GetSingleArticleUsecase>(),
+          getArticleByCategoryUsecase: sl<GetArticleByCategoryUsecase>(),
+          
         ),
       );
 

@@ -61,7 +61,9 @@ class QuestionRemoteDataSourceImpl implements QuestionRemoteDatasource {
   Future<List<QuestionModel>> getQuestionbyCategory(String category) async {
     try {
       var url = Uri.parse('$baseUrl/questions/category/$category');
-      final response = await client.get(url);
+      final response = await client.get(url, headers: {
+        'Content-Type': 'application/json',
+      });
       print('Response status: ${response.statusCode}');
       print('Response body: ${response.body}');
       if (response.statusCode == 200) {
@@ -87,6 +89,8 @@ class QuestionRemoteDataSourceImpl implements QuestionRemoteDatasource {
     try {
       var url = Uri.parse('$baseUrl/questions');
       final response = await client.get(url);
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
       if (response.statusCode == 200) {
         final List<dynamic> questionJson = json.decode(response.body);
         if (questionJson.isEmpty) {

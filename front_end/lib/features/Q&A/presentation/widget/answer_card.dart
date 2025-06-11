@@ -7,6 +7,9 @@ class AnswerCard extends StatefulWidget {
   final void Function() onPressed;
   final VoidCallback onUpdate;
   final VoidCallback onDelete;
+  final String currentUserId;
+  final String ownerId;
+  final String role;
 
   const AnswerCard({
     required this.answer,
@@ -15,6 +18,9 @@ class AnswerCard extends StatefulWidget {
     required this.onPressed,
     required this.onDelete,
     required this.onUpdate,
+    required this.currentUserId,
+    required this.ownerId,
+    required this.role,
     super.key,
   });
 
@@ -27,6 +33,8 @@ class _AnswerCardState extends State<AnswerCard> {
 
   @override
   Widget build(BuildContext context) {
+    print(
+        'role: ${widget.role}, currentUserId: ${widget.currentUserId}, ownerId: ${widget.ownerId}');
     return Material(
       elevation: _isExpanded ? 8 : 0,
       borderRadius: BorderRadius.circular(8),
@@ -54,47 +62,56 @@ class _AnswerCardState extends State<AnswerCard> {
                     widget.therapistName,
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  // Spacer(),
-                  // PopupMenuButton<String>(
-                  //   icon: Icon(Icons.more_vert),
-                  //   onSelected: (value) {
-                  //     if (value == 'update') {
-                  //       widget.onUpdate();
-                  //     } else if (value == 'delete') {
-                  //       widget.onDelete();
-                  //     }
-                  //   },
-                  //   itemBuilder: (context) => [
-                  //     const PopupMenuItem(
-                  //       value: 'update',
-                  //       child: Text('Update'),
-                  //     ),
-                  //     const PopupMenuItem(
-                  //       value: 'delete',
-                  //       child: Text('Delete'),
-                  //     ),
-                  //   ],
-                  // ),
+                  Spacer(),
+                  if ((widget.role == 'therapist') &&
+                      (widget.currentUserId == widget.ownerId))
+                    PopupMenuButton<String>(
+                      icon: Icon(Icons.more_vert),
+                      onSelected: (value) {
+                        if (value == 'update') {
+                          widget.onUpdate();
+                        } else if (value == 'delete') {
+                          widget.onDelete();
+                        }
+                      },
+                      itemBuilder: (context) => [
+                        const PopupMenuItem(
+                          value: 'update',
+                          child: Text('Update'),
+                        ),
+                        const PopupMenuItem(
+                          value: 'delete',
+                          child: Text('Delete'),
+                        ),
+                      ],
+                    ),
                 ],
               ),
               SizedBox(height: 8),
-              Text(
-                widget.answer,
-                maxLines: _isExpanded ? null : 3,
-                overflow: _isExpanded ? null : TextOverflow.ellipsis,
-              ),
-              SizedBox(height: 8),
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _isExpanded = !_isExpanded;
-                  });
-                },
-                child: Text(
-                  _isExpanded ? 'Read less' : 'Read more',
-                  style: TextStyle(color: Colors.blue),
+              if (widget.answer.length > 100) ...[
+                Text(
+                  widget.answer,
+                  maxLines: _isExpanded ? null : 3,
+                  overflow: _isExpanded ? null : TextOverflow.ellipsis,
                 ),
-              ),
+                SizedBox(height: 8),
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _isExpanded = !_isExpanded;
+                    });
+                  },
+                  child: Text(
+                    _isExpanded ? 'Read less' : 'Read more',
+                    style: TextStyle(color: Colors.blue),
+                  ),
+                ),
+              ] else ...[
+                Text(
+                  widget.answer,
+                  style: TextStyle(color: Colors.grey[700]),
+                ),
+              ]
             ],
           ),
         ),

@@ -28,6 +28,7 @@ class ProfilePageGeneralInfoWidget extends StatelessWidget {
             onTap: () {
               showModalBottomSheet(
                   context: context,
+                  isScrollControlled: true,
                   builder: (context) {
                     return Container(
                       height: 210,

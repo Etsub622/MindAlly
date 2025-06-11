@@ -35,3 +35,8 @@ class GetSingleArticleEvent extends ArticleEvent{
   final String id;
   GetSingleArticleEvent(this.id);
 }
+
+class SearchArticleByCategoryEvent extends ArticleEvent{
+  final String category;
+  SearchArticleByCategoryEvent(this.category);
+}

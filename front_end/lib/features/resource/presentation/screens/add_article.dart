@@ -13,6 +13,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
 import 'package:multi_select_flutter/chip_display/multi_select_chip_display.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AddArticle extends StatefulWidget {
   const AddArticle({super.key});
@@ -52,6 +53,18 @@ class _AddArticleState extends State<AddArticle> {
     });
   }
 
+  Future<String> _getTherapistId() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userJson = prefs.getString('user_profile');
+    if (userJson != null) {
+      final userMap = json.decode(userJson);
+      print('userMap in _getTherapistId: $userMap');
+      return userMap['_id'] ?? '';
+    }
+    print('No user profile found in shared preferences (id)');
+    return '';
+  }
+
   // Image uploading to Cloudinary
   Future<void> _uploadImage() async {
     if (_imageFile == null) return;
@@ -75,6 +88,7 @@ class _AddArticleState extends State<AddArticle> {
   }
 
   void uploadArticle(BuildContext context) async {
+    final creatorId = await _getTherapistId();
     final uploadedArticle = ArticleModel(
       id: '',
       type: 'Article',
@@ -82,6 +96,7 @@ class _AddArticleState extends State<AddArticle> {
       content: contentController.text,
       link: linkController.text,
       logo: _imageUrl!,
+      ownerId: creatorId,
       categories: selectedCategories,
     );
     context.read<ArticleBloc>().add(AddArticleEvent(uploadedArticle));
@@ -111,8 +126,10 @@ class _AddArticleState extends State<AddArticle> {
         if (state is ArticleAdded) {
           const snack = SnackBar(content: Text('Article added successfully'));
           ScaffoldMessenger.of(context).showSnackBar(snack);
-          Navigator.pop(context);
+        
+          Navigator.of(context).pop();
           context.read<ArticleBloc>().add(GetArticleEvent());
+     
         } else if (state is ArticleError) {
           final snack = errorsnackBar('Failed to add article,try again later');
           ScaffoldMessenger.of(context).showSnackBar(snack);

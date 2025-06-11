@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front_end/core/common_widget.dart/circular_indicator.dart';
@@ -6,6 +8,7 @@ import 'package:front_end/features/Q&A/domain/entity/answer_entity.dart';
 import 'package:front_end/features/Q&A/presentation/bloc/bloc/answer_bloc.dart';
 import 'package:front_end/features/authentication/presentation/widget/custom_button.dart';
 import 'package:front_end/features/resource/presentation/widget/custom_formfield.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CreateAnswerBottomSheet extends StatefulWidget {
   final String questionId;
@@ -29,13 +32,41 @@ class _CreateAnswerBottomSheetState extends State<CreateAnswerBottomSheet> {
     super.dispose();
   }
 
-  void _createAnswer() {
+  Future<String> _getTherapistId() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userJson = prefs.getString('user_profile');
+    if (userJson != null) {
+      final userMap = json.decode(userJson);
+      print('userMap in _getTherapistId: $userMap');
+      return userMap['_id'] ?? '';
+    }
+    print('No user profile found in shared preferences (id)');
+    return '';
+  }
+
+  Future<String> _getTherapistName() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userJson = prefs.getString('user_profile');
+    if (userJson != null) {
+      final userMap = json.decode(userJson);
+      print('userMap in _getTherapistName: $userMap');
+      return userMap['FullName'] ?? '';
+    }
+    print('No user profile found in shared preferences (name)');
+    return '';
+  }
+
+  void _createAnswer() async {
+    final creatorId = await _getTherapistId();
+    final name = await _getTherapistName();
     final answerEntity = AnswerEntity(
       id: '',
       answer: answerController.text,
-      therapistName: "therapistNameController",
-      therapistProfile: "therapistProfileController",
+      therapistName: name,
+      therapistProfile:
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR2uz88opUkCosnT3sNx3yyBB_GAhOiejbUAg&s",
       questionId: widget.questionId,
+      ownerId: creatorId,
     );
 
     context.read<AnswerBloc>().add(AddAnswerEvent(answerEntity));
@@ -57,7 +88,7 @@ class _CreateAnswerBottomSheetState extends State<CreateAnswerBottomSheet> {
         if (state is AnswerAdded) {
           const snack = SnackBar(content: Text('Answer added successfully'));
           ScaffoldMessenger.of(context).showSnackBar(snack);
-          context.read<AnswerBloc>().add(GetAnswerEvent(widget.questionId)); 
+          context.read<AnswerBloc>().add(GetAnswerEvent(widget.questionId));
           Future.delayed(Duration(milliseconds: 300), () {
             Navigator.of(context).pop();
           });
@@ -71,7 +102,12 @@ class _CreateAnswerBottomSheetState extends State<CreateAnswerBottomSheet> {
 
   Widget _build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(20.0),
+      padding: EdgeInsets.only(
+        left: 20,
+        right: 20,
+        top: 40,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+      ),
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

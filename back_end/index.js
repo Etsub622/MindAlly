@@ -12,6 +12,7 @@ import otpRoutes from "./routes/authenticaionRoutes/otpRoutes.js";
 import patientRoutes from "./routes/profile/profile.js";
 import therapistRoutes from "./routes/profile/therapist.js";
 import chatRoutes from "./routes/chat/chatRoutes.js";
+import NotificationRoute from './routes/chat/notificationRoute.js';
 import { resourceRoutes } from "./routes/resource/resourceRoutes.js";
 import { setIo } from "./controller/chat/chatController.js";
 import paymentRoutes from "./routes/Payment/pay.js";
@@ -46,6 +47,7 @@ app.use("/api/otp", otpRoutes);
 
 app.use("/api/patients", patientRoutes);
 app.use("/api/therapists", therapistRoutes);
+app.use("/api/notifications", NotificationRoute); 
 
 app.use("/api/resources", resourceRoutes);
 
@@ -66,7 +68,7 @@ setIo(io); // Pass io to chat controller
 
 // Start server
 const PORT = process.env.PORT || 3000;
-httpServer.listen(PORT, () => {
+httpServer.listen(PORT,'0.0.0.0', () => {
   console.log(`Server is running on port ${PORT}`);
 });
 

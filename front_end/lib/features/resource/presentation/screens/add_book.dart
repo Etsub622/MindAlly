@@ -13,6 +13,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
 import 'package:multi_select_flutter/chip_display/multi_select_chip_display.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AddBook extends StatefulWidget {
   const AddBook({super.key});
@@ -50,6 +51,17 @@ class _AddBookState extends State<AddBook> {
       }
     });
   }
+  Future<String> _getTherapistId() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userJson = prefs.getString('user_profile');
+    if (userJson != null) {
+      final userMap = json.decode(userJson);
+      print('userMap in _getTherapistId: $userMap');
+      return userMap['_id'] ?? '';
+    }
+    print('No user profile found in shared preferences (id)');
+    return '';
+  }
 
   // Image uploading to Cloudinary
   Future<void> _uploadImage() async {
@@ -74,13 +86,16 @@ class _AddBookState extends State<AddBook> {
   }
 
   void _uploadBook(BuildContext context) async {
+    final ownerId = await _getTherapistId();
     final uploadedBook = BookModel(
         id: '',
         title: titleController.text,
         type: 'Book',
         author: authorController.text,
         image: _imageUrl!,
-        categories: selectedCategories);
+        categories: selectedCategories,
+        ownerId:ownerId,
+        );
     print(uploadedBook);
 
     context.read<BookBloc>().add(AddBookEvent(uploadedBook));

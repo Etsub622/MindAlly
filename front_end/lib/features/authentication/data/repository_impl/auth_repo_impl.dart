@@ -18,25 +18,27 @@ class AuthRepoImpl implements AuthRepository {
   final NetworkInfo networkInfo;
   final LoginLocalDataSource loginLocalDataSource;
   AuthRepoImpl(
-      {required this.authRemoteDatasource, required this.networkInfo, required this.loginLocalDataSource});
+      {required this.authRemoteDatasource,
+      required this.networkInfo,
+      required this.loginLocalDataSource});
 
   @override
   Future<Either<Failure, StudentResponseModel>> login(LoginEntity login) async {
     // if (await networkInfo.isConnected) {
-      try {
-        final user = LoginModel(
-            id: login.id, email: login.email, password: login.password);
-        final response = await authRemoteDatasource.logIn(user);
+    try {
+      final user = LoginModel(
+          id: login.id, email: login.email, password: login.password);
+      final response = await authRemoteDatasource.logIn(user);
 
-        await loginLocalDataSource
-            .setStudentUser(response.studentData as StudentDataModel);
-        await loginLocalDataSource.cacheUser(response.token);
-        final resData = response.toJson();
-        await loginLocalDataSource.cacheUserData(userCredentialModel: resData);
-        return Right(response);
-      } on ServerException {
-        return Left(ServerFailure(message: 'Server Failure'));
-      }
+      await loginLocalDataSource
+          .setStudentUser(response.studentData as StudentDataModel);
+      await loginLocalDataSource.cacheUser(response.token);
+      final resData = response.toJson();
+      await loginLocalDataSource.cacheUserData(userCredentialModel: resData);
+      return Right(response);
+    } on ServerException {
+      return Left(ServerFailure(message: 'Server Failure'));
+    }
     // } else {
     //   return Left(
     //       NetworkFailure(message: 'You are not connected to the internet'));
@@ -59,7 +61,7 @@ class AuthRepoImpl implements AuthRepository {
         final response = await authRemoteDatasource.professionalSignUp(user);
         final resData = response['user'];
         await loginLocalDataSource.cacheUserData(userCredentialModel: resData);
-        return Right(response['token']);          
+        return Right(response['token']);
       } on ServerException {
         return Left(ServerFailure(message: 'Server Failure'));
       }
@@ -82,7 +84,8 @@ class AuthRepoImpl implements AuthRepository {
             phoneNumber: studentSignUp.phoneNumber,
             collage: studentSignUp.collage);
         final response = await authRemoteDatasource.studentSignUp(user);
-        await loginLocalDataSource.cacheUserData(userCredentialModel: response['user']);
+        await loginLocalDataSource.cacheUserData(
+            userCredentialModel: response['user']);
         return Right(response['token']);
       } on ServerException {
         return Left(ServerFailure(message: 'Server Failure'));
@@ -109,8 +112,7 @@ class AuthRepoImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, String>> verifyOtp(
-      String otp, String email) async {
+  Future<Either<Failure, String>> verifyOtp(String otp, String email) async {
     if (await networkInfo.isConnected) {
       try {
         final response = await authRemoteDatasource.verifyOtp(otp, email);

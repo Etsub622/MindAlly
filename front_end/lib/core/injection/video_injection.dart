@@ -15,6 +15,7 @@ class VideoInjection {
           updateVideoUsecase: sl(),
           searchVideoUsecase: sl(),
           getSingleVideoUsecase: sl(),
+          getVideoByCategoryUsecase: sl(),
         ));
 
     // Usecase
@@ -24,6 +25,7 @@ class VideoInjection {
     sl.registerLazySingleton(() => DeleteVideoUsecase(sl()));
     sl.registerLazySingleton(() => AddVideoUsecase(sl()));
     sl.registerLazySingleton(() => GetSingleVideoUsecase(sl()));
+    sl.registerLazySingleton(() => GetVideoByCategoryUsecase(sl()));
 
     // Repository
     sl.registerLazySingleton<VideoRepository>(() => VideoRepoImpl(sl(), sl()));

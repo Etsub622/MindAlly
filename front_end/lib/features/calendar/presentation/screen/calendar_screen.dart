@@ -49,7 +49,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
       return [];
     }
     final List<EventEntity> eventForDay = events[normalizedDay] != null
-        ? events[normalizedDay]!.where((event) => event.status != "Cancelled").toList()
+        ? events[normalizedDay]!
+            .where((event) => event.status != "Cancelled")
+            .toList()
         : [];
     return eventForDay;
   }
@@ -63,7 +65,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
       });
     }
   }
-  
+
   Future<void> fetchUserId() async {
     final userCredential = await _storage.read(key: "user_profile") ?? '';
     if (userCredential.isNotEmpty) {
@@ -75,12 +77,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
     }
   }
 
-
   bool _isDayEnabled(DateTime day) {
     final today = DateTime.now();
     final normalizedDay = DateTime(day.year, day.month, day.day);
     final normalizedToday = DateTime(today.year, today.month, today.day);
-    return normalizedDay.isAfter(normalizedToday) || normalizedDay.isAtSameMomentAs(normalizedToday);
+    return normalizedDay.isAfter(normalizedToday) ||
+        normalizedDay.isAtSameMomentAs(normalizedToday);
   }
 
   Color _getStatusColor(EventStatus status) {
@@ -162,7 +164,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         color: Colors.blue[700],
                         shape: BoxShape.circle,
                       ),
-                      defaultTextStyle: const TextStyle(fontWeight: FontWeight.w500),
+                      defaultTextStyle:
+                          const TextStyle(fontWeight: FontWeight.w500),
                       weekendTextStyle: TextStyle(color: Colors.red[400]),
                     ),
                     calendarBuilders: CalendarBuilders(
@@ -180,7 +183,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                           ? EventStatus.Completed
                                           : EventStatus.Confirm;
                               return Container(
-                                margin: const EdgeInsets.symmetric(horizontal: 1.5),
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 1.5),
                                 width: 8,
                                 height: 8,
                                 decoration: BoxDecoration(
@@ -199,14 +203,17 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         color: Colors.blue[700],
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      formatButtonTextStyle: const TextStyle(color: Colors.white),
+                      formatButtonTextStyle:
+                          const TextStyle(color: Colors.white),
                       titleTextStyle: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.blue[900],
                       ),
-                      leftChevronIcon: Icon(Icons.chevron_left, color: Colors.blue[700]),
-                      rightChevronIcon: Icon(Icons.chevron_right, color: Colors.blue[700]),
+                      leftChevronIcon:
+                          Icon(Icons.chevron_left, color: Colors.blue[700]),
+                      rightChevronIcon:
+                          Icon(Icons.chevron_right, color: Colors.blue[700]),
                     ),
                     onFormatChanged: (format) {
                       if (_calendarFormat != format) {
@@ -231,11 +238,17 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       events.clear();
                       for (var eventEntity in state.events) {
                         try {
-                          final dateParts = eventEntity.date.split('-').map(int.parse).toList();
+                          final dateParts = eventEntity.date
+                              .split('-')
+                              .map(int.parse)
+                              .toList();
                           final startTimeFormatted = eventEntity.startTime
-                              .replaceAll(RegExp(r'am', caseSensitive: false), 'AM')
-                              .replaceAll(RegExp(r'pm', caseSensitive: false), 'PM');
-                          final startDateTime = DateFormat('yyyy-MM-dd hh:mm a').parse(
+                              .replaceAll(
+                                  RegExp(r'am', caseSensitive: false), 'AM')
+                              .replaceAll(
+                                  RegExp(r'pm', caseSensitive: false), 'PM');
+                          final startDateTime =
+                              DateFormat('yyyy-MM-dd hh:mm a').parse(
                             '${eventEntity.date} $startTimeFormatted',
                           );
                           final normalizedDay = DateTime(
@@ -250,31 +263,45 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           }
                           events[normalizedDay]!.sort((a, b) {
                             final aTime = DateFormat('hh:mm a').parse(
-                              a.startTime.replaceAll(RegExp(r'am', caseSensitive: false), 'AM')
-                                  .replaceAll(RegExp(r'pm', caseSensitive: false), 'PM'),
+                              a.startTime
+                                  .replaceAll(
+                                      RegExp(r'am', caseSensitive: false), 'AM')
+                                  .replaceAll(
+                                      RegExp(r'pm', caseSensitive: false),
+                                      'PM'),
                             );
                             final bTime = DateFormat('hh:mm a').parse(
-                              b.startTime.replaceAll(RegExp(r'am', caseSensitive: false), 'AM')
-                                  .replaceAll(RegExp(r'pm', caseSensitive: false), 'PM'),
+                              b.startTime
+                                  .replaceAll(
+                                      RegExp(r'am', caseSensitive: false), 'AM')
+                                  .replaceAll(
+                                      RegExp(r'pm', caseSensitive: false),
+                                      'PM'),
                             );
-                            return aTime.hour * 60 + aTime.minute - (bTime.hour * 60 + bTime.minute);
+                            return aTime.hour * 60 +
+                                aTime.minute -
+                                (bTime.hour * 60 + bTime.minute);
                           });
                         } catch (e) {
-                          print('Failed to parse event: ${eventEntity.date} ${eventEntity.startTime}, error: $e');
+                          print(
+                              'Failed to parse event: ${eventEntity.date} ${eventEntity.startTime}, error: $e');
                           continue;
                         }
                       }
                       _selectedEvents.value = _getEventsForDay(_selectedDay!);
 
                       return Container(
-                        constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height * 0.4),
+                        constraints: BoxConstraints(
+                            minHeight:
+                                MediaQuery.of(context).size.height * 0.4),
                         child: ValueListenableBuilder<List<EventEntity>>(
                           valueListenable: _selectedEvents,
                           builder: (context, value, _) {
                             return ListView.builder(
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 8),
                               itemCount: value.length,
                               itemBuilder: (context, index) {
                                 final event = value[index];
@@ -290,28 +317,43 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                   duration: const Duration(milliseconds: 300),
                                   child: Card(
                                     elevation: 4,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                    color: _getStatusColor(status).withOpacity(0.7),
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(12)),
+                                    color: _getStatusColor(status)
+                                        .withOpacity(0.7),
                                     child: GestureDetector(
                                       child: ListTile(
-                                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                                horizontal: 16, vertical: 8),
                                         leading: Icon(
                                           _getStatusIcon(status),
-                                          color: _getStatusColor(status).withOpacity(1.0),
+                                          color: _getStatusColor(status)
+                                              .withOpacity(1.0),
                                         ),
                                         title: const Text(
                                           "Meeting Session",
-                                          style: TextStyle(fontWeight: FontWeight.bold),
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold),
                                         ),
                                         subtitle: Text(event.startTime),
                                         trailing: Chip(
                                           label: Text(
                                             status.toString().split('.').last,
-                                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                                            style: const TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w600),
                                           ),
-                                          backgroundColor: _getStatusColor(status).withOpacity(0.9),
-                                          labelPadding: const EdgeInsets.symmetric(horizontal: 8),
-                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                          backgroundColor:
+                                              _getStatusColor(status)
+                                                  .withOpacity(0.9),
+                                          labelPadding:
+                                              const EdgeInsets.symmetric(
+                                                  horizontal: 8),
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(16)),
                                         ),
                                         onTap: () => Navigator.push(
                                           context,
@@ -319,9 +361,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                             builder: (context) => WaitingDialog(
                                               event: event,
                                               userId: userId,
-                                              isTherapist: event.therapistId == userId, 
+                                              isTherapist:
+                                                  event.therapistId == userId,
                                               userEmail: userEmail,
-                                              
                                             ),
                                           ),
                                         ),
@@ -335,7 +377,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         ),
                       );
                     } else if (state is GetScheduledEventsError) {
-                      return Center(child: Text('Error: ${state.errorMessage}'));
+                      return Center(
+                          child: Text('Error: ${state.errorMessage}'));
                     } else {
                       return const Center(child: Text('No events loaded'));
                     }

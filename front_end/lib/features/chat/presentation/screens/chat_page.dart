@@ -33,7 +33,8 @@ class _ChatPageState extends State<ChatPage> {
   void initState() {
     super.initState();
     currentChatId = widget.chatId;
-    BlocProvider.of<ChatBloc>(context).add(LoadMessagesEvent(chatId: widget.chatId));
+    BlocProvider.of<ChatBloc>(context)
+        .add(LoadMessagesEvent(chatId: widget.chatId));
     fetchUserId();
   }
 
@@ -82,7 +83,8 @@ class _ChatPageState extends State<ChatPage> {
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return Dialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
               elevation: 8,
               backgroundColor: Colors.white,
               child: Padding(
@@ -138,7 +140,8 @@ class _ChatPageState extends State<ChatPage> {
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.blue[100],
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10)),
                           ),
                           child: const Text('Pick Date'),
                         ),
@@ -183,7 +186,8 @@ class _ChatPageState extends State<ChatPage> {
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.blue[100],
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10)),
                           ),
                           child: const Text('Pick Time'),
                         ),
@@ -196,7 +200,8 @@ class _ChatPageState extends State<ChatPage> {
                           child: Text(
                             selectedDuration == null
                                 ? 'Select Duration'
-                                : 'Duration: ${selectedDuration! ~/ 60 > 0 ? "${selectedDuration! ~/ 60}h " : ""}${selectedDuration! % 60 > 0 ? "${selectedDuration! % 60}m" : ""}'.trim(),
+                                : 'Duration: ${selectedDuration! ~/ 60 > 0 ? "${selectedDuration! ~/ 60}h " : ""}${selectedDuration! % 60 > 0 ? "${selectedDuration! % 60}m" : ""}'
+                                    .trim(),
                             style: Theme.of(context).textTheme.bodyMedium,
                           ),
                         ),
@@ -204,10 +209,13 @@ class _ChatPageState extends State<ChatPage> {
                           value: selectedDuration,
                           hint: const Text('Select Duration'),
                           items: const [
-                            DropdownMenuItem(value: 30, child: Text('30 minutes')),
+                            DropdownMenuItem(
+                                value: 30, child: Text('30 minutes')),
                             DropdownMenuItem(value: 60, child: Text('1 hour')),
-                            DropdownMenuItem(value: 90, child: Text('1.5 hours')),
-                            DropdownMenuItem(value: 120, child: Text('2 hours')),
+                            DropdownMenuItem(
+                                value: 90, child: Text('1.5 hours')),
+                            DropdownMenuItem(
+                                value: 120, child: Text('2 hours')),
                           ],
                           onChanged: (value) {
                             setDialogState(() {
@@ -233,14 +241,16 @@ class _ChatPageState extends State<ChatPage> {
                         ),
                         const SizedBox(width: 8),
                         ElevatedButton(
-                          onPressed: selectedDate != null && selectedTime != null && selectedDuration != null
+                          onPressed: selectedDate != null &&
+                                  selectedTime != null &&
+                                  selectedDuration != null
                               ? () async {
                                 EventModel? event;
                                   // call api to create meeting and then navigate to MeetingScreen with meetingId,token
                                   await createMeeting().then((meetingId) {
                                     if (!context.mounted) return;
-                                                                      
-                                     // Calculate endTime
+
+                                    // Calculate endTime
                                     final startDateTime = DateTime(
                                       selectedDate!.year,
                                       selectedDate!.month,
@@ -248,10 +258,14 @@ class _ChatPageState extends State<ChatPage> {
                                       selectedTime!.hour,
                                       selectedTime!.minute,
                                     );
-                                    final endDateTime = startDateTime.add(Duration(minutes: selectedDuration!));
-                                    final startTimeFormatted = DateFormat('hh:mm a').format(startDateTime);
-                                    final endTimeFormatted = DateFormat('hh:mm a').format(endDateTime);
-
+                                    final endDateTime = startDateTime.add(
+                                        Duration(minutes: selectedDuration!));
+                                    final startTimeFormatted =
+                                        DateFormat('hh:mm a')
+                                            .format(startDateTime);
+                                    final endTimeFormatted =
+                                        DateFormat('hh:mm a')
+                                            .format(endDateTime);
 
                                     event = EventModel(
                                       id: '',
@@ -260,7 +274,7 @@ class _ChatPageState extends State<ChatPage> {
                                       createrId: userId, 
                                       date:
                                           '${selectedDate!.year}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.day.toString().padLeft(2, '0')}',
-                                      startTime:startTimeFormatted,
+                                      startTime: startTimeFormatted,
                                       endTime: endTimeFormatted,
                                       status: 'Pending',
                                       createdAt: DateTime.now(),
@@ -298,10 +312,13 @@ class _ChatPageState extends State<ChatPage> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.blue[700],
                             foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10)),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 12),
                           ),
-                          child: const Text('Book', style: TextStyle(fontWeight: FontWeight.bold)),
+                          child: const Text('Book',
+                              style: TextStyle(fontWeight: FontWeight.bold)),
                         ),
                       ],
                     ),
@@ -348,7 +365,8 @@ class _ChatPageState extends State<ChatPage> {
             child: Column(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   decoration: BoxDecoration(
                     color: Colors.blue[700],
                     boxShadow: [
@@ -381,10 +399,11 @@ class _ChatPageState extends State<ChatPage> {
                       Expanded(
                         child: Text(
                           widget.receiver.name,
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
+                          style:
+                              Theme.of(context).textTheme.titleLarge?.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -396,12 +415,12 @@ class _ChatPageState extends State<ChatPage> {
                         // elevation: 8,
                         // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                         child: const Icon(
-                          Icons.calendar_month_sharp, 
+                          Icons.calendar_month_sharp,
                           size: 28,
                           color: Colors.white,
-                          ),
+                        ),
                       ),
-                      ],
+                    ],
                   ),
                 ),
                 Expanded(
@@ -435,18 +454,20 @@ class _ChatPageState extends State<ChatPage> {
                         return Center(
                           child: Text(
                             state.errorMessage,
-                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                  color: Colors.red[700],
-                                ),
+                            style:
+                                Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                      color: Colors.red[700],
+                                    ),
                           ),
                         );
                       } else {
                         return Center(
                           child: Text(
                             "Failed to load messages",
-                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                  color: Colors.grey[700],
-                                ),
+                            style:
+                                Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                      color: Colors.grey[700],
+                                    ),
                           ),
                         );
                       }

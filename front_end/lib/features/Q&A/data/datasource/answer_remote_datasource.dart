@@ -84,14 +84,16 @@ class AnswerRemoteDataSourceImpl implements AnswerRemoteDatasource {
   @override
   Future<String> updateAnswer(AnswerModel answer, String id) async {
     try {
-      var url = Uri.parse('$baseUrl/updateAnswer/$id');
+      var url = Uri.parse('$baseUrl/answers/$id');
       final updatedAnswer = await client.put(url,
           headers: {
             'Content-Type': 'application/json',
           },
           body: jsonEncode(answer.toJson()));
+      print('updateAnswerStatusCode: ${updatedAnswer.statusCode}');
+      print('updateAnswerBody: ${updatedAnswer.body}');
 
-      if (updatedAnswer.statusCode == 201) {
+      if (updatedAnswer.statusCode == 200) {
         return 'Answer updated successfully';
       } else {
         throw ServerException(
