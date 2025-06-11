@@ -31,7 +31,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   }
 
   Future<void> _initializeSocketListener() async {
-    await _socketService.initSocket(); // Wait for initialization
+    await _socketService.ensureInitialized(); // Wait for initialization
     _socketService.socket.on("newMessage", (data) {
       final message = MessageEntity(
         message: data["message"],

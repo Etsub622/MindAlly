@@ -15,8 +15,9 @@ const resetPassword = async (req, res) => {
         if (!token) {
             return res.status(401).json({err:"unauthorized access"})
         }
+        console.log(jwt.verify(token, process.env.ACCESS_SECRET))
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = jwt.verify(token, process.env.ACCESS_SECRET);
         const { id, role } = decoded;
         const userModel = role === "patient" ? Patient : Therapist;
         const user = await userModel.findById(id);
@@ -67,7 +68,7 @@ const verifyPasswordResetOTP = async (req, res) => {
             return res.status(400).json({ success: false, message: "OTP has expired" });
         }
     
-        const resetToken = jwt.sign({email}, process.env.JWT_SECRET, { expiresIn: "100m" });
+        const resetToken = jwt.sign({email}, process.env.ACCESS_SECRET, { expiresIn: "10m" });
         res.status(200).json({
             success: true,
             message: "OTP verified. Use the reset token to reset your password.",
@@ -88,7 +89,7 @@ const forgotPassword = async (req, res) => {
         }
 
     
-        const decoded = jwt.verify(resetToken, process.env.JWT_SECRET);
+        const decoded = jwt.verify(resetToken, process.env.ACCESS_SECRET);
         const { email } = decoded;
       
         const userModel = await Patient.findOne({ Email: email }) || await Therapist.findOne({ Email:email });

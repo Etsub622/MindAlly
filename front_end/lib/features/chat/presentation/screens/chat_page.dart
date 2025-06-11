@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:front_end/features/calendar/data/model/event_model.dart';
 import 'package:front_end/features/calendar/presentation/bloc/add_event/add_events_bloc.dart';
-import 'package:front_end/features/calendar/presentation/screen/meeting/api_call.dart';
+import 'package:front_end/core/service/api_call.dart';
 import 'package:front_end/features/chat/presentation/bloc/chat/chat_bloc.dart';
 import 'package:front_end/features/chat/data/models/single_chat_model.dart';
 import 'package:front_end/features/chat/domain/entities/message_entity.dart';
@@ -264,18 +264,17 @@ class _ChatPageState extends State<ChatPage> {
                                             .format(endDateTime);
 
                                     final event = EventModel(
-                                      id: '', // Set by backend
-                                      userId: userId,
-                                      therapistId: widget.receiver.id,
+                                      id: '',
+                                      patientId: widget.receiver.role == "therapist" ? userId : widget.receiver.id,
+                                      therapistId: widget.receiver.role == "therapist" ? widget.receiver.id : userId,
+                                      createrId: userId, 
                                       date:
                                           '${selectedDate!.year}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.day.toString().padLeft(2, '0')}',
                                       startTime: startTimeFormatted,
                                       endTime: endTimeFormatted,
-                                      status: 'Pending', // Set by backend
-                                      createdAt:
-                                          DateTime.now(), // Set by backend
-                                      updatedAt:
-                                          DateTime.now(), // Set by backend
+                                      status: 'Pending',
+                                      createdAt: DateTime.now(),
+                                      updatedAt: DateTime.now(), 
                                       meetingId: meetingId,
                                       meetingToken: token,
                                     );

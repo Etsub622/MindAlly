@@ -10,7 +10,7 @@ import { generateAccessToken, generateRefreshToken, hashedPassword } from "../..
 const registerTherapist = async (req, res) => {
     try {
 
-        const { fullName, email, password, specialization , certificate } = req.body
+        const { fullName, email, password, specialization , certificate} = req.body
         
     
     const hashedPass= await hashedPassword(password)

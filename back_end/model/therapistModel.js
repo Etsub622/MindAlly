@@ -1,4 +1,7 @@
+
 import mongoose from "mongoose";
+
+
 
 
 const therapistschema = new mongoose.Schema({
@@ -63,9 +66,16 @@ const therapistschema = new mongoose.Schema({
         type: Number,
         default: 0,
     },
-    fcmToken: {
-        type: String,
+    wallet: {
+        type: Number,
+        default: 0,
+    },
+    payout: {
+        account_name: { type: String },
+        account_number: { type: String },
+        bank_code: { type: Number },
     }
+
 })
 
 

@@ -1,5 +1,6 @@
 import { Session } from "../../model/sessionModel.js";
 import { Therapist } from "../../model/therapistModel.js";
+import { sendAppNotification } from '../../utils/notification.js';
 
 // Fetch therapist availability
 export const getAvailableSlots = async (req, res) => {
@@ -29,10 +30,10 @@ export const bookSession = async (req, res) => {
   return `${h}:${m}`;
 }
   try {
-    const { userId, therapistId, date, startTime, endTime, meeting_id, meeting_token } = req.body;
+    const { userId, therapistId, createrId, date, startTime, endTime, meeting_id, meeting_token } = req.body;
 
     // Validate required fields
-    if (!userId || !therapistId || !date || !startTime || !endTime || !meeting_id || !meeting_token) {
+    if (!userId || !therapistId || !date || !startTime || !endTime || !meeting_id || !meeting_token || !createrId) {
       return res.status(400).json({ message: 'All fields are required.' });
     }
 
@@ -69,13 +70,14 @@ const sessionEnd = new Date(`${date}T${parsedEnd}:00`);
       date,
       startTime,
       status: { $nin: ['Completed', 'Cancelled'] },
+      status: { $nin: ['Completed', 'Cancelled'] },
     });
 
     if (existingSession) {
       return res.status(400).json({ message: "This time slot is already booked." });
     }
 
-    const session = new Session({ userId, therapistId, date, startTime, endTime, meeting_id, meeting_token });
+    const session = new Session({ userId, therapistId, createrId, date, startTime, endTime, meeting_id, meeting_token });
     await session.save();
 
     res.status(201).json({ message: "Session booked successfully", session });
@@ -112,19 +114,30 @@ export const getSessionById = async (req, res) => {
 export const cancelSession = async (req, res) => {
   try {
     const { sessionId } = req.params;
-    const session = await Session.findById(sessionId);
-    if (!session) return res.status(404).json({ message: "Session not found" });
 
-    session.status = "Cancelled";
+    const session = await Session.findById(sessionId);
+    if (!session) {
+      return res.status(404).json({ message: "Session not found" });
+    }
+
+    if (session.status === 'cancelled') {
+      return res.status(400).json({ message: "Session is already cancelled." });
+    }
+
+    session.status = 'cancelled';
     await session.save();
 
-    io.emit("sessionCancelled", session);
+    // // Optional: Notify both sides
+    // sendAppNotification(session.userId, "Your session has been cancelled.");
+    // sendAppNotification(session.therapistId, "A session has been cancelled.");
+    // io.emit("sessionCancelled", session);
 
-    res.status(200).json({ message: "Session cancelled", session });
+    res.status(200).json({ message: "Session cancelled successfully.", session });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 export const getUserSessionsByStatus = async (req, res) => {
   const { status } = req.query;
@@ -198,6 +211,38 @@ export const markCompletedAutomatically = async () => {
   }
 };
 
+
+export const autoCancelUnconfirmedSessions = async () => {
+  const now = new Date();
+  console.log(`[AUTO-CHECK] Running at ${now.toISOString()}`);
+
+  const sessions = await Session.find({ status: 'Pending' });
+  console.log(`[AUTO-CHECK] Found ${sessions.length} pending sessions`);
+
+  for (const session of sessions) {
+    const sessionStartString = `${session.date}T${convertTo24HourFormat(session.startTime)}:00`;
+    const sessionDateTime = new Date(sessionStartString);
+    const diffMs = sessionDateTime - now;
+    const diffMins = Math.round(diffMs / 60000);
+
+    console.log(`🕓 Session: ${session._id}, Starts: ${sessionStartString}, Diff: ${diffMins} mins`);
+
+    if (diffMins <= 30) {
+      session.status = 'Cancelled';
+      await session.save();
+
+      console.log(`❌ Session ${session._id} cancelled`);
+
+      // sendAppNotification(session.userId, "Your session was cancelled because it wasn't confirmed 30 minutes in advance.");
+      // sendAppNotification(session.therapistId, "A pending session was cancelled due to no confirmation.");
+    }
+  }
+};
+
+
 // Auto-run every 60s
 setInterval(markCompletedAutomatically, 60000);
+
+setInterval(autoCancelUnconfirmedSessions, 60000);
+
 
