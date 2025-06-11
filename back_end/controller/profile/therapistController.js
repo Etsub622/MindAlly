@@ -7,7 +7,8 @@ import bcrypt from "bcrypt";
 // Create a new therapist
 export const createTherapist = async (req, res) => {
   const { FullName, Email, Password, modality, Certificate, Bio, Fee, Rating, verified } = req.body;
-  print(req.body);
+  // print(req.body);
+  console.log(req.body);
 
   try {
     const existingTherapist = await Therapist.findOne({ Email });
@@ -27,7 +28,8 @@ export const createTherapist = async (req, res) => {
       verified,
     });
 
-    print(newTherapist);
+    // print(newTherapist);
+    console.log(newTherapist);
 
     await newTherapist.save();
     
@@ -102,6 +104,7 @@ export const getTopTherapists = async (req, res) => {
     if (!user) return res.status(404).json({ message: "User not found" });
 
     const therapists = await Therapist.find();
+    
 
     const userData = {
       preferred_modality: user.preferred_modality || "",
@@ -126,6 +129,7 @@ export const getTopTherapists = async (req, res) => {
     }));
 
     const inputData = { user: userData, therapists: therapistsData };
+
 
     const pythonProcess = spawn('python3', ['therapist_matching/therapist_matcher.py']);
     let output = '';
@@ -179,6 +183,19 @@ export const getTopTherapists = async (req, res) => {
       patient_id,
       top_therapists: enrichedTherapists
     });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// Get all therapists whose documents are not approved (verified = false or not set)
+export const getUnapprovedTherapists = async (req, res) => {
+  try {
+    const unapprovedTherapists = await Therapist.find({
+      $or: [{ verified: false }, { verified: { $exists: false } }]
+    });
+
+    res.json(unapprovedTherapists);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

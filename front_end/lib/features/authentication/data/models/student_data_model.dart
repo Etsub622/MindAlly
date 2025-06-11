@@ -8,19 +8,14 @@ class StudentResponseModel extends StudentDataResponse {
   });
 
   factory StudentResponseModel.fromJson(Map<String, dynamic> json) {
-    final userJson = json["user"];
-    if (userJson == null) {
-      throw FormatException("User data is null");
-    }
-
     return StudentResponseModel(
-      token: json["token"] ?? json["accessToken"] ?? '',
-      message: json["message"] ?? '',
-      studentData: StudentDataModel.fromJson(userJson),
+      token: json["accessToken"],
+      message: json["message"],
+      studentData: StudentDataModel.fromJson(json["user"]),
     );
   }
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toJson(){
     return {
       '_id': studentData.id,
       'FullName': studentData.fullName,
@@ -31,9 +26,9 @@ class StudentResponseModel extends StudentDataResponse {
       'Gender': studentData.gender,
       'ProfileImage': studentData.profileImage,
       'Role': studentData.role,
-      'token': token,
-      'message': message
-    };
+      'token':token,
+      'message':message
+  };
   }
 }
 
@@ -62,7 +57,7 @@ class StudentDataModel extends StudentUserEntity {
       gender: json['Gender'] ?? "",
       profileImage: json['ProfileImage'] ?? "",
       role: json['Role'] ?? "",
-      collage: json['collage'] ?? "",
+      collage:json['collage'] ?? "",
     );
   }
 
