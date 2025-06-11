@@ -1,26 +1,16 @@
-
 part of 'payment_bloc.dart';
 
-abstract class PaymentEvent extends Equatable {
+@immutable
+sealed class PaymentEvent {
   const PaymentEvent();
-
-  @override
-  List<Object> get props => [];
 }
 
 class InitiatePaymentEvent extends PaymentEvent {
-  final String therapistEmail;
-  final String patientEmail;
-  final double sessionHour;
-  final double pricePerHr;
+  final PaymentEntity paymentEntity;
+  const InitiatePaymentEvent(this.paymentEntity);
+}
 
-  const InitiatePaymentEvent({
-    required this.therapistEmail,
-    required this.patientEmail,
-    required this.sessionHour,
-    required this.pricePerHr,
-  });
-
-  @override
-  List<Object> get props => [therapistEmail, patientEmail, sessionHour, pricePerHr];
+class VerifyPaymentEvent extends PaymentEvent {
+  final String txRef;
+  const VerifyPaymentEvent(this.txRef);
 }

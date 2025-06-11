@@ -1,30 +1,23 @@
 part of 'payment_bloc.dart';
 
-abstract class PaymentState extends Equatable {
-  const PaymentState();
+@immutable
+sealed class PaymentState {}
 
-  @override
-  List<Object> get props => [];
-}
-
-class PaymentInitial extends PaymentState {}
+final class PaymentInitial extends PaymentState {}
 
 class PaymentLoading extends PaymentState {}
 
-class PaymentSuccess extends PaymentState {
+class PaymentInitiated extends PaymentState {
   final String checkoutUrl;
-
-  const PaymentSuccess({required this.checkoutUrl});
-
-  @override
-  List<Object> get props => [checkoutUrl];
+  PaymentInitiated(this.checkoutUrl);
 }
 
-class PaymentFailure extends PaymentState {
-  final String error;
+class PaymentVerified extends PaymentState {
+  final String message;
+  PaymentVerified(this.message);
+}
 
-  const PaymentFailure({required this.error});
-
-  @override
-  List<Object> get props => [error];
+class PaymentError extends PaymentState {
+  final String message;
+  PaymentError(this.message);
 }
