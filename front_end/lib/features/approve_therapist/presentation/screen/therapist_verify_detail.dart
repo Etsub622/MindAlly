@@ -101,8 +101,8 @@ class _TherapistDetailPageState extends State<TherapistDetailPage> {
                             child: Text(
                               widget.therapist.email,
                               style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
                           ),
@@ -117,8 +117,8 @@ class _TherapistDetailPageState extends State<TherapistDetailPage> {
                             child: Text(
                               widget.therapist.specialization,
                               style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
                           ),
@@ -131,7 +131,9 @@ class _TherapistDetailPageState extends State<TherapistDetailPage> {
                 Text(
                   'Certificate',
                   style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.bold),
+                      fontSize: 17,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87),
                 ),
                 const SizedBox(height: 12),
                 ClipRRect(
@@ -178,7 +180,8 @@ class _TherapistDetailPageState extends State<TherapistDetailPage> {
                           ? null
                           : () => _handleAction(context, 'approve'),
                       style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,),
+                        backgroundColor: Colors.green,
+                      ),
                       child: _isLoading
                           ? const CircularProgressIndicator(color: Colors.white)
                           : const Text('Approve'),
