@@ -20,6 +20,7 @@ class UpdateVideo extends StatefulWidget {
   final String name;
   final List<String> categories;
   final Function(Map<String, Object>) onUpdate;
+  final String ownerId;
 
   const UpdateVideo({
     super.key,
@@ -31,6 +32,7 @@ class UpdateVideo extends StatefulWidget {
     required this.title,
     required this.onUpdate,
     required this.categories,
+    required this.ownerId,
   });
 
   @override
@@ -40,8 +42,6 @@ class UpdateVideo extends StatefulWidget {
 class _UpdateVideoState extends State<UpdateVideo> {
   late TextEditingController titleController;
   late TextEditingController linkController;
-  late TextEditingController profilePictureController;
-  late TextEditingController nameController;
   late TextEditingController imageController;
   List<String> selectedCategories = [];
 
@@ -50,23 +50,23 @@ class _UpdateVideoState extends State<UpdateVideo> {
     super.initState();
     titleController = TextEditingController(text: widget.title);
     linkController = TextEditingController(text: widget.link);
-    profilePictureController =
-        TextEditingController(text: widget.profilePicture);
-    nameController = TextEditingController(text: widget.name);
     imageController = TextEditingController(text: widget.image);
     selectedCategories = widget.categories;
   }
 
   void updateVideo() async {
-    await _uploadImage();
+    if (_imageFile != null) {
+      await _uploadImage();
+    }
     final updatedVideo = VideoEntity(
         id: '',
-        image: _imageUrl!,
+        image: _imageUrl ?? widget.image,
         title: titleController.text,
         link: linkController.text,
-        profilePicture: 'profilePicture',
-        name: 'name',
+        profilePicture: widget.profilePicture,
+        name: widget.name,
         type: 'Video',
+        ownerId: widget.ownerId,
         categories: selectedCategories);
     context.read<VideoBloc>().add(UpdateVideoEvent(updatedVideo, widget.id));
   }
@@ -138,113 +138,115 @@ class _UpdateVideoState extends State<UpdateVideo> {
 
   Widget _buildForm(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Icon(
-                        Icons.arrow_back_ios_sharp,
-                        color: Color(0xFFB57EDC),
-                        size: 22,
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 130,
-                    ),
-                    const Text(
-                      'Update video',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Color(0XFF3E3E3E),
-                        fontSize: 20,
-                        fontFamily: 'Poppins',
-                      ),
-                    )
-                  ],
-                ),
-                const SizedBox(
-                  height: 25,
-                ),
-                Column(
-                  children: [
-                    SizedBox(
-                      height: 10,
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        _pickImage(ImageSource.gallery);
-                      },
-                      child: const Text('Change image',
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
-                            fontWeight: FontWeight.bold,
-                            color: Color(0XFF3E3E3E),
-                          )),
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                Container(
-                  height: 100,
-                  width: 100,
-                  child: _imageUrl != null && _imageUrl!.isEmpty
-                      ? Image.file(
-                          _imageFile!,
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                        )
-                      : Image.network(
-                          imageController.text,
-                          fit: BoxFit.cover,
-                          width: double.infinity,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Icon(
+                          Icons.arrow_back_ios_sharp,
+                          color: Color(0xFFB57EDC),
+                          size: 22,
                         ),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                CustomFormField(text: 'title', controller: titleController),
-                const SizedBox(
-                  height: 10,
-                ),
-                const SizedBox(
-                  height: 15,
-                ),
-                CustomFormField(text: 'link', controller: linkController),
-                const SizedBox(
-                  height: 25,
-                ),
-                CustomButton(
-                  wdth: double.infinity,
-                  rad: 10,
-                  hgt: 50,
-                  text: "Update",
-                  onPressed: () {
-                    if (titleController.text.isNotEmpty &&
-                        linkController.text.isNotEmpty) {
-                      updateVideo();
-                    }
-                  },
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-              ],
+                      ),
+                      const SizedBox(
+                        width: 20,
+                      ),
+                      const Text(
+                        'Update video',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Color(0XFF3E3E3E),
+                          fontSize: 20,
+                          fontFamily: 'Poppins',
+                        ),
+                      )
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 25,
+                  ),
+                  Column(
+                    children: [
+                      SizedBox(
+                        height: 10,
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          _pickImage(ImageSource.gallery);
+                        },
+                        child: const Text('Change image',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.bold,
+                              color: Color(0XFF3E3E3E),
+                            )),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Container(
+                    height: 100,
+                    width: 100,
+                    child: _imageUrl != null && _imageUrl!.isEmpty
+                        ? Image.file(
+                            _imageFile!,
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                          )
+                        : Image.network(
+                            imageController.text,
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                          ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  CustomFormField(text: 'title', controller: titleController),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  CustomFormField(text: 'link', controller: linkController),
+                  const SizedBox(
+                    height: 25,
+                  ),
+                  CustomButton(
+                    wdth: double.infinity,
+                    rad: 10,
+                    hgt: 50,
+                    text: "Update",
+                    onPressed: () async {
+                      if (titleController.text.isNotEmpty &&
+                          linkController.text.isNotEmpty) {
+                        updateVideo();
+                      }
+                    },
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -256,8 +258,7 @@ class _UpdateVideoState extends State<UpdateVideo> {
   void dispose() {
     titleController.dispose();
     linkController.dispose();
-    profilePictureController.dispose();
-    nameController.dispose();
+
     imageController.dispose();
 
     super.dispose();

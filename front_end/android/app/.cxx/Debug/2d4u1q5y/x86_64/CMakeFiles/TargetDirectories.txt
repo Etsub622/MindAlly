@@ -1,0 +1,2 @@
+/Users/etsubdink/MindAlly/front_end/android/app/.cxx/Debug/2d4u1q5y/x86_64/CMakeFiles/edit_cache.dir
+/Users/etsubdink/MindAlly/front_end/android/app/.cxx/Debug/2d4u1q5y/x86_64/CMakeFiles/rebuild_cache.dir

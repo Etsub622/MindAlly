@@ -8,15 +8,17 @@ class BookModel extends BookEntity {
     required super.type,
     required super.id,
     required super.categories,
+    required super.ownerId,
   });
 
   factory BookModel.fromJson(Map<String, dynamic> json) {
     return BookModel(
-      title: json['title'],
-      author: json['author'],
-      image: json['image'],
-      type: json['type'],
-      id: json['_id'],
+      title: json['title'] ?? '',
+      author: json['author'] ?? '',
+      image: json['image'] ?? '',
+      type: json['type'] ?? '',
+      id: json['_id'] ?? '',
+      ownerId: json['ownerId'] ?? '',
       categories: List<String>.from(json['categories']),
     );
   }
@@ -28,6 +30,7 @@ class BookModel extends BookEntity {
       'image': super.image,
       'type': super.type,
       'categories': super.categories,
+      'ownerId': super.ownerId,
     };
   }
 
@@ -39,6 +42,7 @@ class BookModel extends BookEntity {
       image: super.image,
       type: super.type,
       categories: super.categories,
+      ownerId: super.ownerId,
     );
   }
 }

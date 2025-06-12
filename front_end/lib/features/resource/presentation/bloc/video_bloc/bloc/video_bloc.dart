@@ -14,6 +14,7 @@ class VideoBloc extends Bloc<VideoEvent, VideoState> {
   final DeleteVideoUsecase deleteVideoUsecase;
   final SearchVideoUsecase searchVideoUsecase;
   final GetSingleVideoUsecase getSingleVideoUsecase;
+  final GetVideoByCategoryUsecase getVideoByCategoryUsecase;
   VideoBloc({
     required this.addVideoUsecase,
     required this.deleteVideoUsecase,
@@ -21,6 +22,7 @@ class VideoBloc extends Bloc<VideoEvent, VideoState> {
     required this.searchVideoUsecase,
     required this.updateVideoUsecase,
     required this.getSingleVideoUsecase,
+    required this.getVideoByCategoryUsecase,
   }) : super(VideoInitial()) {
     on<AddVideoEvent>((event, emit) async {
       emit(VideoLoading());
@@ -96,6 +98,25 @@ class VideoBloc extends Bloc<VideoEvent, VideoState> {
       }, (video) {
         emit(SingleVideoLoaded(video));
       });
+    });
+
+    on<SearchVideoByCategoryEvent>((event, emit) async {
+      emit(VideoLoading());
+      final videos = await getVideoByCategoryUsecase(
+          GetVideoByCategoryParams(event.category));
+
+      videos.fold(
+        (failure) {
+          emit(SearchFailed(failure.message));
+        },
+        (videos) {
+          if (videos.isEmpty) {
+            emit(SearchFailed('No resources found'));
+          } else {
+            emit(VideoLoaded(videos));
+          }
+        },
+      );
     });
   }
 }

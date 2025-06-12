@@ -5,6 +5,10 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:front_end/core/utils/constants.dart';
 import 'package:front_end/core/routes/app_path.dart';
 import 'package:front_end/features/Home/presentation/screens/home_screen.dart';
+import 'package:front_end/features/admin/admin_screen.dart';
+import 'package:front_end/features/admin/events_admin_screen.dart';
+import 'package:front_end/features/admin/unapproved_therapists_screen.dart';
+import 'package:front_end/features/approve_therapist/presentation/screen/therapist_list_page.dart';
 import 'package:front_end/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:front_end/features/chat/presentation/screens/chat_room.dart';
 import 'package:front_end/features/Q&A/presentation/screens/qa_room.dart';
@@ -20,7 +24,8 @@ class HomeNavigationScreen extends StatefulWidget {
 }
 
 class _HomeNavigationScreenState extends State<HomeNavigationScreen> {
-  final FlutterSecureStorage flutterSecureStorage = const FlutterSecureStorage();
+  final FlutterSecureStorage flutterSecureStorage =
+      const FlutterSecureStorage();
   String? role;
   String? userId;
   int index = 0;
@@ -77,19 +82,31 @@ class _HomeNavigationScreenState extends State<HomeNavigationScreen> {
             );
           }
 
-          if (role == null || userId == null || role!.isEmpty || userId!.isEmpty) {
+          if (role == null ||
+              userId == null ||
+              role!.isEmpty ||
+              userId!.isEmpty) {
             return const Scaffold(
               body: Center(child: Text("Logging out...")),
             );
           }
+          List<StatefulWidget>  screens = [];
 
-          final screens = [
+          role != "admin" ?
+           screens = [
             HomeScreen(role: role!, userId: userId!),
-            const QARoom(),
+            QARoom(
+              currentUserRole: role!,
+            ),
             const ResourceRoom(),
             const ChatRoom(),
+          ]
+          :
+          screens = [
+            EventsAdminScreen(),
+            TherapistListPage(),
           ];
-
+          
           return Scaffold(
             body: Center(
               child: Stack(
@@ -110,31 +127,56 @@ class _HomeNavigationScreenState extends State<HomeNavigationScreen> {
                     index = newIndex;
                   });
                 },
-                items: [
+                items: 
+                role != "admin" ?
+                [
                   BottomNavigationBarItem(
                     icon: index == 0
-                        ? Image.asset(width: 30, height: 40, AppImage.homeSelected)
-                        : Image.asset(width: 30, height: 40, AppImage.homeUnselected),
+                        ? Image.asset(
+                            width: 30, height: 40, AppImage.homeSelected)
+                        : Image.asset(
+                            width: 30, height: 40, AppImage.homeUnselected),
                     label: 'Home',
                   ),
                   BottomNavigationBarItem(
                     icon: index == 1
-                        ? Image.asset(width: 30, height: 40, AppImage.qaSelected)
-                        : Image.asset(width: 30, height: 40, AppImage.qaUnselected),
+                        ? Image.asset(
+                            width: 30, height: 40, AppImage.qaSelected)
+                        : Image.asset(
+                            width: 30, height: 40, AppImage.qaUnselected),
                     label: 'Q&A',
                   ),
                   BottomNavigationBarItem(
                     icon: index == 2
-                        ? Image.asset(width: 30, height: 40, AppImage.resourceSelected)
-                        : Image.asset(width: 30, height: 40, AppImage.resourceUnselected),
+                        ? Image.asset(
+                            width: 30, height: 40, AppImage.resourceSelected)
+                        : Image.asset(
+                            width: 30, height: 40, AppImage.resourceUnselected),
                     label: 'Resource',
                   ),
                   BottomNavigationBarItem(
                     icon: index == 3
-                        ? Image.asset(width: 30, height: 40, AppImage.chatSelected)
-                        : Image.asset(width: 30, height: 40, AppImage.chatUnselected),
+                        ? Image.asset(
+                            width: 30, height: 40, AppImage.chatSelected)
+                        : Image.asset(
+                            width: 30, height: 40, AppImage.chatUnselected),
                     label: 'Chat',
                   ),
+                ]
+                :[
+                   BottomNavigationBarItem(
+                    icon: index == 0
+                        ? Image.asset(width: 30, height: 40, AppImage.resourceSelected)
+                        : Image.asset(width: 30, height: 40, AppImage.resourceUnselected),
+                    label: 'events',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: index == 1
+                        ? Image.asset(width: 30, height: 40, AppImage.chatSelected)
+                        : Image.asset(width: 30, height: 40, AppImage.chatUnselected),
+                    label: 'therapist',
+                  ),
+
                 ],
               ),
             ),

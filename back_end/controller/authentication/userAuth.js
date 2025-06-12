@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt"
 import { Therapist } from "../../model/therapistModel.js";
 import { Patient } from "../../model/patientModel.js";
+import { Admin } from "../../model/adminModel.js";
 import { Token } from "../../model/token.js"
 import jwt from "jsonwebtoken"
 
@@ -21,7 +22,7 @@ const registerTherapist = async (req, res) => {
       modality:specialization,
       Password: hashedPass,
       Certificate: certificate,
-      Role: "therapist",
+      Role: "pending_therapist",
       verified:false
       
     })
@@ -75,6 +76,41 @@ const registerPatient = async (req, res) => {
     
 }
 
+const registerAdmin = async (req, res) => {
+  try {
+
+      const { fullName, email, password } = req.body
+
+      console.log("Registering admin:", fullName, email, password);
+      
+      const hashpass=await hashedPassword(password)
+  
+
+  
+  const admin = new Admin({
+    FullName:fullName,
+    Email:email,
+    Password: hashpass,
+    Role:"admin"
+  })
+  
+      await admin.save()
+      const token = generateAccessToken(admin._id, admin.Role)
+      
+      res.status(200).json({
+          message: "admin signup successful",
+          token,
+          user:admin,
+      })
+      
+  } catch (error) {
+      console.log(error)
+      
+  }
+ 
+  
+}
+
 const Login = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -84,7 +120,7 @@ const Login = async (req, res) => {
             return res.status(400).json({ error: "Email and Password are required." });
         }
 
-           const userModel = await Patient.findOne({ Email: email }) || await Therapist.findOne({ Email:email });
+           const userModel = await Patient.findOne({ Email: email }) || await Therapist.findOne({ Email:email }) || await Admin.findOne({ Email: email });
         if (!userModel) {
             return res.status(404).json({ error: "Invalid email or password." });
         }
@@ -93,18 +129,24 @@ const Login = async (req, res) => {
         const isMatch = await bcrypt.compare(password, userModel.Password);
         if (!isMatch) {
             return res.status(401).json({ error: "Invalid email or password." });
+
       }
       userModel.lastLogin = new Date();
       await userModel.save();
 
   
 
+
+        }
+        
+        console.log("User found:", userModel._id, userModel.Role);
+
         const accessToken = generateAccessToken(userModel._id, userModel.Role);
         const refreshToken = generateRefreshToken(userModel._id, userModel.Role);
         
         await Token.create({
         userId: userModel._id,
-        userModel: userModel.Role === "patient" ? "Patient" : "Therapist",
+        userModel: userModel.Role === "patient" ? "Patient" : userModel.Role === "admin" ? "Admin" : "Therapist",
         refreshToken
         });
          res
@@ -114,7 +156,7 @@ const Login = async (req, res) => {
         sameSite: "strict",
         maxAge: 3 * 24 * 60 * 60 * 1000 
       })
-      .json({ message: "user login successful",accessToken, user:userModel  });
+      .json({ message: "user login successful",accessToken, user: userModel  });
         
     } catch (error) {
         console.error(error);
@@ -150,5 +192,5 @@ const Logout= async (req, res) => {
 };
 
 
-export { registerTherapist, Login, registerPatient,refreshToken,Logout }
+export { registerTherapist, Login, registerPatient,refreshToken,Logout, registerAdmin }
 

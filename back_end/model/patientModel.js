@@ -53,9 +53,10 @@ const patientschema = new mongoose.Schema({
     type:Array
     },
     lastLogin: { type: Date }
+   },
+   fcmToken: {
+        type: String,
 
-    
- 
 
 })
 

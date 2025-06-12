@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:flutter/foundation.dart';
 import 'package:front_end/core/usecase/usecase.dart';
 import 'package:front_end/features/resource/domain/entity/book_entity.dart';
 import 'package:front_end/features/resource/domain/usecase/book_usecase.dart';
@@ -14,6 +15,7 @@ class BookBloc extends Bloc<BookEvent, BookState> {
   final UpdateBookUsecase updateBookUsecase;
   final SearchBookUsecase searchBookUsecase;
   final GetSingleBookUsecase getSingleBookUsecase;
+  final SearchBookByCategoryUsecase searchBookByCategoryUsecase;
   BookBloc({
     required this.addBookUsecase,
     required this.deleteBookUsecase,
@@ -21,6 +23,7 @@ class BookBloc extends Bloc<BookEvent, BookState> {
     required this.searchBookUsecase,
     required this.updateBookUsecase,
     required this.getSingleBookUsecase,
+    required this.searchBookByCategoryUsecase,
   }) : super(BookInitial()) {
     on<AddBookEvent>((event, emit) async {
       emit(BookLoading());
@@ -94,6 +97,25 @@ class BookBloc extends Bloc<BookEvent, BookState> {
       }, (book) {
         emit(SingleBookLoaded(book));
       });
+    });
+
+    on<SearchBookByCategoryEvent>((event, emit) async {
+      emit(BookLoading());
+      final books = await searchBookByCategoryUsecase(
+          SearchByCategoryParams(event.category));
+
+      books.fold(
+        (failure) {
+          emit(SearchFailed(failure.message));
+        },
+        (books) {
+          if (books.isEmpty) {
+            emit(SearchFailed('No resources found'));
+          } else {
+            emit(BookLoaded(books));
+          }
+        },
+      );
     });
   }
 }

@@ -9,6 +9,7 @@ class VideoEntity extends Equatable {
   final String name;
   final String type;
   final List<String> categories;
+  final String ownerId;
   VideoEntity(
       {required this.id,
       required this.image,
@@ -17,9 +18,10 @@ class VideoEntity extends Equatable {
       required this.profilePicture,
       required this.name,
       required this.type,
+      required this.ownerId,
       required this.categories});
   @override
   List<Object> get props {
-    return [id, image, title, link, profilePicture, name, type, categories];
+    return [id, image, title, link, profilePicture, name, type, categories,ownerId];
   }
 }

@@ -18,6 +18,8 @@ class UpdateArticle extends StatefulWidget {
   final String title;
   final String link;
   final String logo;
+  final String ownerId;
+  final List<String> categories;
 
   final Function(Map<String, Object>) onUpdate;
 
@@ -29,6 +31,8 @@ class UpdateArticle extends StatefulWidget {
     required this.logo,
     required this.title,
     required this.onUpdate,
+    required this.ownerId,
+    required this.categories,
   });
 
   @override
@@ -40,6 +44,7 @@ class _UpdateArticleState extends State<UpdateArticle> {
   late TextEditingController linkController;
   late TextEditingController contentController;
   late TextEditingController logoController;
+  List<String> selectedCategories = [];
 
   @override
   void initState() {
@@ -48,18 +53,22 @@ class _UpdateArticleState extends State<UpdateArticle> {
     linkController = TextEditingController(text: widget.link);
     logoController = TextEditingController(text: widget.logo);
     contentController = TextEditingController(text: widget.content);
+    selectedCategories = widget.categories;
   }
 
   void UpdateArticle() async {
-    await _uploadImage();
+    if (_imageFile != null) {
+      await _uploadImage();
+    }
     final updatedArticle = ArticleEntity(
         id: '',
         title: titleController.text,
         content: contentController.text,
         link: linkController.text,
-        logo: logoController.text,
+        logo:  _imageUrl ?? widget.logo,
+        ownerId: widget.ownerId,
         type: "Article",
-        categories: ['categories', 'categories']);
+        categories: selectedCategories);
     context
         .read<ArticleBloc>()
         .add(UpdateArticleEvent(updatedArticle, widget.id));

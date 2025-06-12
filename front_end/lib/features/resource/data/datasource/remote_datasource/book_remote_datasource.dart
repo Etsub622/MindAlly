@@ -12,6 +12,7 @@ abstract class BookRemoteDatasource {
   Future<String> deleteBook(String id);
   Future<List<BookModel>> searchBooks(String title);
   Future<BookModel> getSingleBook(String id);
+  Future<List<BookModel>> searchBookByCategory(String category);
 }
 
 class BookRemoteDataSourceImpl implements BookRemoteDatasource {
@@ -157,6 +158,33 @@ class BookRemoteDataSourceImpl implements BookRemoteDatasource {
       } else {
         throw ServerException(
             message: 'Failed to get book:${response.statusCode}');
+      }
+    } catch (e) {
+      throw ServerException(message: e.toString());
+    }
+  }
+  
+  @override
+  Future<List<BookModel>> searchBookByCategory(String category) async{
+    try {
+      var url = Uri.parse('$baseUrl/category/$category');
+      final response = await client.get(url, headers: {
+        'Content-Type': 'application/json',
+      });
+      print(response.body);
+      print(response.statusCode);
+      if (response.statusCode == 200) {
+        final List<dynamic> bookJson = json.decode(response.body);
+        if (bookJson.isEmpty) {
+          return [];
+        } else {
+          return bookJson.map((jsonItem) {
+            return BookModel.fromJson(jsonItem as Map<String, dynamic>);
+          }).toList();
+        }
+      } else {
+        throw ServerException(
+            message: 'Failed to get books by category:${response.statusCode}');
       }
     } catch (e) {
       throw ServerException(message: e.toString());

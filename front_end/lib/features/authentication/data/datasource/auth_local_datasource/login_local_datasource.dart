@@ -10,24 +10,23 @@ abstract class LoginLocalDataSource {
   Future<void> deleteUser();
   Future<String> getToken();
   Future<void> setStudentUser(StudentDataModel studentDataModel);
-  Future<void> cacheUserData({required Map<String, dynamic> userCredentialModel});
+  Future<void> cacheUserData(
+      {required Map<String, dynamic> userCredentialModel});
 }
 
 const token_key = 'token_key';
-
 
 class LoginLocalDataSourceImpl implements LoginLocalDataSource {
   final FlutterSecureStorage flutterSecureStorage;
   final SharedPreferences sharedPreferences;
 
-  LoginLocalDataSourceImpl({required this.flutterSecureStorage, required this.sharedPreferences});
+  LoginLocalDataSourceImpl(
+      {required this.flutterSecureStorage, required this.sharedPreferences});
 
   final String authenticationKey = "access_token";
   final String userProfileKey = "user_profile";
 
-  
-
-   @override
+  @override
   Future<void> cacheUserData({
     required Map<String, dynamic> userCredentialModel,
   }) {
@@ -38,13 +37,13 @@ class LoginLocalDataSourceImpl implements LoginLocalDataSource {
   }
 
   @override
-  Future<void> cacheUser(String token)async {
-     await sharedPreferences.setString(token_key, token);
+  Future<void> cacheUser(String token) async {
+    await sharedPreferences.setString(token_key, token);
   }
 
   @override
-   Future<StudentDataModel?> getUser() async {
-    final jsonString = sharedPreferences.getString(token_key);
+  Future<StudentDataModel?> getUser() async {
+    final jsonString = sharedPreferences.getString(userProfileKey);
     if (jsonString != null) {
       return StudentDataModel.fromJson(json.decode(jsonString));
     } else {
@@ -65,6 +64,7 @@ class LoginLocalDataSourceImpl implements LoginLocalDataSource {
 
   @override
   Future<void> setStudentUser(StudentDataModel studentDataModel) {
-    return sharedPreferences.setString(token_key, json.encode(studentDataModel.toJson()));
+    return sharedPreferences.setString(
+        userProfileKey, json.encode(studentDataModel.toJson()));
   }
 }

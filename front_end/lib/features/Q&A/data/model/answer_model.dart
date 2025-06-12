@@ -7,14 +7,17 @@ class AnswerModel extends AnswerEntity {
     required super.answer,
     required super.therapistName,
     required super.therapistProfile,
+    required super.ownerId,
+
   });
   factory AnswerModel.fromJson(Map<String, dynamic> json) {
     return AnswerModel(
-      id: json['_id'],
-      questionId: json['questionId'],
-      answer: json['answer'],
-      therapistName: json['therapistName'],
-      therapistProfile: json['therapistProfile'],
+      id: json['_id']?? '',
+      questionId: json['questionId'] ?? '',
+      answer: json['answer'] ?? '',
+      therapistName: json['therapistName'] ?? '',
+      therapistProfile: json['therapistProfile'] ?? '',
+      ownerId: json['ownerId'] ?? '',
     );
   }
   Map<String, dynamic> toJson() {
@@ -23,6 +26,7 @@ class AnswerModel extends AnswerEntity {
       'answer': super.answer,
       'therapistName': super.therapistName,
       'therapistProfile': super.therapistProfile,
+      'ownerId': super.ownerId,
     };
   }
   AnswerEntity toEntity() {
@@ -32,6 +36,7 @@ class AnswerModel extends AnswerEntity {
       answer: super.answer,
       therapistName: super.therapistName,
       therapistProfile: super.therapistProfile,
+      ownerId: super.ownerId,
     );
   }
 }
