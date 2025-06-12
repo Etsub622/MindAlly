@@ -16,11 +16,20 @@ class TherapistCard extends StatelessWidget {
       child: ListTile(
         leading: CircleAvatar(
           radius: 24,
-          backgroundColor: Colors.grey[300],
-          child: const Icon(Icons.person, color: Colors.grey), // Placeholder
+          backgroundColor: const Color(0xffB57EDC),
+          child: Text(
+            therapist.fullName.isNotEmpty
+                ? therapist.fullName[0].toUpperCase()
+                : '',
+            style: const TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+              fontSize: 22,
+            ),
+          ),
         ),
         title: Text(
-          therapist.name,
+          therapist.fullName,
           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
         ),
         subtitle: Text(

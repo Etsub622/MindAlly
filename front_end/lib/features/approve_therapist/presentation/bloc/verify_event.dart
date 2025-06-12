@@ -1,16 +1,14 @@
-
+// lib/features/approve_therapist/presentation/bloc/verify_event.dart
 part of 'verify_bloc.dart';
 
-@immutable
-sealed class VerifyEvent {}
+abstract class VerifyEvent {}
 
 class LoadTherapistsEvent extends VerifyEvent {}
 
 class ApproveTherapistEvent extends VerifyEvent {
   final String id;
-  final String? reason;
 
-  ApproveTherapistEvent({required this.id, this.reason});
+  ApproveTherapistEvent({required this.id});
 }
 
 class RejectTherapistEvent extends VerifyEvent {

@@ -1,3 +1,4 @@
+// lib/features/approve_therapist/presentation/screen/therapist_verify_detail.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front_end/features/approve_therapist/domain/entity/therapist_verify_entity.dart';
@@ -33,10 +34,9 @@ class _TherapistDetailPageState extends State<TherapistDetailPage> {
     }
     setState(() => _isLoading = true);
     if (action == 'approve') {
-      context.read<VerifyBloc>().add(ApproveTherapistEvent(
-            id: widget.therapist.id,
-            reason: comment.isEmpty ? null : comment,
-          ));
+      context
+          .read<VerifyBloc>()
+          .add(ApproveTherapistEvent(id: widget.therapist.id));
     } else {
       context.read<VerifyBloc>().add(RejectTherapistEvent(
             id: widget.therapist.id,
@@ -49,7 +49,9 @@ class _TherapistDetailPageState extends State<TherapistDetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.therapist.name),
+        title: Text(widget.therapist.fullName,
+            style: const TextStyle(
+                fontWeight: FontWeight.bold, color: Colors.white)),
         backgroundColor: Theme.of(context).primaryColor,
       ),
       body: BlocListener<VerifyBloc, VerifyState>(
@@ -59,6 +61,7 @@ class _TherapistDetailPageState extends State<TherapistDetailPage> {
               SnackBar(content: Text(state.message)),
             );
             Navigator.pop(context);
+            context.read<VerifyBloc>().add(LoadTherapistsEvent());
           }
           if (state is VerifyError) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -73,10 +76,56 @@ class _TherapistDetailPageState extends State<TherapistDetailPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Specialization: ${widget.therapist.specialization}',
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w600),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.1),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.email, color: Color(0xff800080)),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              widget.therapist.email,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          const Icon(Icons.work, color: Color(0xff800080)),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              widget.therapist.specialization,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -84,7 +133,7 @@ class _TherapistDetailPageState extends State<TherapistDetailPage> {
                   style: const TextStyle(
                       fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: widget.therapist.certificate.isNotEmpty
@@ -108,25 +157,28 @@ class _TherapistDetailPageState extends State<TherapistDetailPage> {
                               size: 50, color: Colors.grey[600]),
                         ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
                 TextField(
                   controller: _commentController,
                   decoration: const InputDecoration(
                     labelText: 'Comment (required for rejection)',
-                    border: OutlineInputBorder(),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                      borderSide: BorderSide(color: Colors.grey),
+                    ),
                   ),
                   maxLines: 3,
                 ),
                 const SizedBox(height: 16),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     ElevatedButton(
                       onPressed: _isLoading
                           ? null
                           : () => _handleAction(context, 'approve'),
                       style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green),
+                          backgroundColor: Colors.green,),
                       child: _isLoading
                           ? const CircularProgressIndicator(color: Colors.white)
                           : const Text('Approve'),

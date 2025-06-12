@@ -4,6 +4,8 @@ import { ChatHistory } from "../../model/chatsModel.js";
 import { spawn } from 'child_process';
 import bcrypt from "bcrypt";
 
+import { sendEmail } from '../../utils/sendEmail.js';
+
 import { promises as fs } from 'fs'; // For async file operations
 import { tmpdir } from 'os'; // Import tmpdir
 import { join } from 'path'; // Import join explicitly
@@ -193,13 +195,12 @@ export const getTopTherapists = async (req, res) => {
 // Get all therapists whose documents are not approved (Role: "pending_therapist")
 export const getUnapprovedTherapists = async (req, res) => {
   try {
-    const unapprovedTherapists = await Therapist.find({
-      Role: "pending_therapist"
-    });
-
+    const unapprovedTherapists = await Therapist.find({ Role: 'pending_therapist' })
+      .select('_id FullName Email Role Certificate modality')
+      .lean();
     res.json(unapprovedTherapists);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: 'Failed to fetch unapproved therapists', error: err.message });
   }
 };
 
@@ -211,6 +212,78 @@ export const getApprovedTherapists = async (req, res) => {
     });
 
     res.json(approvedTherapists);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+
+export const approveTherapist = async (req, res) => {
+  try {
+    const therapist = await Therapist.findById(req.params.therapist_id);
+    if (!therapist) {
+      return res.status(404).json({ message: "Therapist not found" });
+    }
+    therapist.Role = "therapist";
+    therapist.verified = true; 
+    await therapist.save();
+
+    // Send congratulatory email
+    if (therapist.Email) {
+      await sendEmail(
+        therapist.Email,
+        "Congratulations! Your therapist profile is approved",
+        `<div style="text-align:center;">
+          <img src="https://cdn.pixabay.com/photo/2017/01/31/13/14/award-2025795_1280.png" alt="Congratulations" width="120" />
+          <h2>Congratulations, ${therapist.FullName}!</h2>
+          <p>Your therapist application has been <b>approved</b>.<br>
+          You can now access all professional features on MindAlly.</p>
+        </div>`
+      );
+    }
+
+    res.json({ message: "Therapist approved successfully", therapist });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const getRejectedTherapists = async (req, res) => {
+  try {
+    const rejectedTherapists = await Therapist.find({ Role: 'rejected_therapist' })
+      .select('_id FullName Email Role Certificate modality rejectionReason')
+      .lean();
+    res.json(rejectedTherapists);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch rejected therapists', error: err.message });
+  }
+};
+
+
+export const rejectTherapist = async (req, res) => {
+  try {
+    const therapist = await Therapist.findById(req.params.therapist_id);
+    if (!therapist) {
+      return res.status(404).json({ message: "Therapist not found" });
+    }
+    // Store rejection reason
+    if (req.body.reason) {
+      therapist.rejectionReason = req.body.reason;
+    }
+    therapist.verified = false;
+    therapist.Role = "rejected_therapist";
+    await therapist.save();
+
+    // Send email notification to therapist
+    if (therapist.Email && therapist.rejectionReason) {
+      await sendEmail(
+        therapist.Email,
+        "Your therapist application was rejected",
+        `<p>Dear ${therapist.FullName},<br>Your application was rejected for the following reason:<br><b>${therapist.rejectionReason}</b></p>`
+      );
+    }
+
+    res.json({ message: "Therapist rejected successfully", therapist });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

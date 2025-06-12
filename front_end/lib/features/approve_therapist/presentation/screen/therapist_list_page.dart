@@ -16,7 +16,26 @@ class _TherapistListPageState extends State<TherapistListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Unapproved Therapists'),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Unapproved Therapists',
+              style: TextStyle(color: Colors.white),
+            ),
+            IconButton(
+              icon: const Icon(
+                Icons.refresh,
+                color: Colors.white,
+                size: 25,
+              ),
+              tooltip: 'Refresh',
+              onPressed: () {
+                context.read<VerifyBloc>().add(LoadTherapistsEvent());
+              },
+            ),
+          ],
+        ),
         backgroundColor: Theme.of(context).primaryColor,
       ),
       body: BlocConsumer<VerifyBloc, VerifyState>(

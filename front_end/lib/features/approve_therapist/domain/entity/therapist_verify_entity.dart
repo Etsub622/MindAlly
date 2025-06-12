@@ -1,23 +1,24 @@
+// lib/features/approve_therapist/domain/entity/therapist_verify_entity.dart
 import 'package:equatable/equatable.dart';
 
 class TherapistVerifyEntity extends Equatable {
   final String id;
-  final String name;
+  final String fullName;
   final String email;
-
-  final String? profilePicture;
+  final String role;
   final String certificate;
   final String specialization;
 
-  const TherapistVerifyEntity(
-      {required this.id,
-      required this.name,
-      required this.email,
-      this.profilePicture,
-      required this.certificate,
-      required this.specialization});
+  const TherapistVerifyEntity({
+    required this.id,
+    required this.fullName,
+    required this.email,
+    required this.role,
+    required this.certificate,
+    required this.specialization,
+  });
 
   @override
   List<Object?> get props =>
-      [id, name, email, certificate, specialization, profilePicture];
+      [id, fullName, email, role, certificate, specialization];
 }
