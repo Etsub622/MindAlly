@@ -44,8 +44,8 @@ const registerTherapist = async (req, res) => {
 const registerPatient = async (req, res) => {
     try {
 
-        const { fullName, email, password, collage } = req.body
-        
+        const { fullName, email, password, collage ,emergencyEmail} = req.body
+
         const hashpass=await hashedPassword(password)
     
   
@@ -55,7 +55,8 @@ const registerPatient = async (req, res) => {
       Email:email,
       Collage:collage,
       Password: hashpass,
-      Role:"patient"
+      Role:"patient",
+      EmergencyEmail: emergencyEmail
     })
     
         await patient.save()
@@ -128,9 +129,18 @@ const Login = async (req, res) => {
         const isMatch = await bcrypt.compare(password, userModel.Password);
         if (!isMatch) {
             return res.status(401).json({ error: "Invalid email or password." });
+
+      }
+      userModel.lastLogin = new Date();
+      await userModel.save();
+
+  
+
+
         }
         
         console.log("User found:", userModel._id, userModel.Role);
+
         const accessToken = generateAccessToken(userModel._id, userModel.Role);
         const refreshToken = generateRefreshToken(userModel._id, userModel.Role);
         
