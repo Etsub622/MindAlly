@@ -32,7 +32,6 @@ const patientschema = new mongoose.Schema({
    gender: {
     type: String,
    },
-
    preferred_modality:{
     type: String,
    },
@@ -56,12 +55,10 @@ const patientschema = new mongoose.Schema({
    preferred_specialties:{
     type:Array
     },
-    lastLogin: { type: Date }
-   },
+   lastLogin: { type: Date },
    fcmToken: {
         type: String,
-
-
+   }
 })
 
 

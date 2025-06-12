@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:front_end/core/routes/app_path.dart';
 import 'package:front_end/features/Home/presentation/screens/home_navigation_screen.dart';
 import 'package:front_end/features/Home/presentation/screens/therapist_detail_screen.dart';
+import 'package:front_end/features/Home/presentation/screens/therapist_verify_screen.dart';
 import 'package:front_end/features/admin/admin_screen.dart';
 import 'package:front_end/features/approve_therapist/domain/entity/therapist_verify_entity.dart';
 import 'package:front_end/features/authentication/data/models/professional_signup_model.dart';
@@ -16,6 +17,7 @@ import 'package:front_end/features/authentication/presentation/screens/role_sele
 import 'package:front_end/features/authentication/presentation/screens/student_signUp.dart';
 import 'package:front_end/features/authentication/presentation/screens/therapist_onboarding.dart';
 import 'package:front_end/features/calendar/presentation/screen/calendar_screen.dart';
+import 'package:front_end/features/calendar/presentation/screen/meeting/meeting_screen.dart';
 import 'package:front_end/features/chat/presentation/screens/chat_page.dart';
 import 'package:front_end/features/chat/presentation/screens/chat_room.dart';
 import 'package:front_end/features/profile_patient/domain/entities/user_entity.dart';
@@ -33,13 +35,17 @@ final routes = <GoRoute>[
     name: 'therapist_onboard',
     path: AppPath.therapistOnboard,
     builder: (BuildContext context, GoRouterState state) =>
-        const TherapistOnboardingScreen(),
+        TherapistOnboardingScreen(
+          isFromSignUp: state.uri.queryParameters['isFromSignUp'] == 'true',
+        ),
   ),
   GoRoute(
     name: 'patient_onboard',
     path: AppPath.patientOnboard,
     builder: (BuildContext context, GoRouterState state) =>
-        const PatientOnboardingSreen(),
+         PatientOnboardingSreen(
+          isFromSignUp: state.uri.queryParameters['isFromSignUp'] == 'true',
+        ),
   ),
   GoRoute(
       path: AppPath.role, builder: (context, state) => const RoleSelection()),
@@ -108,9 +114,18 @@ final routes = <GoRoute>[
     name: 'therapistDetails',
     builder: (context, state) {
       final therapist = state.extra as UpdateTherapistEntity;
-      return TherapistDetailPage(therapist: therapist);
+      return TherapistDetailScreen(therapist: therapist);
     },
   ),
+   GoRoute(
+    path: '/therapistVerify',
+    name: 'therapistVerify',
+    builder: (context, state) {
+      final therapist = state.extra as TherapistVerifyEntity;
+      return TherapistDetailPage(therapist: therapist);
+    },
+
+  )
 ];
 
 GoRouter routerConfig() {

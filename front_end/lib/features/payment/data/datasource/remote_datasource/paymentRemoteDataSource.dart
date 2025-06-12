@@ -45,7 +45,7 @@ class PaymentRemoteDataSourceImpl implements PaymentRemoteDataSource {
         url,
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          "email": email,
+          "therapistEmail": email,
           "amount": amount,
         }),
       );
@@ -53,8 +53,9 @@ class PaymentRemoteDataSourceImpl implements PaymentRemoteDataSource {
         final Map<String, dynamic> decodedBody = jsonDecode(response.body);
         return decodedBody["data"]["checkout_url"];
       } else {
+        final Map<String, dynamic> decodedError = jsonDecode(response.body);
         throw ServerException(
-            message: 'Failed to initiate payment:${response.statusCode}');
+            message: decodedError["error"]?? 'Failed to withdraw payment');
       }
     } catch (e) {
       throw ServerException(message: e.toString());

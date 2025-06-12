@@ -1,3 +1,4 @@
+import 'package:front_end/core/config/config_key.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -33,7 +34,7 @@ class SocketService {
       String token = sharedPreferences.getString("token_key") ?? '';
 
       _socket = IO.io(
-        'http://192.168.248.220:8000', // Replace with your backend URL
+        '${ConfigKey.baseUrl2}', // Replace with your backend URL
         IO.OptionBuilder()
             .setTransports(['websocket'])
             .disableAutoConnect()

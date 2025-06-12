@@ -136,8 +136,8 @@ export const initializeSocket = (httpServer) => {
         const latestIndex = checkInArray.length > 0 ? checkInArray[checkInArray.length - 1].index : 1;
 
         const updateField = isTherapist
-          ? { $push: { therapistCheckOutTimes: { index: latestIndex, time: new Date() } } }
-          : { $push: { patientCheckOutTimes: { index: latestIndex, time: new Date() } } };
+          ? { $push: { therapistCheckOutTimes: { index: latestIndex, time: new Date.now() } } }
+          : { $push: { patientCheckOutTimes: { index: latestIndex, time: new Date.now() } } };
 
         await Session.updateOne({ _id: sessionId }, updateField);
         console.log(`Check-out recorded for ${isTherapist ? "therapist" : "patient"} in session ${sessionId} at index ${latestIndex}`);

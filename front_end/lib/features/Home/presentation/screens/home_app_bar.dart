@@ -31,7 +31,7 @@ class _AppbarHomeState extends State<AppbarHome> {
   @override
   void initState() {
     super.initState();
-    if (widget.role == "therapist") {
+    if (widget.role == "therapist" || widget.role == "pending_therapist") {
       BlocProvider.of<TherapistProfileBloc>(context).add(GetTherapistLoadEvent(therapistId: widget.userId));
     } else if (widget.role == "patient") {
       BlocProvider.of<PatientProfileBloc>(context).add(GetPatientLoadEvent(patientId: widget.userId));
@@ -64,7 +64,7 @@ class _AppbarHomeState extends State<AppbarHome> {
       },
       child: AppBar(
         toolbarHeight: 110,
-        title: widget.role == "therapist"
+        title: widget.role == "therapist" || widget.role == "pending_therapist"
             ? BlocBuilder<TherapistProfileBloc, GetTherapistState>(
                 builder: (context, state) => buildProfileContent(context, state),
               )
@@ -75,11 +75,11 @@ class _AppbarHomeState extends State<AppbarHome> {
           IconButton(
             onPressed: () {
               Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const CalendarScreen(),
-                  ),
-        );
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const CalendarScreen(),
+                ),
+              );
             },
             icon: const Icon(Icons.calendar_month_sharp),
           ),
@@ -92,7 +92,13 @@ class _AppbarHomeState extends State<AppbarHome> {
   }
 
   Widget buildProfileContent(BuildContext context, dynamic state) {
-    if (widget.role == "therapist" && state is GetTherapistLoaded) {
+    if (widget.role == "pending_therapist" && state is GetTherapistLoaded) {
+      String userName = state.therapist.name;
+      String profilePicture = state.therapist.profilePicture ?? "";
+      String email = state.therapist.email;
+
+      return buildPendingTherapistUI(context, userName, profilePicture, email);
+    } else if (widget.role == "therapist" && state is GetTherapistLoaded) {
       String userName = state.therapist.name;
       String profilePicture = state.therapist.profilePicture ?? "";
       bool hasPassword = state.therapist.hasPassword;
@@ -107,7 +113,8 @@ class _AppbarHomeState extends State<AppbarHome> {
 
       return buildProfileUI(context, userName, profilePicture, hasPassword, email);
     } else if ((widget.role == "therapist" && state is GetTherapistError) ||
-        (widget.role == "patient" && state is GetPatientError)) {
+        (widget.role == "patient" && state is GetPatientError) ||
+        (widget.role == "pending_therapist" && state is GetTherapistError)) {
       return buildProfileUI(context, "userName", "profilePicture", true, "email");
     } else {
       return const Center(child: CircularProgressIndicator());
@@ -165,6 +172,148 @@ class _AppbarHomeState extends State<AppbarHome> {
           ],
         ),
       ],
+    );
+  }
+
+  Widget buildPendingTherapistUI(BuildContext context, String userName, String profilePicture, String email) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PendingTherapistScreen(
+                  username: userName,
+                  email: email,
+                  therapistId: widget.userId,
+                ),
+              ),
+            );
+          },
+          child: Stack(
+            alignment: Alignment.bottomRight,
+            children: [
+              CircleAvatar(
+                backgroundColor: Colors.grey[300],
+                backgroundImage: profilePicture.isNotEmpty
+                    ? CachedNetworkImageProvider(
+                        profilePicture,
+                        errorListener: (_) => const Icon(
+                          Icons.error,
+                          color: Colors.red,
+                        ),
+                      )
+                    : null,
+                radius: 25,
+                child: profilePicture.isEmpty
+                    ? Icon(Icons.person, size: 30, color: Colors.grey[600])
+                    : null,
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.orange[600],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  'Pending',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 10),
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('⏳', style: Theme.of(context).textTheme.bodySmall),
+            Text(
+              'Hi, ${cutUsername(userName)}',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Colors.grey[600],
+                  ),
+            ),
+            Text(
+              'Account under review',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    fontSize: 10,
+                    color: Colors.orange[600],
+                  ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class PendingTherapistScreen extends StatelessWidget {
+  final String username;
+  final String email;
+  final String therapistId;
+
+  const PendingTherapistScreen({
+    super.key,
+    required this.username,
+    required this.email,
+    required this.therapistId,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Pending Verification'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Hello, $username!',
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Your therapist account is currently under review. We’re verifying your credentials to ensure the best experience for our users.',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 16),
+            ListTile(
+              leading: const Icon(Icons.email),
+              title: Text(email),
+              subtitle: const Text('Registered email'),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'What to expect:',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 8),
+            const Text('• You’ll receive an email once your account is approved.'),
+            const Text('• Verification typically takes 1-3 business days.'),
+            const Text('• Contact support if you have questions.'),
+            const SizedBox(height: 24),
+            Center(
+              child: ElevatedButton(
+              onPressed: () {
+                context.read<AuthBloc>().add(LogoutEvent());
+              },
+              child: const Text('Logout'),
+            ),
+            )
+          ],
+        ),
+      ),
     );
   }
 }

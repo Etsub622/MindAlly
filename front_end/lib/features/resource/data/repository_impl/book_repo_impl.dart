@@ -17,21 +17,21 @@ class BookRepoImpl implements BookRepository {
     print('is inknkkkkkkkkkkkkkk');
 
     // if (await networkInfo.isConnected) {
-    print('uguguguiiguu');
-    try {
-      final newBook = BookModel(
-          id: '',
-          type: 'Book',
-          title: book.title,
-          author: book.author,
-          image: book.image,
-          categories: book.categories);
-      final res = await remoteDatasource.addBook(newBook);
-      print(res);
-      print(newBook);
-      return right(res);
-    } on ServerException {
-      return (Left(ServerFailure(message: 'server failure')));
+    // print('uguguguiiguu');
+    // try {
+    //   final newBook = BookModel(
+    //       id: '',
+    //       type: 'Book',
+    //       title: book.title,
+    //       author: book.author,
+    //       image: book.image,
+    //       categories: book.categories);
+    //   final res = await remoteDatasource.addBook(newBook);
+    //   print(res);
+    //   print(newBook);
+    //   return right(res);
+    // } on ServerException {
+    //   return (Left(ServerFailure(message: 'server failure')));
 
     if (await networkInfo.isConnected) {
       print('uguguguiiguu');
@@ -112,19 +112,19 @@ class BookRepoImpl implements BookRepository {
   Future<Either<Failure, String>> updateBook(BookEntity book, String id) async {
 
     // if (await networkInfo.isConnected) {
-    try {
-      final updatedBook = BookModel(
-          id: '',
-          type: 'Book',
-          title: book.title,
-          author: book.author,
-          image: book.image,
-          categories: book.categories);
-      print('res: $updatedBook');
-      final res = await remoteDatasource.updateBook(updatedBook, id);
-      return Right(res);
-    } on ServerException {
-      return Left(ServerFailure(message: 'server failure'));
+    // try {
+    //   final updatedBook = BookModel(
+    //       id: '',
+    //       type: 'Book',
+    //       title: book.title,
+    //       author: book.author,
+    //       image: book.image,
+    //       categories: book.categories);
+    //   print('res: $updatedBook');
+    //   final res = await remoteDatasource.updateBook(updatedBook, id);
+    //   return Right(res);
+    // } on ServerException {
+    //   return Left(ServerFailure(message: 'server failure'));
 
     if (await networkInfo.isConnected) {
       try {
