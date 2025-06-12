@@ -110,6 +110,23 @@ const headers = {
   'Authorization': `Bearer ${chapa_key}`
 };
 
+
+const getChapaBanks = async (req, res) => {
+  try {
+    const response = await axios.get("https://api.chapa.co/v1/banks", {
+      headers: { Authorization: `Bearer ${chapa_key}` }
+    });
+    // Always check if data exists and return it
+    if (response.data.data) {
+      res.status(200).json(response.data.data); // Returns an array of bank objects
+    } else {
+      res.status(500).json({ error: "Failed to fetch banks from Chapa", detail: response.data });
+    }
+  } catch (err) {
+    console.error("Error fetching Chapa banks:", err.response?.data || err.message);
+    res.status(500).json({ error: "Server error fetching bank list" });
+  }
+};
 const acceptPayment = async (req, res) => {
     try {
         const { therapistEmail, patientEmail, sessionDuration,Fee} = req.body;
@@ -247,11 +264,24 @@ const withdrawFromWallet = async (req, res) => {
       reference: uuidv4()
     };
 
-    const response = await axios.post(
-      "https://api.chapa.co/v1/transfers",
-      transferData,
-      { headers: { Authorization: `Bearer ${chapa_key}` } }
-    );
+    // const response = await axios.post(
+    //   "https://api.chapa.co/v1/transfers",
+    //   transferData,
+    //   { headers: { Authorization: `Bearer ${chapa_key}` } }
+    // );
+    let response;
+    if (process.env.NODE_ENV === "test") {
+      // MOCKED SUCCESS RESPONSE FOR TESTING
+      response = { data: { status: "success" } };
+    } else {
+      // REAL CHAPA CALL
+      response = await axios.post(
+        "https://api.chapa.co/v1/transfers",
+        transferData,
+        { headers: { Authorization: `Bearer ${chapa_key}` } }
+      );
+    }
+
 
     if (response.data.status === "success") {
       // Log debit transaction (don’t update therapist.wallet)
@@ -282,4 +312,4 @@ const withdrawFromWallet = async (req, res) => {
 };
 
 
-export { acceptPayment, verifyPayment, withdrawFromWallet };
+export { acceptPayment, verifyPayment, withdrawFromWallet, getChapaBanks };

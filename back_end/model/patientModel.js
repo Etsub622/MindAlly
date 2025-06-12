@@ -10,6 +10,10 @@ const patientschema = new mongoose.Schema({
         required: true,
         unique:true
     },
+    EmergencyEmail: {
+        type: String,
+        unique:true
+    },
     Password: {
         type: String,
         required:true
@@ -47,7 +51,8 @@ const patientschema = new mongoose.Schema({
 
    preferred_specialties:{
     type:Array
-   }
+    },
+    lastLogin: { type: Date }
 
     
  
