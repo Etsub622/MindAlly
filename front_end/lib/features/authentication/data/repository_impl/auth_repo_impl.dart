@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dartz/dartz.dart';
 import 'package:front_end/core/error/exception.dart';
 import 'package:front_end/core/error/failure.dart';
@@ -21,10 +23,11 @@ class AuthRepoImpl implements AuthRepository {
       {required this.authRemoteDatasource,
       required this.networkInfo,
       required this.loginLocalDataSource});
+     
 
   @override
   Future<Either<Failure, StudentResponseModel>> login(LoginEntity login) async {
-    // if (await networkInfo.isConnected) {
+    if (await networkInfo.isConnected) {
     try {
       final user = LoginModel(
           id: login.id, email: login.email, password: login.password);
@@ -39,10 +42,10 @@ class AuthRepoImpl implements AuthRepository {
     } on ServerException {
       return Left(ServerFailure(message: 'Server Failure'));
     }
-    // } else {
-    //   return Left(
-    //       NetworkFailure(message: 'You are not connected to the internet'));
-    // }
+    } else {
+      return Left(
+          NetworkFailure(message: 'You are not connected to the internet'));
+    }
   }
 
   @override

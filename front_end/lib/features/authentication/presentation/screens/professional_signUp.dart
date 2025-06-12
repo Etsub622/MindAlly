@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -9,6 +12,9 @@ import 'package:front_end/features/authentication/presentation/bloc/auth_bloc.da
 import 'package:front_end/features/authentication/presentation/widget/custom_button.dart';
 import 'package:front_end/features/authentication/presentation/widget/text_field.dart';
 import 'package:go_router/go_router.dart';
+import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfessionalSignup extends StatefulWidget {
   const ProfessionalSignup({super.key});
@@ -27,6 +33,43 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController areaContloller = TextEditingController();
   final TextEditingController documentController = TextEditingController();
+
+  // Pick images from the device
+  File? _imageFile;
+  String? _imageUrl;
+
+  Future<void> _pickImage(ImageSource source) async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? pickedFile = await picker.pickImage(source: source);
+
+    setState(() {
+      if (pickedFile != null) {
+        _imageFile = File(pickedFile.path);
+      }
+    });
+  }
+
+  // Image uploading to Cloudinary
+  Future<void> _uploadImage() async {
+    if (_imageFile == null) return;
+
+    final url = Uri.parse('https://api.cloudinary.com/v1_1/dzfbycabj/upload');
+    final request = http.MultipartRequest('POST', url)
+      ..fields['upload_preset'] = 'imagePreset'
+      ..files.add(await http.MultipartFile.fromPath('file', _imageFile!.path));
+    final response = await request.send();
+
+    if (response.statusCode == 200) {
+      final responseData = await response.stream.toBytes();
+      final responseString = String.fromCharCodes(responseData);
+      final jsonMap = json.decode(responseString);
+      setState(() {
+        _imageUrl = jsonMap['url'];
+      });
+    } else {
+      print('Failed to upload image');
+    }
+  }
 
   @override
   void dispose() {
@@ -73,7 +116,7 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
         fullName: nameController.text,
         phoneNumber: phoneController.text,
         specialization: areaContloller.text,
-        certificate: documentController.text);
+        certificate: _imageUrl!);
     context
         .read<AuthBloc>()
         .add(ProfessionalsignUpEvent(professionalSignupEntity: newUser));
@@ -197,8 +240,68 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
                 const SizedBox(
                   height: 20,
                 ),
-                CustomTextField(
-                    text: "Certified document", controller: documentController),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: const Color(0xff807C8B),
+                      width: 1,
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (_imageFile == null)
+                        Text(
+                          'Upload your certified document',
+                          style: const TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 14,
+                            color: Colors.black,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        )
+                      else
+                        Text(
+                          'Change your certified document',
+                          style: const TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 14,
+                            color: Colors.black,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      const SizedBox(height: 8),
+                      Center(
+                        child: GestureDetector(
+                          onTap: () {
+                            _pickImage(ImageSource.gallery);
+                          },
+                          child: const Padding(
+                            padding: EdgeInsets.only(left: 4.0),
+                            child: Icon(
+                              Icons.add_a_photo,
+                              size: 33,
+                              color: Color(0xff800080),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 10),
+                if (_imageFile != null)
+                  Container(
+                    height: 200,
+                    width: double.infinity,
+                    child: Image.file(
+                      _imageFile!,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 const SizedBox(
                   height: 40,
                 ),
@@ -207,10 +310,22 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
                   rad: 10,
                   hgt: 50,
                   text: "Sign Up",
-                  onPressed: () {
+                  onPressed: () async {
                     if (_key.currentState!.validate()) {
                       if (passwordController.text ==
                           confirmPasswordController.text) {
+                        if (_imageFile == null) {
+                          final snack = errorsnackBar(
+                              'Please upload your certified document');
+                          ScaffoldMessenger.of(context).showSnackBar(snack);
+                          return;
+                        }
+                        await _uploadImage();
+                        if (_imageUrl == null) {
+                          final snack = errorsnackBar('Image upload failed');
+                          ScaffoldMessenger.of(context).showSnackBar(snack);
+                          return;
+                        }
                         _professionalSignUp(context);
                       } else {
                         final snack = errorsnackBar('Password does not match');

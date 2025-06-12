@@ -33,7 +33,7 @@ class SocketService {
       String token = sharedPreferences.getString("token_key") ?? '';
 
       _socket = IO.io(
-        'http://10.0.2.2:8000', // Replace with your backend URL
+        'http://192.168.79.220:8000', // Replace with your backend URL
         IO.OptionBuilder()
             .setTransports(['websocket'])
             .disableAutoConnect()

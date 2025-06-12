@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front_end/features/admin/events_admin_screen.dart';
 import 'package:front_end/features/admin/unapproved_therapists_screen.dart';
+import 'package:front_end/features/approve_therapist/presentation/screen/therapist_list_page.dart';
 import 'package:front_end/features/authentication/presentation/bloc/auth_bloc.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
@@ -12,7 +13,6 @@ class AdminDashboardScreen extends StatefulWidget {
 }
 
 class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
-  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,7 +35,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const EventsAdminScreen()),
+                  MaterialPageRoute(
+                      builder: (context) => const EventsAdminScreen()),
                 );
               },
               child: const Text('View Events'),
@@ -45,7 +46,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const UnapprovedTherapistsScreen()),
+                  MaterialPageRoute(builder: (context) => TherapistListPage()),
                 );
               },
               child: const Text('View Unapproved Therapists'),
@@ -56,4 +57,3 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     );
   }
 }
-

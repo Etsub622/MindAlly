@@ -23,7 +23,7 @@ class AddBook extends StatefulWidget {
 }
 
 class _AddBookState extends State<AddBook> {
-  TextEditingController imageController = TextEditingController();
+  // TextEditingController imageController = TextEditingController();
   TextEditingController authorController = TextEditingController();
   TextEditingController titleController = TextEditingController();
   List<String> selectedCategories = [];
@@ -103,7 +103,7 @@ class _AddBookState extends State<AddBook> {
 
   @override
   void dispose() {
-    imageController.dispose();
+    // imageController.dispose();
     authorController.dispose();
     titleController.dispose();
     super.dispose();

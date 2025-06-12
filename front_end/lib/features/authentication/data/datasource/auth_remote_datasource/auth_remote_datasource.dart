@@ -80,9 +80,12 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
         if (jsonResponse['user'] == null) {
           throw ServerException(message: 'User data is null');
         }
+        print(jsonResponse['user'].runtimeType);
+        print('User data: ${jsonResponse['user']}');
+
         final res = {
           'token': token,
-          'user': json.decode(jsonResponse['user']),
+          'user': jsonResponse['user'],
         };
         return res;
       } else {
@@ -105,8 +108,12 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       final user = await client.post(url,
           body: jsonEncode(loginModel.toJson()),
           headers: {'Content-Type': 'application/json'});
+      print('Raw response: ${user.body}');
+
       if (user.statusCode == 200) {
         print(" login succccc");
+        print('${user.body}');
+        print('status code: ${user.statusCode}');
         final responseJson = jsonDecode(user.body);
         print('responseJson: $responseJson');
         print('statusCode: ${user.statusCode}');
@@ -121,7 +128,11 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       } else {
         final errorMessage = jsonDecode(user.body);
         print(" login failed $errorMessage");
-        throw ServerException(message: errorMessage?['error']);
+        throw ServerException(
+          message: errorMessage?['error']?.toString() ??
+              errorMessage?['message']?.toString() ??
+              'Login failed',
+        );
       }
     } catch (e) {
       print(" login failed ${e.toString()}");
