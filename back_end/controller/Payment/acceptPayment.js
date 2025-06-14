@@ -10,6 +10,7 @@ import dotenv from "dotenv";
 dotenv.config();
 const chapa_webhook_secret = process.env.CHAPA_WEBHOOK_SECRET;
 const chapa_key = process.env.CHAPA_API_KEY;
+
 const headers = {
   'Content-Type': 'application/json',
   'Authorization': `Bearer ${chapa_key}`
@@ -44,6 +45,9 @@ const getChapaBanks = async (req, res) => {
     res.status(500).json({ error: "Server error fetching bank list" });
   }
 };
+
+
+
 const acceptPayment = async (req, res) => {
   try {
 
@@ -55,8 +59,8 @@ const acceptPayment = async (req, res) => {
       if (!therapist) return res.status(404).json({ error: "Therapist not found" });
 
 
-      const amount = pricePerHr * sessionDuration; 
-      // const amount = Fee * sessionDuration; 
+      const amount = pricePerHr * sessionDuration;
+      // const amount = Fee * sessionDuration;
 
       const tx_ref = uuidv4();
 
@@ -79,8 +83,23 @@ const acceptPayment = async (req, res) => {
           'Authorization': `Bearer ${chapa_key}`,
       };
 
-      const response = await axios.post(url, data, { headers });
-      res.json(response.data);
+    const response = await axios.post(url, data, { headers });
+    
+    await Transaction.create({
+      therapistEmail,
+      patientEmail,
+      type: "credit",
+      amount,
+      status: "pending",
+      reference: tx_ref // This must match the webhook tx_ref!
+    });
+
+    // res.json(response.data);
+    res.json({
+      message: "Payment initialized. Redirect user to Chapa.",
+      tx_ref,
+      checkout_url: response.data.data.checkout_url
+    });
   } catch (error) {
       console.error('Error:', error.response ? error.response.data : error.message);
       res.status(500).json({ error: 'Payment request failed' });
@@ -89,59 +108,67 @@ const acceptPayment = async (req, res) => {
 
 
 
- const verifyPayment = async (req, res) => {
-    
-        try {
-            // const signature = req.headers["chapa-signature"] || req.headers["x-chapa-signature"];
-            // const bodyBuffer = Buffer.isBuffer(req.body) ? req.body : Buffer.from(JSON.stringify(req.body));
-            // const hash = crypto
-            //     .createHmac("sha256", chapa_webhook_secret)
-            //     .update(bodyBuffer)
-            //     .digest("hex");
-            // console.log('Received x-chapa-signature:', signature);
-            // console.log('Calculated hash:', hash);
-    
-            // if (hash !== signature) {
-            //     return res.status(400).json({ message: "Invalid signature" });
-            // }
-        
-            const body = Buffer.isBuffer(req.body) ? JSON.parse(req.body) : req.body;
-            const { tx_ref, status, metadata, amount } = body;
 
-        if (status === "success" && tx_ref) {
-          
-            const response = await axios.get(`https://api.chapa.co/v1/transaction/verify/${tx_ref}`, { headers: { Authorization: `Bearer ${chapa_key}` } });
+// This function is meant to be used as a webhook handler with express.raw() middleware
+const verifyPayment = async (req, res) => {
+  try {
+    // 1. Signature verification (security)
+    const signature = req.headers["x-chapa-signature"] || req.headers["chapa-signature"];
+    const bodyBuffer = req.body; // req.body is a Buffer because of express.raw()
+    console.log('Is Buffer:', Buffer.isBuffer(bodyBuffer));
+    const hash = crypto
+      .createHmac("sha256", chapa_webhook_secret)
+      .update(bodyBuffer)
+      .digest("hex");
+      console.log('Is Buffer:', Buffer.isBuffer(bodyBuffer));
+      console.log('Raw body:', bodyBuffer.toString());
+      console.log('Computed hash:', hash);
+      console.log('Received signature:', signature);
+      
 
-            
-          
-          const therapistEmail = metadata?.therapistEmail;
-          const patientEmail = metadata?.patientEmail;
-              if (therapistEmail) {
-                  const therapist = await Therapist.findOne({ Email: therapistEmail });
-                  if (therapist) {
-                      therapist.wallet += Number(amount);
-                      await therapist.save();
-
-                    await Transaction.create({
-                      therapistEmail,
-                       patientEmail,
-                        type: "credit",
-                        amount,
-                      status: "completed",
-                      reference: tx_ref 
-                    });
-                }
-            }
-            return res.status(200).json({ message: "Payment verified and wallet credited" });
-        } else {
-            return res.status(400).json({ message: "Invalid payment status or missing transaction reference" });
-        }
-    } catch (err) {
-        console.error('Error verifying payment:', err);
-        return res.status(500).json({ msg: err.message });
+    if (hash !== signature) {
+      return res.status(400).json({ message: "Invalid signature" });
     }
+
+    // 2. Parse the body after signature verification
+    const body = JSON.parse(bodyBuffer.toString());
+    const { tx_ref, status, metadata, amount } = body;
+
+    // 3. Only process successful payments
+    console.log('Webhook tx_ref:', tx_ref);
+    if (status === "success" && tx_ref) {
+      // Find and update the transaction
+      const tx = await Transaction.findOne({ reference: tx_ref });
+      console.log('Found transaction:', tx);
+      if (tx && tx.status !== "completed") {
+        tx.status = "completed";
+        await tx.save();
+        console.log(req.headers);
+        // Optionally update therapist wallet
+        if (tx.therapistEmail) {
+          const therapist = await Therapist.findOne({ Email: tx.therapistEmail });
+          if (therapist) {
+            therapist.wallet += Number(amount);
+            await therapist.save();
+          }
+        }
+      }
+      return res.status(200).json({ message: "Payment verified and wallet credited" });
+    } else {
+      return res.status(400).json({ message: "Invalid payment status or missing transaction reference" });
+    }
+  } catch (err) {
+    console.error('Error verifying payment:', err);
+    return res.status(500).json({ msg: err.message });
+  }
 };
 
+const getPaymentStatus = async (req, res) => {
+  const { tx_ref } = req.query;
+  const tx = await Transaction.findOne({ reference: tx_ref });
+  if (!tx) return res.status(404).json({ status: "not_found" });
+  res.json({ status: tx.status });
+};
 
 
 
@@ -241,159 +268,111 @@ const withdrawFromWallet = async (req, res) => {
 
 const refundToPatient = async (req, res) => {
   try {
-      const { patientEmail, therapistEmail, patientAccountNumber, patientBankCode, patientAccountName } = req.body;
+    const { patientEmail, therapistEmail, patientAccountNumber, patientBankCode, patientAccountName } = req.body;
 
-      const therapist = await Therapist.findOne({ Email: therapistEmail });
-      if (!therapist) {
-          return res.status(404).json({ error: "Therapist not found" });
-      }
+    // 1. Check for all required fields first
+    if (!patientEmail || !therapistEmail || !patientAccountNumber || !patientBankCode || !patientAccountName) {
+      return res.status(400).json({
+        error: "All patient and therapist details are required for a refund."
+      });
+    }
 
-      const patient = await Patient.findOne({ Email: patientEmail });
-      if (!patient) {
-          return res.status(404).json({ error: "Patient not found" });
-      }
+    // 2. Find therapist and patient
+    const therapist = await Therapist.findOne({ Email: therapistEmail });
+    if (!therapist) return res.status(404).json({ error: "Therapist not found" });
 
-      // Find the last completed payment transaction from this patient to this therapist
-      // Crucially, it must have a 'reference' (tx_ref from Chapa) to be refundable
-      const lastPaymentTransaction = await Transaction.findOne({
-          patientEmail: patientEmail,
-          therapistEmail: therapistEmail,
-          type: "credit",
-          status: "completed",
-          reference: { $exists: true, $ne: null } // Ensure 'reference' field exists and is not null
-      }).sort({ createdAt: -1 });
+    const patient = await Patient.findOne({ Email: patientEmail });
+    if (!patient) return res.status(404).json({ error: "Patient not found" });
 
-      if (!lastPaymentTransaction) {
-          return res.status(404).json({ error: "No completed payment with a valid reference found from this patient to this therapist to refund." });
-      }
+    // 3. Find the last completed payment transaction
+    const lastPaymentTransaction = await Transaction.findOne({
+      patientEmail,
+      therapistEmail,
+      type: "credit",
+      status: "completed",
+      reference: { $exists: true, $ne: null }
+    }).sort({ createdAt: -1 });
 
-      // --- THE CRITICAL CHECK FOR DUPLICATE REFUNDS FOR *THIS SPECIFIC PAYMENT* ---
-      // We now check if there's already a refund transaction explicitly linked
-      // to the 'reference' of the 'lastPaymentTransaction'.
-      const existingRefundForThisPayment = await Transaction.findOne({
-          originalTxRef: lastPaymentTransaction.reference, // This links to the *specific* payment's tx_ref
-          type: "refund_to_patient",
-          status: { $in: ["completed", "pending_account_details"] } // Check for completed or pending refunds
+    if (!lastPaymentTransaction) {
+      return res.status(404).json({ error: "No completed payment with a valid reference found from this patient to this therapist to refund." });
+    }
+
+    // 4. Check for existing refund
+    const existingRefund = await Transaction.findOne({
+      originalTxRef: lastPaymentTransaction.reference,
+      type: "refund_to_patient",
+      status: { $in: ["completed", "pending_account_details"] }
+    });
+
+    if (existingRefund) {
+      return res.status(400).json({ error: "A refund for this specific payment has already been initiated or completed." });
+    }
+
+    // 5. Check therapist balance
+    const transactions = await Transaction.find({ therapistEmail });
+    const totalCredit = transactions.filter(t => t.type === "credit").reduce((sum, t) => sum + t.amount, 0);
+    const totalDebit = transactions.filter(t => t.type === "debit" || t.type === "refund_to_patient").reduce((sum, t) => sum + t.amount, 0);
+    const currentTherapistBalance = totalCredit - totalDebit;
+    const refundAmount = lastPaymentTransaction.amount;
+    const originalTxRef = lastPaymentTransaction.reference;
+
+    if (currentTherapistBalance < refundAmount) {
+      return res.status(400).json({ error: "Therapist has insufficient wallet balance for this refund." });
+    }
+
+    // 6. Proceed with direct payout if all details are present
+    const refundReference = `REF-${uuidv4()}`;
+    const transferData = {
+      account_name: patientAccountName,
+      account_number: patientAccountNumber,
+      amount: String(refundAmount),
+      currency: "ETB",
+      bank_code: patientBankCode,
+      reference: refundReference
+    };
+
+    let response;
+    if (process.env.NODE_ENV === "test") {
+      response = { data: { status: "success" } };
+    } else {
+      response = await axios.post(
+        "https://api.chapa.co/v1/transfers",
+        transferData,
+        { headers: { Authorization: `Bearer ${chapa_key}` } }
+      );
+    }
+
+    if (response.data.status === "success") {
+      await Transaction.create({
+        therapistEmail,
+        patientEmail,
+        type: "refund_to_patient",
+        amount: refundAmount,
+        status: "completed",
+        reference: refundReference,
+        originalTxRef: originalTxRef
       });
 
-      if (existingRefundForThisPayment) {
-          return res.status(400).json({ error: "A refund for this specific payment has already been initiated or completed." });
-      }
-      // --- END CRITICAL CHECK ---
-
-      const refundAmount = lastPaymentTransaction.amount;
-      const originalTxRef = lastPaymentTransaction.reference; // This is the tx_ref of the payment being refunded
-
-      // Calculate therapist's current wallet balance from transactions
-      const transactions = await Transaction.find({ therapistEmail });
-      const totalCredit = transactions
-          .filter(t => t.type === "credit")
-          .reduce((sum, t) => sum + t.amount, 0);
-
-      const totalDebit = transactions
-          .filter(t => t.type === "debit" || t.type === "refund_to_patient")
-          .reduce((sum, t) => sum + t.amount, 0);
-
-      const currentTherapistBalance = totalCredit - totalDebit;
-
-      if (currentTherapistBalance < refundAmount) {
-          return res.status(400).json({ error: "Therapist has insufficient wallet balance for this refund." });
-      }
-
-      // If patient account details are missing, email the patient and log as pending
-      if (!patientAccountNumber || !patientBankCode || !patientAccountName) {
-          await transporter.sendMail({
-              from: process.env.EMAIL_USER,
-              to: patientEmail,
-              subject: "Refund Request - Action Required",
-              html: `
-                  <p>Dear ${patient.FullName || 'Patient'},</p>
-                  <p>A refund of ${refundAmount} ETB for your last session payment has been requested. To process this refund, please provide your bank account details by replying to this email or updating your profile in the app.</p>
-                  <p>Once we receive your details, we will initiate the transfer.</p>
-                  <p>Thank you.</p>
-              `,
-          });
-
-          await Transaction.create({
-              therapistEmail,
-              patientEmail,
-              type: "refund_to_patient",
-              amount: refundAmount,
-              status: "pending_account_details",
-              originalTxRef: originalTxRef,
-              reference: `REF-${uuidv4()}` // Unique reference for this refund request
-          });
-
-          return res.status(202).json({
-              message: "Patient account details not provided. Email sent to patient to request details. Refund pending.",
-              refundStatus: "pending_account_details",
-              amountRequested: refundAmount
-          });
-      }
-
-      // Proceed with direct payout if account details are provided
-      const refundReference = `REF-${uuidv4()}`; // This is the reference for the Chapa transfer
-
-      const transferData = {
-          account_name: patientAccountName,
-          account_number: patientAccountNumber,
-          amount: String(refundAmount),
-          currency: "ETB",
-          bank_code: patientBankCode,
-          reference: refundReference
-      };
-
-      let response;
-      if (process.env.NODE_ENV === "test") {
-          response = { data: { status: "success" } };
-      } else {
-          response = await axios.post(
-              "https://api.chapa.co/v1/transfers",
-              transferData,
-              { headers: { Authorization: `Bearer ${chapa_key}` } }
-          );
-      }
-
-      if (response.data.status === "success") {
-          await Transaction.create({
-              therapistEmail,
-              patientEmail,
-              type: "refund_to_patient",
-              amount: refundAmount,
-              status: "completed",
-              reference: refundReference, // Store the reference of the Chapa transfer here
-              originalTxRef: originalTxRef // Store the original payment's tx_ref here
-          });
-
-          return res.status(200).json({
-              success: true,
-              message: "Refund successful and transferred to patient's account.",
-              refundReference: refundReference,
-              newTherapistBalance: currentTherapistBalance - refundAmount
-          });
-      } else {
-          await Transaction.create({
-              therapistEmail,
-              patientEmail,
-              type: "refund_to_patient",
-              amount: refundAmount,
-              status: "failed",
-              reference: refundReference,
-              originalTxRef: originalTxRef
-          });
-          return res.status(500).json({
-              error: "Refund transfer failed via Chapa.",
-              detail: response.data
-          });
-      }
+      return res.status(200).json({
+        success: true,
+        message: "Refund successful and transferred to patient's account.",
+        refundReference: refundReference,
+        newTherapistBalance: currentTherapistBalance - refundAmount
+      });
+    } else {
+      return res.status(500).json({
+        error: "Refund transfer failed via Chapa.",
+        detail: response.data
+      });
+    }
 
   } catch (err) {
-      console.error("Error initiating refund:", err.response?.data || err.message);
-      res.status(500).json({ error: "Server error during refund initiation." });
+    console.error("Error initiating refund:", err.response?.data || err.message);
+    res.status(500).json({ error: "Server error during refund initiation." });
   }
 };
 
 // ... (export statement) ...
 
 
-export { acceptPayment, verifyPayment, withdrawFromWallet, getChapaBanks ,refundToPatient};
+export { acceptPayment, verifyPayment, withdrawFromWallet, getChapaBanks ,refundToPatient,getPaymentStatus};
