@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dartz/dartz.dart';
 import 'package:front_end/core/error/exception.dart';
 import 'package:front_end/core/error/failure.dart';
@@ -18,11 +20,13 @@ class AuthRepoImpl implements AuthRepository {
   final NetworkInfo networkInfo;
   final LoginLocalDataSource loginLocalDataSource;
   AuthRepoImpl(
-      {required this.authRemoteDatasource, required this.networkInfo, required this.loginLocalDataSource});
+      {required this.authRemoteDatasource,
+      required this.networkInfo,
+      required this.loginLocalDataSource});
 
   @override
   Future<Either<Failure, StudentResponseModel>> login(LoginEntity login) async {
-    // if (await networkInfo.isConnected) {
+    if (await networkInfo.isConnected) {
       try {
         final user = LoginModel(
             id: login.id, email: login.email, password: login.password);
@@ -37,6 +41,32 @@ class AuthRepoImpl implements AuthRepository {
       } on ServerException {
         return Left(ServerFailure(message: 'Server Failure'));
       }
+    } else {
+      return Left(
+          NetworkFailure(message: 'You are not connected to the internet'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, String>> professionalSignup(
+      ProfessionalSignupEntity professionalSignup) async {
+    // if (await networkInfo.isConnected) {
+    try {
+      final user = ProfessionalSignupModel(
+          id: professionalSignup.id,
+          email: professionalSignup.email,
+          password: professionalSignup.password,
+          fullName: professionalSignup.fullName,
+          phoneNumber: professionalSignup.phoneNumber,
+          specialization: professionalSignup.specialization,
+          certificate: professionalSignup.certificate);
+      final response = await authRemoteDatasource.professionalSignUp(user);
+      final resData = response['user'];
+      await loginLocalDataSource.cacheUserData(userCredentialModel: resData);
+      return Right(response['token']);
+    } on ServerException {
+      return Left(ServerFailure(message: 'Server Failure'));
+    }
     // } else {
     //   return Left(
     //       NetworkFailure(message: 'You are not connected to the internet'));
@@ -44,83 +74,59 @@ class AuthRepoImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, String>> professionalSignup(
-      ProfessionalSignupEntity professionalSignup) async {
-    if (await networkInfo.isConnected) {
-      try {
-        final user = ProfessionalSignupModel(
-            id: professionalSignup.id,
-            email: professionalSignup.email,
-            password: professionalSignup.password,
-            fullName: professionalSignup.fullName,
-            phoneNumber: professionalSignup.phoneNumber,
-            specialization: professionalSignup.specialization,
-            certificate: professionalSignup.certificate);
-        final response = await authRemoteDatasource.professionalSignUp(user);
-        final resData = response['user'];
-        await loginLocalDataSource.cacheUserData(userCredentialModel: resData);
-        return Right(response['token']);          
-      } on ServerException {
-        return Left(ServerFailure(message: 'Server Failure'));
-      }
-    } else {
-      return Left(
-          NetworkFailure(message: 'You are not connected to the internet'));
-    }
-  }
-
-  @override
   Future<Either<Failure, String>> studentSignUp(
       StudentSignupEntity studentSignUp) async {
-    if (await networkInfo.isConnected) {
-      try {
-        final user = StudentSignupModel(
-            id: studentSignUp.id,
-            email: studentSignUp.email,
-            password: studentSignUp.password,
-            fullName: studentSignUp.fullName,
-            phoneNumber: studentSignUp.phoneNumber,
-            collage: studentSignUp.collage);
-        final response = await authRemoteDatasource.studentSignUp(user);
-        await loginLocalDataSource.cacheUserData(userCredentialModel: response['user']);
-        return Right(response['token']);
-      } on ServerException {
-        return Left(ServerFailure(message: 'Server Failure'));
-      }
-    } else {
-      return Left(
-          NetworkFailure(message: 'You are not connected to the internet'));
+    // if (await networkInfo.isConnected) {
+    try {
+      final user = StudentSignupModel(
+          id: studentSignUp.id,
+          email: studentSignUp.email,
+          password: studentSignUp.password,
+          fullName: studentSignUp.fullName,
+          phoneNumber: studentSignUp.phoneNumber,
+          EmergencyEmail: studentSignUp.EmergencyEmail,
+          collage: studentSignUp.collage);
+      final response = await authRemoteDatasource.studentSignUp(user);
+      await loginLocalDataSource.cacheUserData(
+          userCredentialModel: response['user']);
+      return Right(response['token']);
+    } on ServerException {
+      return Left(ServerFailure(message: 'Server Failure'));
     }
+    // } else {
+    //   return Left(
+    //       NetworkFailure(message: 'You are not connected to the internet'));
+    // }
   }
 
   @override
   Future<Either<Failure, String>> sendOtp(String email) async {
-    if (await networkInfo.isConnected) {
-      try {
-        final response = await authRemoteDatasource.sendOtp(email);
-        return Right(response);
-      } on ServerException {
-        return Left(ServerFailure(message: 'Server Failure'));
-      }
-    } else {
-      return Left(
-          NetworkFailure(message: 'You are not connected to the internet'));
+    // if (await networkInfo.isConnected) {
+    try {
+      final response = await authRemoteDatasource.sendOtp(email);
+      return Right(response);
+    } on ServerException {
+      return Left(ServerFailure(message: 'Server Failure'));
     }
+    // } else {
+    //   return Left(
+    //       NetworkFailure(message: 'You are not connected to the internet'));
+    // }
   }
 
   @override
-  Future<Either<Failure, String>> verifyOtp(
-      String otp, String email) async {
-    if (await networkInfo.isConnected) {
-      try {
-        final response = await authRemoteDatasource.verifyOtp(otp, email);
-        return Right(response);
-      } on ServerException {
-        return Left(ServerFailure(message: 'Server Failure'));
-      }
-    } else {
-      return Left(
-          NetworkFailure(message: 'You are not connected to the internet'));
+  Future<Either<Failure, String>> verifyOtp(String otp, String email, verificationType) async {
+    // if (await networkInfo.isConnected) {
+    try {
+      final response = await authRemoteDatasource.verifyOtp(otp, email, verificationType);
+      return Right(response);
+    } on ServerException {
+      return Left(ServerFailure(message: 'Server Failure'));
     }
+    // } else {
+    //   return Left(
+    //       NetworkFailure(message: 'You are not connected to the internet'));
+    // }
   }
+  
 }

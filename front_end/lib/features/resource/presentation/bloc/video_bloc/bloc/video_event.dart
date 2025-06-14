@@ -35,3 +35,7 @@ class SearchVideoEvent extends VideoEvent {
   SearchVideoEvent(this.title);
 }
 
+class SearchVideoByCategoryEvent extends VideoEvent {
+  final String category;
+  SearchVideoByCategoryEvent(this.category);
+}

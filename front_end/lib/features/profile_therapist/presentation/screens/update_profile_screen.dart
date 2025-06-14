@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:front_end/features/profile_therapist/data/models/therapist_model.dart';
 import 'package:front_end/features/profile_therapist/presentation/bloc/get_therapist_bloc/get_therapist_bloc.dart';
 import 'package:front_end/features/profile_therapist/presentation/screens/profile_body_screen.dart';
 import 'package:go_router/go_router.dart';
@@ -10,6 +11,7 @@ class TherapistProfileNew extends StatefulWidget {
   final bool hasPassword;
   final String email;
   final String therapistId;
+  final PayoutModel? payout;
 
   const TherapistProfileNew({
     Key? key,
@@ -17,7 +19,8 @@ class TherapistProfileNew extends StatefulWidget {
     required this.username,
     required this.hasPassword,
     required this.email,
-    required this.therapistId
+    required this.therapistId,
+    this.payout,
   }) : super(key: key);
 
   @override
@@ -93,6 +96,7 @@ class TherapistProfileNewState extends State<TherapistProfileNew> {
             hasPassword: widget.hasPassword, 
             email: widget.email,
             therapistId: widget.therapistId,
+            payout: widget.payout,
           )),
     ));
   }

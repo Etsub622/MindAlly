@@ -1,6 +1,7 @@
 
 
 import 'package:front_end/features/profile_patient/domain/entities/patient_entity.dart';
+import 'package:front_end/features/profile_therapist/data/models/therapist_model.dart';
 
 class PatientModel extends PatientEntity {
   const PatientModel({
@@ -10,6 +11,7 @@ class PatientModel extends PatientEntity {
     required  super.hasPassword,
     required  super.role,
     required super.collage,
+    required super.payout,
         });
 
   factory PatientModel.fromJson(Map<String, dynamic> json) {
@@ -20,6 +22,7 @@ class PatientModel extends PatientEntity {
       role: json['Role'],
       hasPassword: json['Password'] != null,
       collage: json['Collage'],
+      payout: json['payout'] != null ? PayoutModel.fromJson(json['payout']) : null,
     );
   }
   Map<String, dynamic> toJson() {

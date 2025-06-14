@@ -7,8 +7,9 @@ import 'package:front_end/features/profile_therapist/presentation/bloc/update_th
 import 'package:go_router/go_router.dart';
 
 class TherapistOnboardingScreen extends StatefulWidget {
+  final bool isFromSignUp;
 
-  const TherapistOnboardingScreen({super.key});
+  const TherapistOnboardingScreen({super.key, required this.isFromSignUp});
 
   @override
   _TherapistOnboardingScreenState createState() => _TherapistOnboardingScreenState();
@@ -104,7 +105,9 @@ class _TherapistOnboardingScreenState extends State<TherapistOnboardingScreen> {
       'specialties': specialties,
     };
     print('Therapist Onboarding Data: $onboardingData');
-    context.push(AppPath.home);
+   widget.isFromSignUp
+        ? context.pushReplacement(AppPath.login)
+        : context.pushReplacement(AppPath.home);
   }
 
   @override

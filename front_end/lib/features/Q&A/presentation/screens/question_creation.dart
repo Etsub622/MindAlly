@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front_end/core/common_widget.dart/circular_indicator.dart';
@@ -9,6 +11,7 @@ import 'package:front_end/features/resource/presentation/widget/custom_formfield
 import 'package:multi_select_flutter/chip_display/multi_select_chip_display.dart';
 import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CreateQuestionBottomSheet extends StatefulWidget {
   const CreateQuestionBottomSheet({Key? key}) : super(key: key);
@@ -38,20 +41,50 @@ class _CreateQuestionBottomSheetState extends State<CreateQuestionBottomSheet> {
     super.dispose();
   }
 
-  void _createQuestion() {
+  Future<String> _getStudentName() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userJson = prefs.getString('user_profile');
+    if (userJson != null) {
+      final userMap = json.decode(userJson);
+      print('userMap in _getStudentName: $userMap');
+      return userMap['FullName'] ?? '';
+    }
+    print('No user profile found in shared preferences (name)');
+    return '';
+  }
+
+  Future<String> _getStudentId() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userJson = prefs.getString('user_profile');
+    if (userJson != null) {
+      final userMap = json.decode(userJson);
+      print('userMap in _getStudentId: $userMap');
+      return userMap['_id'] ?? '';
+    }
+    print('No user profile found in shared preferences (id)');
+    return '';
+  }
+
+  void _createQuestion() async {
     final title = _titleController.text.trim();
     final description = _descriptionController.text.trim();
 
     if (title.isNotEmpty && description.isNotEmpty) {
+      final name = await _getStudentName();
+      final creatorId = await _getStudentId();
       final questionEntity = QuestionEntity(
         id: '',
         title: title,
         description: description,
-        studentName: "studentName",
+        studentName: name,
+        creatorId: creatorId,
         studentProfile:
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR2uz88opUkCosnT3sNx3yyBB_GAhOiejbUAg&s",
         category: selectedCategories,
       );
+
+      print('creatorId: ${questionEntity.creatorId}');
+      print('userName: ${questionEntity.studentName}');
 
       context.read<QuestionBloc>().add(AddQuestionEvent(questionEntity));
     } else {

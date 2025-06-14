@@ -95,3 +95,18 @@ class SearchArticleParams {
   final String title;
   SearchArticleParams(this.title);
 }
+
+class GetArticleByCategoryUsecase extends Usecase<List<ArticleEntity>, GetArticleByCategoryParams> {
+  final ArticleRepository repository;
+  GetArticleByCategoryUsecase(this.repository);
+
+  @override
+  Future<Either<Failure, List<ArticleEntity>>> call(GetArticleByCategoryParams params) async {
+    return await repository.getArticleByCategory(params.category);
+  }
+}
+
+class GetArticleByCategoryParams {
+  final String category;
+  GetArticleByCategoryParams(this.category);
+}

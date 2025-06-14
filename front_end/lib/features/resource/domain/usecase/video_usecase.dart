@@ -92,3 +92,20 @@ class SearchVideoParams {
   final String title;
   SearchVideoParams(this.title);
 }
+
+
+class GetVideoByCategoryUsecase extends Usecase<List<VideoEntity>, GetVideoByCategoryParams> {
+  final VideoRepository repository;
+  GetVideoByCategoryUsecase(this.repository);
+
+  @override
+  Future<Either<Failure, List<VideoEntity>>> call(
+      GetVideoByCategoryParams params) async {
+    return await repository.getVideoByCategory(params.category);
+  }
+}
+
+class GetVideoByCategoryParams {
+  final String category;
+  GetVideoByCategoryParams(this.category);
+}

@@ -14,7 +14,7 @@ class QuestionRepoImpl implements QuestionRepository {
   @override
   Future<Either<Failure, String>> createQuestion(
       QuestionEntity question) async {
-    if (await networkInfo.isConnected) {
+    // if (await networkInfo.isConnected) {
       try {
         final newQuestion = QuestionModel(
           id: '',
@@ -23,6 +23,7 @@ class QuestionRepoImpl implements QuestionRepository {
           studentName: question.studentName,
           studentProfile: question.studentProfile,
           title: question.title,
+          creatorId: question.creatorId,
         );
         final res = await remoteDatasource.addQuestion(newQuestion);
         print(res);
@@ -30,30 +31,30 @@ class QuestionRepoImpl implements QuestionRepository {
       } on Exception {
         return (Left(ServerFailure(message: 'server failure')));
       }
-    } else {
-      return Left(
-          NetworkFailure(message: 'You are not connected to the internet.'));
-    }
+    // } else {
+    //   return Left(
+    //       NetworkFailure(message: 'You are not connected to the internet.'));
+    // }
   }
 
   @override
   Future<Either<Failure, String>> deleteQuestion(String id) async {
-    if (await networkInfo.isConnected) {
+    // if (await networkInfo.isConnected) {
       try {
         final res = await remoteDatasource.deleteQuestion(id);
         return Right(res);
       } on Exception {
         return Left(ServerFailure(message: 'server failure'));
       }
-    } else {
-      return Left(
-          NetworkFailure(message: 'You are not connected to the internet.'));
-    }
+    // } else {
+    //   return Left(
+    //       NetworkFailure(message: 'You are not connected to the internet.'));
+    // }
   }
 
   @override
   Future<Either<Failure, List<QuestionEntity>>> getQuestions() async {
-    if (await networkInfo.isConnected) {
+    // if (await networkInfo.isConnected) {
       try {
         final res = await remoteDatasource.getQuestions();
         final questionEntity = res.map((book) => book.toEntity()).toList();
@@ -62,16 +63,16 @@ class QuestionRepoImpl implements QuestionRepository {
       } on Exception {
         return Left(ServerFailure(message: 'server failure'));
       }
-    } else {
-      return Left(
-          NetworkFailure(message: 'You are not connected to the internet.'));
-    }
+    // } else {
+    //   return Left(
+    //       NetworkFailure(message: 'You are not connected to the internet.'));
+    // }
   }
 
   @override
   Future<Either<Failure, List<QuestionEntity>>> getQuestionsByCategory(
       String category) async {
-    if (await networkInfo.isConnected) {
+    // if (await networkInfo.isConnected) {
       try {
         final res = await remoteDatasource.getQuestionbyCategory(category);
         final questionEntity =
@@ -80,16 +81,16 @@ class QuestionRepoImpl implements QuestionRepository {
       } on Exception {
         return Left(ServerFailure(message: 'server failure'));
       }
-    } else {
-      return Left(
-          NetworkFailure(message: 'You are not connected to the internet.'));
-    }
+    // } else {
+    //   return Left(
+    //       NetworkFailure(message: 'You are not connected to the internet.'));
+    // }
   }
 
   @override
   Future<Either<Failure, String>> updateQuestion(
       QuestionEntity question, String id) async {
-    if (await networkInfo.isConnected) {
+    // if (await networkInfo.isConnected) {
       try {
         final newQuestion = QuestionModel(
           id: id,
@@ -98,15 +99,16 @@ class QuestionRepoImpl implements QuestionRepository {
           studentName: question.studentName,
           studentProfile: question.studentProfile,
           title: question.title,
+          creatorId: question.creatorId,
         );
         final res = await remoteDatasource.updateQuestion(newQuestion, id);
         return right(res);
       } on Exception {
         return (Left(ServerFailure(message: 'server failure')));
       }
-    } else {
-      return Left(
-          NetworkFailure(message: 'You are not connected to the internet.'));
-    }
+    // } else {
+    //   return Left(
+    //       NetworkFailure(message: 'You are not connected to the internet.'));
+    // }
   }
 }

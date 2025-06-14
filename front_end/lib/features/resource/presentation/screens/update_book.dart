@@ -20,6 +20,8 @@ class UpdateBook extends StatefulWidget {
   final String author;
   final String imageUrl;
   final List<String> categories;
+  final String ownerId; 
+
   final Function(Map<String, Object>) onUpdate;
 
   const UpdateBook({
@@ -31,6 +33,7 @@ class UpdateBook extends StatefulWidget {
     required this.title,
     required this.onUpdate,
     required this.categories,
+    required this.ownerId, 
   });
 
   @override
@@ -71,6 +74,7 @@ class _UpdateBookState extends State<UpdateBook> {
       title: titleController.text, 
       type: 'Book', 
       categories: selectedCategories,
+      ownerId: widget.ownerId, 
     );
     print('updatedbook: $updatedbook');
     context.read<BookBloc>().add(UpdateBookEvent(updatedbook, widget.id));

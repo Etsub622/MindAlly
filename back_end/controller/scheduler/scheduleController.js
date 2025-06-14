@@ -1,5 +1,6 @@
 import { Session } from "../../model/sessionModel.js";
 import { Therapist } from "../../model/therapistModel.js";
+import { sendAppNotification } from '../../utils/notification.js';
 
 // Fetch therapist availability
 export const getAvailableSlots = async (req, res) => {
@@ -29,10 +30,12 @@ export const bookSession = async (req, res) => {
   return `${h}:${m}`;
 }
   try {
-    const { userId, therapistId, date, startTime, endTime } = req.body;
+    const { userId, therapistId, createrId, date, startTime, endTime, meeting_id, meeting_token, price } = req.body;
+     
+    const sessionPrice = price !== undefined ? price : 0.0;
 
     // Validate required fields
-    if (!userId || !therapistId || !date || !startTime || !endTime) {
+    if (!userId || !therapistId || !date || !startTime || !endTime || !meeting_id || !meeting_token || !createrId) {
       return res.status(400).json({ message: 'All fields are required.' });
     }
 
@@ -68,14 +71,15 @@ const sessionEnd = new Date(`${date}T${parsedEnd}:00`);
       therapistId,
       date,
       startTime,
-      status: { $nin: ['completed', 'cancelled'] },
+      status: { $nin: ['Completed', 'Cancelled'] },
+      status: { $nin: ['Completed', 'Cancelled'] },
     });
 
     if (existingSession) {
       return res.status(400).json({ message: "This time slot is already booked." });
     }
-
-    const session = new Session({ userId, therapistId, date, startTime, endTime });
+   console.log(`Booking session for user ${sessionPrice}`);
+    const session = new Session({ userId, therapistId, createrId, date, startTime, endTime, meeting_id, meeting_token, price: sessionPrice, });
     await session.save();
 
     res.status(201).json({ message: "Session booked successfully", session });
@@ -96,6 +100,24 @@ export const getUserSessions = async (req, res) => {
   }
 };
 
+export const getAllUserSessions = async (req, res) => {
+  try {
+    // Define the filter object
+    const filter = { status: 'Completed' };
+
+    // Fetch sessions with the specified status
+    const sessions = await Session.find(filter);
+
+    // Return the sessions
+    res.json(sessions);
+  } catch (error) {
+    console.error('Error fetching sessions:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+
+
 export const getSessionById = async (req, res) => {
   try {
     const session = await Session.findById(req.params.sessionId);
@@ -112,19 +134,31 @@ export const getSessionById = async (req, res) => {
 export const cancelSession = async (req, res) => {
   try {
     const { sessionId } = req.params;
-    const session = await Session.findById(sessionId);
-    if (!session) return res.status(404).json({ message: "Session not found" });
+    console.log(`Cancelling session with ID: ${sessionId}`);
 
-    session.status = "Cancelled";
+    const session = await Session.findById(sessionId);
+    if (!session) {
+      return res.status(404).json({ message: "Session not found" });
+    }
+
+    if (session.status === 'Cancelled') {
+      return res.status(400).json({ message: "Session is already cancelled." });
+    }
+
+    session.status = 'Cancelled';
     await session.save();
 
-    io.emit("sessionCancelled", session);
+    // // Optional: Notify both sides
+    // sendAppNotification(session.userId, "Your session has been cancelled.");
+    // sendAppNotification(session.therapistId, "A session has been cancelled.");
+    // io.emit("sessionCancelled", session);
 
-    res.status(200).json({ message: "Session cancelled", session });
+    res.status(200).json({ message: "Session cancelled successfully.", session });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 export const getUserSessionsByStatus = async (req, res) => {
   const { status } = req.query;
@@ -148,13 +182,25 @@ export const getTherapistSessionsByStatus = async (req, res) => {
 };
 
 export const confirmSession = async (req, res) => {
-  const session = await Session.findByIdAndUpdate(req.params.sessionId, { status: 'confirmed' }, { new: true });
+  const updateData = { status: 'Confirmed' };
+  
+  // Conditionally add price to updateData if provided in request body
+  if (req.body.price !== undefined) {
+    updateData.price = req.body.price;
+  }
+
+  const session = await Session.findByIdAndUpdate(
+    req.params.sessionId, 
+    updateData, 
+    { new: true }
+  );
+  
   if (!session) return res.status(404).send('Session not found');
   res.json(session);
 };
 
 export const completeSession = async (req, res) => {
-  const session = await Session.findByIdAndUpdate(req.params.sessionId, { status: 'completed' }, { new: true });
+  const session = await Session.findByIdAndUpdate(req.params.sessionId, { status: 'Completed' }, { new: true });
   if (!session) return res.status(404).send('Session not found');
   res.json(session);
 };
@@ -179,25 +225,55 @@ export const markCompletedAutomatically = async () => {
 
   // Step 1: Mark past-day sessions as completed
   await Session.updateMany(
-    { date: { $lt: formattedDate }, status: { $ne: 'completed' } },
-    { status: 'completed' }
+    { date: { $lt: formattedDate }, status: { $ne: 'Completed' } },
+    { status: 'Completed' }
   );
 
   // Step 2: Get today's sessions and mark if their endTime (converted) is <= now
   const todaysSessions = await Session.find({
     date: formattedDate,
-    status: { $ne: 'completed' }
+    status: { $ne: 'Completed' }
   });
 
   for (const session of todaysSessions) {
     const endTimeConverted = convertTo24HourFormat(session.endTime);
     if (endTimeConverted <= nowTime24h) {
-      session.status = 'completed';
+      session.status = 'Completed';
       await session.save();
     }
   }
 };
 
+
+export const autoCancelUnconfirmedSessions = async () => {
+  const now = new Date();
+
+  const sessions = await Session.find({ status: 'Pending' });
+
+  for (const session of sessions) {
+    const sessionStartString = `${session.date}T${convertTo24HourFormat(session.startTime)}:00`;
+    const sessionDateTime = new Date(sessionStartString);
+    const diffMs = sessionDateTime - now;
+    const diffMins = Math.round(diffMs / 60000);
+
+    console.log(`🕓 Session: ${session._id}, Starts: ${sessionStartString}, Diff: ${diffMins} mins`);
+
+    if (diffMins <= 30) {
+      session.status = 'Cancelled';
+      await session.save();
+
+      console.log(`❌ Session ${session._id} cancelled`);
+
+      // sendAppNotification(session.userId, "Your session was cancelled because it wasn't confirmed 30 minutes in advance.");
+      // sendAppNotification(session.therapistId, "A pending session was cancelled due to no confirmation.");
+    }
+  }
+};
+
+
 // Auto-run every 60s
 setInterval(markCompletedAutomatically, 60000);
+
+setInterval(autoCancelUnconfirmedSessions, 60000);
+
 

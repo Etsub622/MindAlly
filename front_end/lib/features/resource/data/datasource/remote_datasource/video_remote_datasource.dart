@@ -12,6 +12,7 @@ abstract class VideoRemoteDatasource {
   Future<String> deleteVideo(String id);
   Future<List<VideoModel>> searchVideos(String title);
   Future<VideoModel> getSingleVideo(String id);
+  Future<List<VideoModel>> searchVideoByCategory(String category);
 }
 
 class VideoRemoteDataSourceImpl implements VideoRemoteDatasource {
@@ -66,18 +67,17 @@ class VideoRemoteDataSourceImpl implements VideoRemoteDatasource {
       final response = await client.get(url, headers: {
         'Content-Type': 'application/json',
       });
-      print(url);
-      print(response.body);
-      print(response.statusCode);
+     
       if (response.statusCode == 200) {
-        final List<dynamic> videoJson = json.decode(response.body);
-        if (videoJson.isEmpty) {
-          return [];
-        } else {
-          return videoJson.map((jsonItem) {
-            return VideoModel.fromJson(jsonItem as Map<String, dynamic>);
-          }).toList();
+        final decodedResponse = jsonDecode(response.body);
+
+        final List<VideoModel> videos = [];
+        for (var video in decodedResponse) {
+          videos.add(VideoModel.fromJson(video));
         }
+        return videos;
+      } else if (response.statusCode == 404) {
+        return [];
       } else {
         throw ServerException(
             message: 'Failed to get books:${response.statusCode}');
@@ -154,6 +154,33 @@ class VideoRemoteDataSourceImpl implements VideoRemoteDatasource {
       } else {
         throw ServerException(
             message: 'Failed to get video:${response.statusCode}');
+      }
+    } catch (e) {
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<List<VideoModel>> searchVideoByCategory(String category) async {
+    try {
+      var url = Uri.parse('$baseUrl/category/$category');
+      final response = await client.get(url, headers: {
+        'Content-Type': 'application/json',
+      });
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+      if (response.statusCode == 200) {
+        final List<dynamic> videoJson = json.decode(response.body);
+        if (videoJson.isEmpty) {
+          return [];
+        } else {
+          return videoJson.map((jsonItem) {
+            return VideoModel.fromJson(jsonItem as Map<String, dynamic>);
+          }).toList();
+        }
+      } else {
+        throw ServerException(
+            message: 'Failed to get videos:${response.statusCode}');
       }
     } catch (e) {
       throw ServerException(message: e.toString());

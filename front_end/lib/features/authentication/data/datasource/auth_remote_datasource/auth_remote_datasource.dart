@@ -14,7 +14,7 @@ abstract class AuthRemoteDatasource {
       ProfessionalSignupModel professionalModel);
   Future<StudentResponseModel> logIn(LoginModel loginModel);
   Future<String> sendOtp(String email);
-  Future<String> verifyOtp(String otp, String email);
+  Future<String> verifyOtp(String otp, String email, String verificationType);
 }
 
 class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
@@ -30,7 +30,8 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       final user = await client.post(url,
           body: jsonEncode(professionalModel.toJson()),
           headers: {'Content-Type': 'application/json'});
-
+      print(professionalModel.toJson());
+      print('statusCode: ${user.statusCode}');
       if (user.statusCode == 200) {
         final jsonResponse = jsonDecode(user.body);
         final token = jsonResponse['token'];
@@ -65,7 +66,8 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       final user = await client.post(url,
           body: jsonEncode(studentModel.toJson()),
           headers: {'Content-Type': 'application/json'});
-
+      print('statusCode: ${user.statusCode}');
+      print('response: ${user.body}');
       if (user.statusCode == 200) {
         final jsonResponse = jsonDecode(user.body);
         final token = jsonResponse['token'];
@@ -73,18 +75,24 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
         // Save the token to SharedPreferences
         final sharedPreferences = await SharedPreferences.getInstance();
         await sharedPreferences.setString('token_key', token);
+        await sharedPreferences.setString(
+            'user_profile', json.encode(jsonResponse['user']));
         if (jsonResponse['user'] == null) {
           throw ServerException(message: 'User data is null');
         }
+        print(jsonResponse['user'].runtimeType);
+        print('User data: ${jsonResponse['user']}');
+
         final res = {
           'token': token,
-          'user': json.decode(jsonResponse['user']),
+          'user': jsonResponse['user'],
         };
         return res;
       } else {
         throw ServerException(message: 'Failed to sign up');
       }
     } catch (e) {
+      print('error:${e.toString()}');
       throw ServerException(
           message: 'Unexpected error occured: ${e.toString()}');
     }
@@ -94,30 +102,22 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   Future<StudentResponseModel> logIn(LoginModel loginModel) async {
     try {
       final sharedPreferences = await SharedPreferences.getInstance();
-      // final loginLocalDataSource =
-      //     LoginLocalDataSourceImpl(sharedPreferences: sharedPreferences);
-      // final token = await loginLocalDataSource.getToken();
-
-      // // Decode the token to get the role
-      // Map<String, dynamic> payload = JwtDecoder.decode(token);
-      // String role = payload['role'];
-      // print(role);
-      // print('token:$token');
 
       var url = Uri.parse('$baseUrl/user/Login');
-      // if (role == 'patient') {
-      //   url = Uri.parse('$baseUrl/Login');
-      // } else if (role == 'therapist') {
-      //   url = Uri.parse('$baseUrl/therapist/therapistLogin');
-      // } else {
-      //   url = '';
-      // }
 
       final user = await client.post(url,
           body: jsonEncode(loginModel.toJson()),
           headers: {'Content-Type': 'application/json'});
+      print('Raw response: ${user.body}');
+
       if (user.statusCode == 200) {
+        print(" login succccc");
+        print('${user.body}');
+        print('status code: ${user.statusCode}');
         final responseJson = jsonDecode(user.body);
+        print('responseJson: $responseJson');
+        print('statusCode: ${user.statusCode}');
+        // final token = responseJson['accessToken'];
 
         if (responseJson['user'] == null) {
           throw ServerException(message: 'User data is null');
@@ -127,9 +127,15 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
         return studentResponse;
       } else {
         final errorMessage = jsonDecode(user.body);
-        throw ServerException(message: errorMessage?['error']);
+        print(" login failed $errorMessage");
+        throw ServerException(
+          message: errorMessage?['error']?.toString() ??
+              errorMessage?['message']?.toString() ??
+              'Login failed',
+        );
       }
     } catch (e) {
+      print(" login failed ${e.toString()}");
       throw ServerException(
           message: 'Unexpected error occurred: ${e.toString()}');
     }
@@ -155,20 +161,42 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   }
 
   @override
-  Future<String> verifyOtp(String otp, String email) async {
+  Future<String> verifyOtp(
+      String otp, String email, String verificationType) async {
     try {
-      var url = Uri.parse('$baseUrl/otp/verifyReset');
-      final res = await client.post(url,
-          body: jsonEncode({'otp': otp, 'email': email}),
-          headers: {'Content-Type': 'application/json; charset=UTF-8'});
-      if (res.statusCode == 200) {
-        return jsonDecode(res.body)['resetToken'];
+      var url = Uri.parse('$baseUrl/otp/verifyOTP');
+      final res = await client.post(
+        url,
+        body: jsonEncode({
+          'otp': otp,
+          'email': email,
+          'verificationType': verificationType,
+        }),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      print('Response status code: ${res.statusCode}');
+      print('Response body: ${res.body}');
+      if (res.statusCode >= 200 && res.statusCode < 300) {
+        final jsonResponse = jsonDecode(res.body);
+      
+        if (verificationType == 'forgotPassword' &&
+            jsonResponse['resetToken'] != null) {
+          final sharedPreferences = await SharedPreferences.getInstance();
+          await sharedPreferences.setString(
+              'reset_token', jsonResponse['resetToken']);
+        }
+        return jsonResponse['message'] ?? 'OTP verified successfully';
       } else {
-        throw ServerException(message: 'Failed to verify OTP');
+        final jsonResponse = jsonDecode(res.body);
+        throw ServerException(
+            message: jsonResponse['error'] ??
+                jsonResponse['message'] ??
+                'Failed to verify OTP');
       }
     } catch (e) {
       throw ServerException(
-          message: 'Unexpected error occured: ${e.toString()}');
+          message: 'Unexpected error occurred: ${e.toString()}');
     }
   }
 }

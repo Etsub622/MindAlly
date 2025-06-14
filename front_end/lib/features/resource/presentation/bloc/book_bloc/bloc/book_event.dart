@@ -34,3 +34,8 @@ class GetSingleBookEvent extends BookEvent {
   final String id;
   GetSingleBookEvent(this.id);
 }
+
+class SearchBookByCategoryEvent extends BookEvent {
+  final String category;
+  SearchBookByCategoryEvent(this.category);
+}

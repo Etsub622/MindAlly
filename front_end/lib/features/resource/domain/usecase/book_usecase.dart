@@ -89,3 +89,18 @@ class SearchParams {
   final String title;
   SearchParams(this.title);
 }
+
+class SearchBookByCategoryUsecase extends Usecase<List<BookEntity>, SearchByCategoryParams> {
+  final BookRepository repository;
+  SearchBookByCategoryUsecase(this.repository);
+
+  @override
+  Future<Either<Failure, List<BookEntity>>> call(SearchByCategoryParams params) async {
+    return await repository.getBookByCategory(params.category);
+  }
+}
+
+class SearchByCategoryParams {
+  final String category;
+  SearchByCategoryParams(this.category);
+}

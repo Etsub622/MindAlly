@@ -7,8 +7,11 @@ class QuestionCard extends StatefulWidget {
   final List<String> category;
   final String profileImage;
   final void Function() onPressed;
-  final VoidCallback onUpdate;
-  final VoidCallback onDelete;
+  final VoidCallback? onUpdate;
+  final VoidCallback? onDelete;
+  final String currentUserId;
+  final String ownerId;
+  final String role;
 
   const QuestionCard({
     required this.name,
@@ -17,8 +20,11 @@ class QuestionCard extends StatefulWidget {
     required this.category,
     required this.profileImage,
     required this.onPressed,
-    required this.onDelete,
-    required this.onUpdate,
+    this.onDelete,
+    this.onUpdate,
+    required this.currentUserId,
+    required this.ownerId,
+    required this.role,
     super.key,
   });
 
@@ -32,134 +38,208 @@ class _QuestionCardState extends State<QuestionCard> {
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
-      duration: Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
-      margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+      margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        gradient: LinearGradient(
+          colors: [Colors.white, Colors.grey[50]!],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            blurRadius: 10,
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 12,
             spreadRadius: 2,
-            offset: Offset(0, 4),
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Padding(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 CircleAvatar(
+                  radius: 24,
+                  backgroundColor: Colors.grey[200],
                   backgroundImage: NetworkImage(widget.profileImage),
-                  radius: 22,
+                  onBackgroundImageError: (_, __) =>
+                      const Icon(Icons.person, color: Colors.grey),
+                  child: widget.profileImage.isEmpty
+                      ? const Icon(Icons.person, color: Colors.grey, size: 30)
+                      : null,
                 ),
-                SizedBox(width: 12),
+                const SizedBox(width: 12),
                 Expanded(
-                  child: Text(
-                    widget.name,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                    overflow: TextOverflow.ellipsis,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.name,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 18,
+                          color: Colors.black87,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        widget.role == 'therapist' ? 'Therapist' : 'User',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                PopupMenuButton<String>(
-                  icon: Icon(Icons.more_vert, color: Colors.grey[700]),
-                  onSelected: (value) {
-                    if (value == 'update') {
-                      widget.onUpdate();
-                    } else if (value == 'delete') {
-                      widget.onDelete();
-                    }
-                  },
-                  itemBuilder: (context) => [
-                    PopupMenuItem(value: 'update', child: Text('Edit')),
-                    PopupMenuItem(
+                if ((widget.role == 'therapist') ||
+                    (widget.currentUserId == widget.ownerId))
+                  PopupMenuButton<String>(
+                    icon: Icon(Icons.more_vert, color: Colors.grey[600]),
+                    color: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    onSelected: (value) {
+                      if (value == 'update') {
+                        widget.onUpdate?.call();
+                      } else if (value == 'delete') {
+                        widget.onDelete?.call();
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      const PopupMenuItem(value: 'update', child: Text('Edit')),
+                      PopupMenuItem(
                         value: 'delete',
                         child: Text('Delete',
-                            style: TextStyle(color: Colors.red))),
-                  ],
-                ),
+                            style: TextStyle(color: Colors.red[400])),
+                      ),
+                    ],
+                  ),
               ],
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 12),
             Text(
               widget.title,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-            ),
-            SizedBox(height: 8),
-            AnimatedCrossFade(
-              duration: Duration(milliseconds: 250),
-              crossFadeState: _isExpanded
-                  ? CrossFadeState.showSecond
-                  : CrossFadeState.showFirst,
-              firstChild: Text(
-                widget.content,
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: Colors.grey[700]),
-              ),
-              secondChild: Text(
-                widget.content,
-                style: TextStyle(color: Colors.grey[700]),
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: Colors.black87,
+                letterSpacing: 0.2,
               ),
             ),
-            SizedBox(height: 8),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  _isExpanded = !_isExpanded;
-                });
-              },
-              child: Row(
-                children: [
-                  Text(
-                    _isExpanded ? 'Read less' : 'Read more',
-                    style: TextStyle(
-                        color: Colors.blue, fontWeight: FontWeight.w500),
+            const SizedBox(height: 8),
+            if (widget.content.length > 100) ...[
+              AnimatedCrossFade(
+                duration: const Duration(milliseconds: 250),
+                crossFadeState: _isExpanded
+                    ? CrossFadeState.showSecond
+                    : CrossFadeState.showFirst,
+                firstChild: Text(
+                  widget.content,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: Colors.grey[800],
+                    fontSize: 15,
+                    height: 1.5,
                   ),
-                  Icon(
-                    _isExpanded ? Icons.expand_less : Icons.expand_more,
-                    color: Color.fromARGB(239, 130, 5, 220),
-                    size: 18,
+                ),
+                secondChild: Text(
+                  widget.content,
+                  style: TextStyle(
+                    color: Colors.grey[800],
+                    fontSize: 15,
+                    height: 1.5,
                   ),
-                ],
+                ),
               ),
-            ),
-            SizedBox(height: 7),
+              const SizedBox(height: 8),
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _isExpanded = !_isExpanded;
+                  });
+                },
+                child: Row(
+                  children: [
+                    Text(
+                      _isExpanded ? 'Read less' : 'Read more',
+                      style: const TextStyle(
+                        color: Color(0xFF6200EE),
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(
+                      _isExpanded ? Icons.expand_less : Icons.expand_more,
+                      color: const Color(0xFF6200EE),
+                      size: 20,
+                    ),
+                  ],
+                ),
+              ),
+            ] else ...[
+              Text(
+                widget.content,
+                style: TextStyle(
+                  color: Colors.grey[800],
+                  fontSize: 15,
+                  height: 1.5,
+                ),
+              ),
+            ],
+            const SizedBox(height: 12),
             Wrap(
-              spacing: 6,
-              runSpacing: 4,
+              spacing: 8,
+              runSpacing: 6,
               children: widget.category.map((cat) {
-                return Chip(
-                  backgroundColor: Colors.blue[50],
+                return ActionChip(
+                  backgroundColor: Colors.transparent,
+                  side: const BorderSide(color: Color(0xFF6200EE), width: 1),
                   label: Text(
                     cat,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Color.fromARGB(239, 130, 5, 220),
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: Color(0xFF6200EE),
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
-                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
+                  onPressed: () {
+                    // Optional: Add category filter action
+                  },
                 );
               }).toList(),
             ),
-            SizedBox(height: 5),
+            const SizedBox(height: 12),
             Align(
               alignment: Alignment.centerRight,
-              child: IconButton(
+              child: ElevatedButton.icon(
                 onPressed: widget.onPressed,
-                icon: Icon(Icons.message,
-                    color: Color.fromARGB(239, 130, 5, 220), size: 28),
+                icon: const Icon(Icons.message, size: 20),
+                label: const Text('Reply'),
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: const Color(0xFF6200EE),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  elevation: 2,
+                ),
               ),
             ),
           ],

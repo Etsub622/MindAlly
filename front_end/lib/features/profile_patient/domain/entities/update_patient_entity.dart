@@ -1,6 +1,9 @@
 
 
+import 'dart:io';
+
 import 'package:equatable/equatable.dart';
+import 'package:front_end/features/profile_therapist/data/models/therapist_model.dart';
 
 class UpdatePatientEntity extends Equatable {
     final String? name;
@@ -10,12 +13,14 @@ class UpdatePatientEntity extends Equatable {
     final String? collage;
     final String? gender;
     final String? preferredModality;
-    final String? preferredGender;
+    final List<String>? preferredGender;
     final List<String>? preferredLanguage;
     final List<String>? preferredDays;
-    final String? preferredMode;
+    final List<String>? preferredMode;
     final List<String>? preferredSpecialties;
     final String? profilePicture;
+    final PayoutModel? payout;
+    final File? profilePictureFile;
   
 
   const UpdatePatientEntity({
@@ -31,7 +36,9 @@ class UpdatePatientEntity extends Equatable {
   this.preferredDays, 
   this.preferredMode, 
   this.profilePicture,
-  this.preferredSpecialties
+  this.preferredSpecialties,
+  this.payout,
+  this.profilePictureFile,
   });
 
   @override

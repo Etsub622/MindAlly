@@ -5,6 +5,7 @@ import numpy as np
 import joblib
 import json
 import sys
+import os
 
 # Define the LogisticRegressionTorch class
 class LogisticRegressionTorch(nn.Module):
@@ -15,32 +16,34 @@ class LogisticRegressionTorch(nn.Module):
     def forward(self, x):
         return torch.sigmoid(self.linear(x))
 
-# Load scaler and model
-scaler = joblib.load('/Users/etsubdink/MindAlly/back_end/therapist_matching/model/scaler.pkl')
+script_dir = os.path.dirname(os.path.abspath(__file__))
+scaler_path = os.path.join(script_dir, 'model', 'scaler.pkl')
+model_path = os.path.join(script_dir, 'model', 'logreg_rl_model.pth')
+scaler = joblib.load(scaler_path)
 input_dim = 7
 model = LogisticRegressionTorch(input_dim)
-model.load_state_dict(torch.load('/Users/etsubdink/MindAlly/back_end/therapist_matching/model/logreg_rl_model.pth'))
+model.load_state_dict(torch.load(model_path, weights_only=True)) 
 model.eval()
 
-# Create features function
 def create_features(user, therapist):
     features = []
     features.append(1 if user['preferred_modality'] == therapist['modality'] else 0)
     features.append(1 if user['preferred_gender'] == therapist['gender'] else 0)
-    features.append(1 if any(lang in user['preferred_language'] for lang in (therapist['language'] if isinstance(therapist['language'], list) else [therapist['language']])) else 0)
+    user_langs = user['preferred_language'] if isinstance(user['preferred_language'], list) and len(user['preferred_language']) > 0 else []
+    therapist_langs = therapist['language'] if isinstance(therapist['language'], list) and len(therapist['language']) > 0 else [therapist['language']] if therapist['language'] else []
+    features.append(1 if any(lang in user_langs for lang in therapist_langs) else 0)
     features.append(1 if user['preferred_mode'] == therapist['mode'] else 0)
     
-    user_days = set(user['preferred_days']) if user['preferred_days'] else set()
-    therapist_days = set(therapist['available_days'].split(',')) if pd.notna(therapist['available_days']) else set()
+    user_days = set(user['preferred_days']) if isinstance(user['preferred_days'], list) and len(user['preferred_days']) > 0 else set()
+    therapist_days = set(therapist['available_days'].split(',')) if pd.notna(therapist['available_days']) and len(therapist['available_days'].split(',')) > 0 else set()
     features.append(1 if len(user_days.intersection(therapist_days)) > 0 else 0)
     
-    user_specialties = set(user['preferred_specialties']) if user['preferred_specialties'] else set()
-    therapist_specialties = set(therapist['specialties'].split(',')) if pd.notna(therapist['specialties']) else set()
+    user_specialties = set(user['preferred_specialties']) if isinstance(user['preferred_specialties'], list) and len(user['preferred_specialties']) > 0 else set()
+    therapist_specialties = set(therapist['specialties'].split(',')) if pd.notna(therapist['specialties']) and len(therapist['specialties'].split(',')) > 0 else set()
     features.append(len(user_specialties.intersection(therapist_specialties)))
     features.append(therapist['experience_years'] if pd.notna(therapist['experience_years']) else 0)
     return np.array(features)
 
-# Suggest top 5 therapists
 def suggest_top_5_therapists(user_data, therapists_data, scaler, model):
     scores = []
     therapist_ids = []
@@ -76,18 +79,25 @@ def suggest_top_5_therapists(user_data, therapists_data, scaler, model):
     ]
     return top_therapists
 
-
 if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print(json.dumps({"error": "Output file path not provided"}), file=sys.stderr)
+        sys.exit(1)
+    
+    output_file = sys.argv[1]  # Get the output file path from command-line argument
+    
     for line in sys.stdin:
         try:
             data = json.loads(line.strip())
-            # print(data)
             user_data = data['user']
             therapists_data = data['therapists']
             top_5 = suggest_top_5_therapists(user_data, therapists_data, scaler, model)
-            print(json.dumps(top_5))
-            sys.stdout.flush()
+            # Write the result to the specified output file
+            with open(output_file, 'w') as f:
+                json.dump(top_5, f)
+        except json.JSONDecodeError as e:
+            with open(output_file, 'w') as f:
+                json.dump({"error": f"Invalid JSON input: {str(e)}"}, f)
         except Exception as e:
-            print(json.dumps({"error": str(e)}))
-            sys.stdout.flush()
-
+            with open(output_file, 'w') as f:
+                json.dump({"error": str(e)}, f)

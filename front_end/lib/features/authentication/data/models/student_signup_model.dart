@@ -8,6 +8,7 @@ class StudentSignupModel extends StudentSignupEntity {
     required super.fullName,
     required super.phoneNumber,
     required super.collage,
+    required super.EmergencyEmail,
   });
   factory StudentSignupModel.fromJson(Map<String, dynamic> json) {
     return StudentSignupModel(
@@ -17,6 +18,7 @@ class StudentSignupModel extends StudentSignupEntity {
       fullName: json['fullName'],
       phoneNumber: json['phoneNumber'],
       collage: json['college'],
+      EmergencyEmail: json['EmergencyEmail'],
     );
   }
 
@@ -28,6 +30,7 @@ class StudentSignupModel extends StudentSignupEntity {
       'fullName': super.fullName,
       'phoneNumber': super.phoneNumber,
       'collage': super.collage,
+      'EmergencyEmail': super.EmergencyEmail,
     };
   }
 }

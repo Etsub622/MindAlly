@@ -28,6 +28,7 @@ class ProfilePageGeneralInfoWidget extends StatelessWidget {
             onTap: () {
               showModalBottomSheet(
                   context: context,
+                  isScrollControlled: true,
                   builder: (context) {
                     return Container(
                       height: 210,
@@ -155,7 +156,11 @@ class ProfilePageGeneralInfoWidget extends StatelessWidget {
             )
           ,ListTile(
             onTap: () {
-              context.push(AppPath.therapistOnboard);
+              GoRouter.of(context).pushNamed(
+              'therapist_onboard', 
+            queryParameters: {
+              "isFromSignUp": "false"
+            });
             },
             leading: Icon(
               Icons.filter_list,

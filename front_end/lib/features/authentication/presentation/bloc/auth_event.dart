@@ -28,7 +28,8 @@ final class SendOtpEvent extends AuthEvent {
 final class VerifyOtpEvent extends AuthEvent {
   final String otp;
   final String email;
-  const VerifyOtpEvent({required this.otp, required this.email});
+  final String verificationType;
+  const VerifyOtpEvent({required this.otp, required this.email,required this.verificationType});
 }
 
 final class ResetPasswordEvent extends AuthEvent {

@@ -13,7 +13,7 @@ class AnswerRepoImpl implements AnswerRepository {
 
   @override
   Future<Either<Failure, String>> createAnswer(AnswerEntity answer) async {
-    if (await networkInfo.isConnected) {
+    // if (await networkInfo.isConnected) {
       try {
         final newAnswer = AnswerModel(
           id: '',
@@ -21,37 +21,38 @@ class AnswerRepoImpl implements AnswerRepository {
           answer: answer.answer,
           therapistName: answer.therapistName,
           therapistProfile: answer.therapistProfile,
+          ownerId: answer.ownerId,
         );
         final res = await remoteDatasource.addAnswer(newAnswer);
         return right(res);
       } on Exception {
         return (Left(ServerFailure(message: 'server failure')));
       }
-    } else {
-      return Left(
-          NetworkFailure(message: 'You are not connected to the internet.'));
-    }
+    // } else {
+    //   return Left(
+    //       NetworkFailure(message: 'You are not connected to the internet.'));
+    // }
   }
 
   @override
   Future<Either<Failure, String>> deleteAnswer(String id) async {
-    if (await networkInfo.isConnected) {
+    // if (await networkInfo.isConnected) {
       try {
         final res = await remoteDatasource.deleteAnswer(id);
         return Right(res);
       } on Exception {
         return Left(ServerFailure(message: 'server failure'));
       }
-    } else {
-      return Left(
-          NetworkFailure(message: 'You are not connected to the internet.'));
-    }
+    // } else {
+    //   return Left(
+    //       NetworkFailure(message: 'You are not connected to the internet.'));
+    // }
   }
 
   @override
   Future<Either<Failure, List<AnswerEntity>>> getAnswers(
       String questionId) async {
-    if (await networkInfo.isConnected) {
+    // if (await networkInfo.isConnected) {
       try {
         final res = await remoteDatasource.getAnswers(questionId);
         final answerEntity = res.map((book) => book.toEntity()).toList();
@@ -60,16 +61,16 @@ class AnswerRepoImpl implements AnswerRepository {
       } on Exception {
         return Left(ServerFailure(message: 'server failure'));
       }
-    } else {
-      return Left(
-          NetworkFailure(message: 'You are not connected to the internet.'));
-    }
+    // } else {
+    //   return Left(
+    //       NetworkFailure(message: 'You are not connected to the internet.'));
+    // }
   }
 
   @override
   Future<Either<Failure, String>> updateAnswer(
       AnswerEntity answer, String id) async {
-    if (await networkInfo.isConnected) {
+    // if (await networkInfo.isConnected) {
       try {
         final newAnswer = AnswerModel(
           id: id,
@@ -77,15 +78,16 @@ class AnswerRepoImpl implements AnswerRepository {
           answer: answer.answer,
           therapistName: answer.therapistName,
           therapistProfile: answer.therapistProfile,
+          ownerId: answer.ownerId,
         );
         final res = await remoteDatasource.updateAnswer(newAnswer, id);
         return right(res);
       } on Exception {
         return (Left(ServerFailure(message: 'server failure')));
       }
-    } else {
-      return Left(
-          NetworkFailure(message: 'You are not connected to the internet.'));
-    }
+    // } else {
+    //   return Left(
+    //       NetworkFailure(message: 'You are not connected to the internet.'));
+    // }
   }
 }

@@ -1,5 +1,6 @@
 
 
+import 'package:equatable/equatable.dart';
 import 'package:front_end/features/profile_therapist/domain/entities/therapist_entity.dart';
 
 class   TherapistModel extends TherapistEntity {
@@ -15,6 +16,7 @@ class   TherapistModel extends TherapistEntity {
     required super.fee,
     required super.rating,
     required super.verified,
+    required super.payout,
         });
 
   factory TherapistModel.fromJson(Map<String, dynamic> json) {
@@ -27,8 +29,9 @@ class   TherapistModel extends TherapistEntity {
       bio: json['Bio'] ?? "",
       certificate: json['certificate'] ?? "",
       fee: json['fee'] ?? 0,
-      rating: json['rating'] ?? 0.0,
+      rating: json['averageRating'] ?? 0.0,
       verified: json['verified'] ?? false,
+      payout: json['payout'] != null ? PayoutModel.fromJson(json['payout'] ?? {}) : null,
     );
   }
 
@@ -44,7 +47,40 @@ class   TherapistModel extends TherapistEntity {
       'fee': fee,
       'rating': rating,
       'verified': verified,
+      'payout': payout?.toJson(),
       
     };
   }
     }
+    
+class PayoutModel extends Equatable {
+  final String accountNumber;
+  final String accountName;
+  final String bankCode;
+
+  const PayoutModel({
+    required this.accountNumber,
+    required this.accountName,
+    required this.bankCode,
+  });
+
+  @override
+  List<Object?> get props => [bankCode, accountName, accountNumber];
+
+
+  factory PayoutModel.fromJson(Map<String, dynamic> json) {
+    return PayoutModel(
+      accountNumber: json['account_number'] ?? '',
+      accountName: json['account_name'] ?? '',
+      bankCode: json['bank_code'] ?? '',
+    );
+  }
+  
+  toJson() {
+    return {
+      'account_number': accountNumber,
+      'account_name': accountName,
+      'bank_code': bankCode,
+    };
+  }
+}

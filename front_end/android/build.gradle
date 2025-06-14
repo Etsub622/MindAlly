@@ -1,3 +1,21 @@
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+
+        classpath 'com.android.tools.build:gradle:8.3.0'
+        // ...other classpaths...
+
+        // Add the Google Services classpath here
+        classpath 'com.google.gms:google-services:4.4.2'
+        classpath 'com.android.tools.build:gradle:8.3.0'
+        // coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
+
+    }
+}
+
 allprojects {
     repositories {
         google()

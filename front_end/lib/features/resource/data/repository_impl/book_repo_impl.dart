@@ -15,6 +15,24 @@ class BookRepoImpl implements BookRepository {
   @override
   Future<Either<Failure, String>> addBook(BookEntity book) async {
     print('is inknkkkkkkkkkkkkkk');
+
+    // if (await networkInfo.isConnected) {
+    // print('uguguguiiguu');
+    // try {
+    //   final newBook = BookModel(
+    //       id: '',
+    //       type: 'Book',
+    //       title: book.title,
+    //       author: book.author,
+    //       image: book.image,
+    //       categories: book.categories);
+    //   final res = await remoteDatasource.addBook(newBook);
+    //   print(res);
+    //   print(newBook);
+    //   return right(res);
+    // } on ServerException {
+    //   return (Left(ServerFailure(message: 'server failure')));
+
     if (await networkInfo.isConnected) {
       print('uguguguiiguu');
       try {
@@ -24,6 +42,7 @@ class BookRepoImpl implements BookRepository {
             title: book.title,
             author: book.author,
             image: book.image,
+            ownerId: book.ownerId,
             categories: book.categories);
         final res = await remoteDatasource.addBook(newBook);
         print(res);
@@ -35,57 +54,78 @@ class BookRepoImpl implements BookRepository {
     } else {
       return Left(
           NetworkFailure(message: 'You are not connected to the internet.'));
+
     }
+    // } else {
+    //   return Left(
+    //       NetworkFailure(message: 'You are not connected to the internet.'));
+    // }
   }
 
   @override
   Future<Either<Failure, String>> deleteBook(String id) async {
-    if (await networkInfo.isConnected) {
-      try {
-        final res = await remoteDatasource.deleteBook(id);
-        return Right(res);
-      } on ServerException {
-        return Left(ServerFailure(message: 'server failure'));
-      }
-    } else {
-      return Left(
-          NetworkFailure(message: 'You are not connected to the internet.'));
+    // if (await networkInfo.isConnected) {
+    try {
+      final res = await remoteDatasource.deleteBook(id);
+      return Right(res);
+    } on ServerException {
+      return Left(ServerFailure(message: 'server failure'));
     }
+    // } else {
+    //   return Left(
+    //       NetworkFailure(message: 'You are not connected to the internet.'));
+    // }
   }
 
   @override
   Future<Either<Failure, List<BookEntity>>> getBooks() async {
-    if (await networkInfo.isConnected) {
-      try {
-        final res = await remoteDatasource.getBooks();
-        final bookEntities = res.map((book) => book.toEntity()).toList();
-        return Right(bookEntities);
-      } on ServerException {
-        return Left(ServerFailure(message: 'server failure'));
-      }
-    } else {
-      return Left(
-          NetworkFailure(message: 'You are not connected to the internet.'));
+    // if (await networkInfo.isConnected) {
+    try {
+      final res = await remoteDatasource.getBooks();
+      final bookEntities = res.map((book) => book.toEntity()).toList();
+      return Right(bookEntities);
+    } on ServerException {
+      return Left(ServerFailure(message: 'server failure'));
     }
+    // } else {
+    //   return Left(
+    //       NetworkFailure(message: 'You are not connected to the internet.'));
+    // }
   }
 
   @override
   Future<Either<Failure, List<BookEntity>>> searchBook(String title) async {
-    if (await networkInfo.isConnected) {
-      try {
-        final res = await remoteDatasource.searchBooks(title);
-        return Right(res);
-      } on ServerException {
-        return Left(ServerFailure(message: 'server failure'));
-      }
-    } else {
-      return Left(
-          NetworkFailure(message: 'you are not corrected to the internet.'));
+    // if (await networkInfo.isConnected) {
+    try {
+      final res = await remoteDatasource.searchBooks(title);
+      return Right(res);
+    } on ServerException {
+      return Left(ServerFailure(message: 'server failure'));
     }
+    // } else {
+    //   return Left(
+    //       NetworkFailure(message: 'you are not corrected to the internet.'));
+    // }
   }
 
   @override
   Future<Either<Failure, String>> updateBook(BookEntity book, String id) async {
+
+    // if (await networkInfo.isConnected) {
+    // try {
+    //   final updatedBook = BookModel(
+    //       id: '',
+    //       type: 'Book',
+    //       title: book.title,
+    //       author: book.author,
+    //       image: book.image,
+    //       categories: book.categories);
+    //   print('res: $updatedBook');
+    //   final res = await remoteDatasource.updateBook(updatedBook, id);
+    //   return Right(res);
+    // } on ServerException {
+    //   return Left(ServerFailure(message: 'server failure'));
+
     if (await networkInfo.isConnected) {
       try {
         final updatedBook = BookModel(
@@ -94,6 +134,7 @@ class BookRepoImpl implements BookRepository {
             title: book.title,
             author: book.author,
             image: book.image,
+            ownerId: book.ownerId,
             categories: book.categories);
         print('res: $updatedBook');
         final res = await remoteDatasource.updateBook(updatedBook, id);
@@ -104,27 +145,43 @@ class BookRepoImpl implements BookRepository {
     } else {
       return Left(
           NetworkFailure(message: 'you are not connected to the internet.'));
+
     }
+    // } else {
+    //   return Left(
+    //       NetworkFailure(message: 'you are not connected to the internet.'));
+    // }
   }
 
   @override
   Future<Either<Failure, BookEntity>> getSingleBook(String id) async {
+    // if (await networkInfo.isConnected) {
+    try {
+      final res = await remoteDatasource.getSingleBook(id);
+      return Right(res);
+    } on ServerException {
+      return Left(ServerFailure(message: 'server failure'));
+    }
+    // } else {
+    //   return Left(
+    //       NetworkFailure(message: 'you are not connected to the internet.'));
+    // }
+  }
+
+  @override
+  Future<Either<Failure, List<BookEntity>>> getBookByCategory(String category)async {
     if (await networkInfo.isConnected) {
       try {
-        final res = await remoteDatasource.getSingleBook(id);
-        return Right(res);
+        final res = await remoteDatasource.searchBookByCategory(category);
+        final bookEntities = res.map((book) => book.toEntity()).toList();
+        return Right(bookEntities);
       } on ServerException {
         return Left(ServerFailure(message: 'server failure'));
       }
     } else {
       return Left(
-          NetworkFailure(message: 'you are not connected to the internet.'));
+          NetworkFailure(message: 'You are not connected to the internet.'));
     }
-  }
-
-  @override
-  Future<Either<Failure, List<BookEntity>>> getBookByCategory(String category) {
-    // TODO: implement getBookByCategory
-    throw UnimplementedError();
+   
   }
 }

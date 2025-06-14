@@ -6,12 +6,18 @@ class ArticleCard extends StatelessWidget {
   final ArticleEntity article;
   final VoidCallback onUpdate;
   final VoidCallback onDelete;
+  final String currentUserId;
+  final String ownerId;
+  final String role;
 
   const ArticleCard({
     super.key,
     required this.article,
     required this.onDelete,
     required this.onUpdate,
+    required this.currentUserId,
+    required this.ownerId,
+    required this.role,
   });
 
   Future<void> _launchURL(BuildContext context) async {
@@ -67,26 +73,27 @@ class ArticleCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  PopupMenuButton<String>(
-                    icon: const Icon(Icons.more_vert),
-                    onSelected: (value) {
-                      if (value == 'update') {
-                        onUpdate();
-                      } else if (value == 'delete') {
-                        onDelete();
-                      }
-                    },
-                    itemBuilder: (context) => [
-                      const PopupMenuItem(
-                        value: 'update',
-                        child: Text('Update'),
-                      ),
-                      const PopupMenuItem(
-                        value: 'delete',
-                        child: Text('Delete'),
-                      ),
-                    ],
-                  ),
+                  if (currentUserId == ownerId && role == 'therapist')
+                    PopupMenuButton<String>(
+                      icon: const Icon(Icons.more_vert),
+                      onSelected: (value) {
+                        if (value == 'update') {
+                          onUpdate();
+                        } else if (value == 'delete') {
+                          onDelete();
+                        }
+                      },
+                      itemBuilder: (context) => [
+                        const PopupMenuItem(
+                          value: 'update',
+                          child: Text('Update'),
+                        ),
+                        const PopupMenuItem(
+                          value: 'delete',
+                          child: Text('Delete'),
+                        ),
+                      ],
+                    ),
                 ],
               ),
               const SizedBox(height: 8),

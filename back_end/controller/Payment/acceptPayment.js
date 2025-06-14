@@ -49,9 +49,8 @@ const getChapaBanks = async (req, res) => {
 
 
 const acceptPayment = async (req, res) => {
+
   try {
-
-
       const { therapistEmail, patientEmail, sessionDuration, pricePerHr} = req.body;
 
 
@@ -183,6 +182,7 @@ const withdrawFromWallet = async (req, res) => {
     }
 
     const therapist = await Therapist.findOne({ Email: therapistEmail });
+    console.log("Therapist found:", therapistEmail);
     if (!therapist) return res.status(404).json({ error: "Therapist not found" });
 
     // Calculate wallet balance from transaction history
@@ -203,7 +203,9 @@ const withdrawFromWallet = async (req, res) => {
     }
 
     const { account_name, account_number, bank_code } = therapist.payout || {};
+    
     if (!account_name || !account_number || !bank_code) {
+      console.log("Therapist payout information is incomplete:", therapist.payout);
       return res.status(400).json({ error: "Therapist payout information is incomplete" });
     }
 

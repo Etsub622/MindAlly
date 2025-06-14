@@ -35,19 +35,18 @@ const therapistschema = new mongoose.Schema({
     // Reviews: {
     //     type:[String]
     // },
-    Rating: {
-        type:Number
-        
-    },
+    ratings: [{ type: Number }],
+    averageRating: { type: Number, default: 0.0 },
     gender: {
         type: String,
     },
     Role: {
         type: String,
-        default:"therapist"
+        default:"pending_therapist"
     },
     verified: {
-        type:Boolean
+        type:Boolean,
+        default: false,
     },
     specialities: {
         type: Array

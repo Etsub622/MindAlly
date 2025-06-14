@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:front_end/core/routes/app_path.dart';
 import 'package:front_end/features/Home/presentation/screens/home_navigation_screen.dart';
+import 'package:front_end/features/Home/presentation/screens/therapist_detail_screen.dart';
+import 'package:front_end/features/Home/presentation/screens/therapist_verify_screen.dart';
+import 'package:front_end/features/admin/admin_screen.dart';
+import 'package:front_end/features/approve_therapist/domain/entity/therapist_verify_entity.dart';
+import 'package:front_end/features/authentication/data/models/professional_signup_model.dart';
+import 'package:front_end/features/authentication/data/models/student_signup_model.dart';
 import 'package:front_end/features/authentication/presentation/screens/forgot_password.dart';
 import 'package:front_end/features/authentication/presentation/screens/login.dart';
 import 'package:front_end/features/authentication/presentation/screens/otp.dart';
@@ -10,27 +16,40 @@ import 'package:front_end/features/authentication/presentation/screens/reset_pas
 import 'package:front_end/features/authentication/presentation/screens/role_selection.dart';
 import 'package:front_end/features/authentication/presentation/screens/student_signUp.dart';
 import 'package:front_end/features/authentication/presentation/screens/therapist_onboarding.dart';
+import 'package:front_end/features/calendar/presentation/screen/calendar_screen.dart';
+import 'package:front_end/features/calendar/presentation/screen/meeting/meeting_screen.dart';
 import 'package:front_end/features/chat/presentation/screens/chat_page.dart';
 import 'package:front_end/features/chat/presentation/screens/chat_room.dart';
 import 'package:front_end/features/profile_patient/domain/entities/user_entity.dart';
+import 'package:front_end/features/profile_therapist/domain/entities/update_therapist_entity.dart';
 import 'package:front_end/features/resource/presentation/screens/book_resource.dart';
 
 import 'package:go_router/go_router.dart';
 
 final routes = <GoRoute>[
   GoRoute(
-      name: 'home',
-      path: AppPath.home,
-      builder: (context, state) => const HomeNavigationScreen(index: 0)),
+    name: 'home',
+    path: AppPath.home,
+    builder: (context, state) {
+      final extra = state.extra as Map<String, dynamic>?;
+      return HomeNavigationScreen(index: extra?['index'] ?? 0, extra: extra);
+    },
+  ),
   GoRoute(
     name: 'therapist_onboard',
     path: AppPath.therapistOnboard,
-    builder: (BuildContext context, GoRouterState state) => const TherapistOnboardingScreen(),
+    builder: (BuildContext context, GoRouterState state) =>
+        TherapistOnboardingScreen(
+          isFromSignUp: state.uri.queryParameters['isFromSignUp'] == 'true',
+        ),
   ),
   GoRoute(
     name: 'patient_onboard',
     path: AppPath.patientOnboard,
-    builder: (BuildContext context, GoRouterState state) => const PatientOnboardingSreen(),
+    builder: (BuildContext context, GoRouterState state) =>
+         PatientOnboardingSreen(
+          isFromSignUp: state.uri.queryParameters['isFromSignUp'] == 'true',
+        ),
   ),
   GoRoute(
       path: AppPath.role, builder: (context, state) => const RoleSelection()),
@@ -40,7 +59,9 @@ final routes = <GoRoute>[
   GoRoute(
       path: AppPath.professional,
       builder: (context, state) => const ProfessionalSignup()),
-  GoRoute(path: AppPath.login, builder: (context, state) => const Login()),
+  GoRoute(
+    name: 'login',
+    path: AppPath.login, builder: (context, state) => const Login()),
   GoRoute(
       path: AppPath.forgotPassword,
       builder: (context, state) => const ForgotPassword()),
@@ -51,16 +72,21 @@ final routes = <GoRoute>[
         final resetToken = extra['resetToken']!;
         return ResetPassword(resetToken: resetToken);
       }),
-       GoRoute(
-      path: AppPath.bookResource,
-      builder: (context, state) => BookResource ()),
   GoRoute(
-      path: AppPath.otp,
-      builder: (context, state) {
-        final email = state.extra as String;
-        return OtpVerification(email: email);
-      }),
-
+    name:"bookResource",
+      path: AppPath.bookResource, builder: (context, state) => BookResource()),
+  GoRoute(
+    path: AppPath.otp,
+    builder: (context, state) {
+      final extra = state.extra as Map<String, dynamic>;
+      return OtpVerification(
+        email: extra['email'] as String,
+        verificationType: extra['verificationType'] as String,
+        student: extra['student'] as StudentSignupModel?,
+        professional: extra['professional'] as ProfessionalSignupModel?,
+      );
+    },
+  ),
   GoRoute(
     name: 'chat',
     path: AppPath.chat,
@@ -72,8 +98,55 @@ final routes = <GoRoute>[
     builder: (BuildContext context, GoRouterState state) => ChatPage(
       chatId: state.uri.queryParameters['chatId'],
       receiver: UserEntity(
-        id: state.uri.queryParameters['id'] ?? "", name: state.uri.queryParameters['name'] ?? "", email: state.uri.queryParameters['email'] ?? "", hasPassword: state.uri.queryParameters['hasPassword']== "true" ? true : false, role: state.uri.queryParameters['role'] ?? ""),
+          id: state.uri.queryParameters['id'] ?? "",
+          name: state.uri.queryParameters['name'] ?? "",
+          email: state.uri.queryParameters['email'] ?? "",
+          hasPassword:
+              state.uri.queryParameters['hasPassword'] == "true" ? true : false,
+          role: state.uri.queryParameters['role'] ?? ""),
     ),
+  ),
+  GoRoute(
+      name: "calendar",
+      path: AppPath.calendar,
+      builder: (BuildContext context, GoRouterState state) =>
+          const CalendarScreen()),
+  GoRoute(
+      name: "admin",
+      path: AppPath.admin,
+      builder: (BuildContext context, GoRouterState state) =>
+          const AdminDashboardScreen()),
+  GoRoute(
+    path: '/therapistDetails',
+    name: 'therapistDetails',
+    builder: (context, state) {
+      final therapist = state.extra as UpdateTherapistEntity;
+      return TherapistDetailScreen(therapist: therapist);
+    },
+  ),
+   GoRoute(
+    path: '/therapistVerify',
+    name: 'therapistVerify',
+    builder: (context, state) {
+      final therapist = state.extra as TherapistVerifyEntity;
+      return TherapistVerifyScreen(therapist: therapist);
+    },
+  ),
+  GoRoute(
+    path: '/meeting',
+    name: "meeting",
+    builder: (context, state) {
+      return MeetingScreen(
+        meetingId: state.uri.queryParameters['meetingId'] ?? "",
+        token: state.uri.queryParameters['token'] ?? "",
+        sessionId : state.uri.queryParameters['sessionId'] ?? "",
+        userId: state.uri.queryParameters['userId'] ?? "",
+        isTherapist: state.uri.queryParameters['isTherapist'] == "true",
+        therapistId: state.uri.queryParameters['therapistId'] ?? "",
+
+      );
+    },
+
   )
 ];
 
@@ -82,13 +155,12 @@ GoRouter routerConfig() {
     initialLocation: AppPath.home,
     routes: routes,
   );
-
 }
 
 class AppRouter extends StatelessWidget {
   final GoRouter router;
 
-   void popUntil(bool Function(String) predicate) {
+  void popUntil(bool Function(String) predicate) {
     while (!predicate(router.routerDelegate.currentConfiguration.fullPath)) {
       router.pop();
     }
