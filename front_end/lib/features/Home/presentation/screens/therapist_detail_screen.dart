@@ -80,6 +80,18 @@ class TherapistDetailScreen extends StatelessWidget {
                               color: Colors.purple[700],
                             ),
                       ),
+                      SizedBox(width: 16),
+                      const Icon(
+                Icons.star,
+                color: Colors.amber,
+              ),
+                      Text(
+                        therapist.rating != null ? "${therapist.rating}" : "N/A",
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.purple[700],
+                            ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 16),

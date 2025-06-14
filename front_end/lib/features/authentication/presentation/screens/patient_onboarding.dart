@@ -89,10 +89,10 @@ class _PatientOnboardingSreenState extends State<PatientOnboardingSreen> {
      BlocProvider.of<UpdatePatientBloc>(context).add(UpdatePatientLoadEvent(patient: UpdatePatientModel(
       gender: gender,
       preferredModality: preferredModality,
-      preferredGender: preferredGender,
+      preferredGender: preferredGender != null ? [preferredGender!] : null,
       preferredLanguage: [ preferredLanguage ?? ""],
       preferredDays: preferredDays,
-      preferredMode: preferredMode,
+      preferredMode: preferredMode != null ? [preferredMode!] : null,
       preferredSpecialties: preferredSpecialties,
     )));
 
@@ -107,8 +107,8 @@ class _PatientOnboardingSreenState extends State<PatientOnboardingSreen> {
     };
     print('Onboarding Data: $onboardingData');
     widget.isFromSignUp
-        ? context.pushReplacement(AppPath.login)
-        : context.pushReplacement(AppPath.home);
+        ? context.goNamed('login')
+        : context.goNamed('home', extra: {'index': 0});
   }
 
   @override

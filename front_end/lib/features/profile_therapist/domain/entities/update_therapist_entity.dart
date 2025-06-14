@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:equatable/equatable.dart';
+import 'package:front_end/features/profile_therapist/data/models/therapist_model.dart';
 
 class UpdateTherapistEntity extends Equatable {
   final String? id;
@@ -18,6 +21,8 @@ class UpdateTherapistEntity extends Equatable {
   final String? profilePicture;
   final int? experienceYears;
   final String? chatId;
+  final PayoutModel? payout;
+  final File? profilePictureFile;
 
   const UpdateTherapistEntity(
       {required this.id,
@@ -36,7 +41,10 @@ class UpdateTherapistEntity extends Equatable {
       this.mode,
       this.profilePicture,
       this.experienceYears,
-      this.chatId});
+      this.chatId,
+      this.payout,
+      this.profilePictureFile,
+      });
 
   @override
   List<Object?> get props => [
@@ -55,6 +63,6 @@ class UpdateTherapistEntity extends Equatable {
         language,
         mode,
         experienceYears,
-        chatId
+        chatId,
       ];
 }

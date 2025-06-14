@@ -57,11 +57,11 @@ class _WebViewScreenState extends State<WebViewScreen> {
                           ),
                         );
              
-              // context.go(AppPath.calendar);
+              context.goNamed('home', extra: {'index': 3});
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Payment completed!')),
               );
-              return NavigationDecision.prevent;
+              return NavigationDecision.navigate;
             }
             return NavigationDecision.navigate;
           },

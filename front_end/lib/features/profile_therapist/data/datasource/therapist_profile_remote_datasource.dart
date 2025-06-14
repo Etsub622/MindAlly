@@ -6,7 +6,6 @@ import 'package:front_end/core/util/get_token.dart';
 import 'package:front_end/core/util/get_user_credential.dart';
 import 'package:front_end/features/profile_therapist/data/models/therapist_model.dart';
 import 'package:front_end/features/profile_therapist/data/models/update_therapist_model.dart';
-import 'package:front_end/features/profile_therapist/domain/entities/update_therapist_entity.dart';
 import 'package:http/http.dart' as http;
 
 abstract class TherapistProfileRemoteDatasource {
@@ -69,8 +68,26 @@ class TherapistProfileRemoteDatasourceImpl extends TherapistProfileRemoteDatasou
         final userData = await getUserCredential();
         final token = await getToken();
         final therapistId = userData?['_id'];
+        String? profileImage;
+        if(therapist.profilePictureFile != null){
+          final url = Uri.parse('https://api.cloudinary.com/v1_1/dzfbycabj/upload');
+          final request = http.MultipartRequest('POST', url)
+            ..fields['upload_preset'] = 'imagePreset'
+            ..files.add(await http.MultipartFile.fromPath('file', therapist.profilePictureFile!.path));
+          final response = await request.send();
+
+          if (response.statusCode == 200) {
+            final responseData = await response.stream.toBytes();
+            final responseString = String.fromCharCodes(responseData);
+            final jsonMap = json.decode(responseString);
+            profileImage = jsonMap['url'];
+          } else {
+            print('Failed to upload image');
+          }
+        }
         try{
           final Data = therapist.toJson();
+          Data["profilePicture"] = profileImage ?? therapist.profilePicture;
           final reqBody = json.encode(Data);
             final response = await client.put(
               Uri.parse('$baseUrl/$therapistId'),

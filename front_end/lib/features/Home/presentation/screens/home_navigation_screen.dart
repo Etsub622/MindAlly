@@ -17,15 +17,15 @@ import 'package:go_router/go_router.dart';
 
 class HomeNavigationScreen extends StatefulWidget {
   final int index;
-  const HomeNavigationScreen({super.key, required this.index});
+  final Map<String, dynamic>? extra;
+  const HomeNavigationScreen({super.key, required this.index, this.extra});
 
   @override
   State<HomeNavigationScreen> createState() => _HomeNavigationScreenState();
 }
 
 class _HomeNavigationScreenState extends State<HomeNavigationScreen> {
-  final FlutterSecureStorage flutterSecureStorage =
-      const FlutterSecureStorage();
+  final FlutterSecureStorage flutterSecureStorage = const FlutterSecureStorage();
   String? role;
   String? userId;
   int index = 0;
@@ -34,8 +34,27 @@ class _HomeNavigationScreenState extends State<HomeNavigationScreen> {
   @override
   void initState() {
     super.initState();
-    index = widget.index;
+    // Initialize index
+    updateIndex();
     getRoleAndId();
+  }
+
+  @override
+  void didUpdateWidget(HomeNavigationScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Update index if extra changes
+    if (widget.extra != oldWidget.extra || widget.index != oldWidget.index) {
+      updateIndex();
+    }
+  }
+
+  void updateIndex() {
+    setState(() {
+      index = (widget.extra != null && widget.extra!['index'] != null)
+          ? widget.extra!['index'] as int
+          : widget.index;
+      print("Updated index: $index, extra: ${widget.extra}"); // Debug log
+    });
   }
 
   Future<void> getRoleAndId() async {
@@ -82,31 +101,25 @@ class _HomeNavigationScreenState extends State<HomeNavigationScreen> {
             );
           }
 
-          if (role == null ||
-              userId == null ||
-              role!.isEmpty ||
-              userId!.isEmpty) {
+          if (role == null || userId == null || role!.isEmpty || userId!.isEmpty) {
             return const Scaffold(
               body: Center(child: Text("Logging out...")),
             );
           }
-          List<StatefulWidget>  screens = [];
+          List<StatefulWidget> screens = [];
 
-          role != "admin" ?
-           screens = [
-            HomeScreen(role: role!, userId: userId!),
-            QARoom(
-              currentUserRole: role!,
-            ),
-            const ResourceRoom(),
-            const ChatRoom(),
-          ]
-          :
-          screens = [
-            EventsAdminScreen(),
-            TherapistListPage(),
-          ];
-          
+          role != "admin"
+              ? screens = [
+                  HomeScreen(role: role!, userId: userId!),
+                  QARoom(currentUserRole: role!),
+                  const ResourceRoom(),
+                  const ChatRoom(),
+                ]
+              : screens = [
+                  EventsAdminScreen(),
+                  TherapistListPage(),
+                ];
+
           return Scaffold(
             body: Center(
               child: Stack(
@@ -125,59 +138,50 @@ class _HomeNavigationScreenState extends State<HomeNavigationScreen> {
                 onTap: (int newIndex) {
                   setState(() {
                     index = newIndex;
+                    print("Bottom nav tapped: $index"); // Debug log
                   });
                 },
-                items: 
-                role != "admin" ?
-                [
-                  BottomNavigationBarItem(
-                    icon: index == 0
-                        ? Image.asset(
-                            width: 30, height: 40, AppImage.homeSelected)
-                        : Image.asset(
-                            width: 30, height: 40, AppImage.homeUnselected),
-                    label: 'Home',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: index == 1
-                        ? Image.asset(
-                            width: 30, height: 40, AppImage.qaSelected)
-                        : Image.asset(
-                            width: 30, height: 40, AppImage.qaUnselected),
-                    label: 'Q&A',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: index == 2
-                        ? Image.asset(
-                            width: 30, height: 40, AppImage.resourceSelected)
-                        : Image.asset(
-                            width: 30, height: 40, AppImage.resourceUnselected),
-                    label: 'Resource',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: index == 3
-                        ? Image.asset(
-                            width: 30, height: 40, AppImage.chatSelected)
-                        : Image.asset(
-                            width: 30, height: 40, AppImage.chatUnselected),
-                    label: 'Chat',
-                  ),
-                ]
-                :[
-                   BottomNavigationBarItem(
-                    icon: index == 0
-                        ? Image.asset(width: 30, height: 40, AppImage.resourceSelected)
-                        : Image.asset(width: 30, height: 40, AppImage.resourceUnselected),
-                    label: 'events',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: index == 1
-                        ? Image.asset(width: 30, height: 40, AppImage.chatSelected)
-                        : Image.asset(width: 30, height: 40, AppImage.chatUnselected),
-                    label: 'therapist',
-                  ),
-
-                ],
+                items: role != "admin"
+                    ? [
+                        BottomNavigationBarItem(
+                          icon: index == 0
+                              ? Image.asset(width: 30, height: 40, AppImage.homeSelected)
+                              : Image.asset(width: 30, height: 40, AppImage.homeUnselected),
+                          label: 'Home',
+                        ),
+                        BottomNavigationBarItem(
+                          icon: index == 1
+                              ? Image.asset(width: 30, height: 40, AppImage.qaSelected)
+                              : Image.asset(width: 30, height: 40, AppImage.qaUnselected),
+                          label: 'Q&A',
+                        ),
+                        BottomNavigationBarItem(
+                          icon: index == 2
+                              ? Image.asset(width: 30, height: 40, AppImage.resourceSelected)
+                              : Image.asset(width: 30, height: 40, AppImage.resourceUnselected),
+                          label: 'Resource',
+                        ),
+                        BottomNavigationBarItem(
+                          icon: index == 3
+                              ? Image.asset(width: 30, height: 40, AppImage.chatSelected)
+                              : Image.asset(width: 30, height: 40, AppImage.chatUnselected),
+                          label: 'Chat',
+                        ),
+                      ]
+                    : [
+                        BottomNavigationBarItem(
+                          icon: index == 0
+                              ? Image.asset(width: 30, height: 40, AppImage.resourceSelected)
+                              : Image.asset(width: 30, height: 40, AppImage.resourceUnselected),
+                          label: 'events',
+                        ),
+                        BottomNavigationBarItem(
+                          icon: index == 1
+                              ? Image.asset(width: 30, height: 40, AppImage.chatSelected)
+                              : Image.asset(width: 30, height: 40, AppImage.chatUnselected),
+                          label: 'therapist',
+                        ),
+                      ],
               ),
             ),
           );

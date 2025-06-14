@@ -454,13 +454,14 @@ class _WaitingDialogState extends State<WaitingDialog> {
                 'sessionId': widget.event.id,
                 'userId': widget.userId,
                 'isTherapist': widget.isTherapist.toString(),
+                'therapistId': widget.event.therapistId,
               });
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.green[400],
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
-            child: const Text('Join Meeting'),
+            child: const Text('Join'),
           ),
         const SizedBox(height: 8),
         ElevatedButton(

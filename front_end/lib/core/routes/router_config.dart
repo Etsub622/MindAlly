@@ -28,9 +28,13 @@ import 'package:go_router/go_router.dart';
 
 final routes = <GoRoute>[
   GoRoute(
-      name: 'home',
-      path: AppPath.home,
-      builder: (context, state) => const HomeNavigationScreen(index: 0)),
+    name: 'home',
+    path: AppPath.home,
+    builder: (context, state) {
+      final extra = state.extra as Map<String, dynamic>?;
+      return HomeNavigationScreen(index: extra?['index'] ?? 0, extra: extra);
+    },
+  ),
   GoRoute(
     name: 'therapist_onboard',
     path: AppPath.therapistOnboard,
@@ -55,7 +59,9 @@ final routes = <GoRoute>[
   GoRoute(
       path: AppPath.professional,
       builder: (context, state) => const ProfessionalSignup()),
-  GoRoute(path: AppPath.login, builder: (context, state) => const Login()),
+  GoRoute(
+    name: 'login',
+    path: AppPath.login, builder: (context, state) => const Login()),
   GoRoute(
       path: AppPath.forgotPassword,
       builder: (context, state) => const ForgotPassword()),
@@ -67,6 +73,7 @@ final routes = <GoRoute>[
         return ResetPassword(resetToken: resetToken);
       }),
   GoRoute(
+    name:"bookResource",
       path: AppPath.bookResource, builder: (context, state) => BookResource()),
   GoRoute(
     path: AppPath.otp,
@@ -122,7 +129,22 @@ final routes = <GoRoute>[
     name: 'therapistVerify',
     builder: (context, state) {
       final therapist = state.extra as TherapistVerifyEntity;
-      return TherapistDetailPage(therapist: therapist);
+      return TherapistVerifyScreen(therapist: therapist);
+    },
+  ),
+  GoRoute(
+    path: '/meeting',
+    name: "meeting",
+    builder: (context, state) {
+      return MeetingScreen(
+        meetingId: state.uri.queryParameters['meetingId'] ?? "",
+        token: state.uri.queryParameters['token'] ?? "",
+        sessionId : state.uri.queryParameters['sessionId'] ?? "",
+        userId: state.uri.queryParameters['userId'] ?? "",
+        isTherapist: state.uri.queryParameters['isTherapist'] == "true",
+        therapistId: state.uri.queryParameters['therapistId'] ?? "",
+
+      );
     },
 
   )

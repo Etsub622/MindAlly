@@ -100,6 +100,7 @@ class _PatientProfilePageState extends State<PatientProfilePageBody> {
                                     userName: state.patient.name,
                                     email: state.patient.email,
                                     patientId: state.patient.id,
+                                    payout: state.patient.payout,
                                   )),
                         );
                       },

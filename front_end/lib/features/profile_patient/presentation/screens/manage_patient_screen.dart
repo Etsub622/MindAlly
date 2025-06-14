@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -7,19 +8,26 @@ import 'package:flutter_svg/svg.dart';
 import 'package:front_end/core/routes/routes.dart';
 import 'package:front_end/core/utils/constants.dart';
 import 'package:front_end/features/authentication/presentation/bloc/auth_bloc.dart';
+import 'package:front_end/features/profile_patient/data/models/update_patient_model.dart';
+import 'package:front_end/features/profile_patient/domain/entities/update_patient_entity.dart';
 import 'package:front_end/features/profile_patient/presentation/bloc/delete_patient_bloc/delete_patient_bloc.dart';
 import 'package:front_end/features/profile_patient/presentation/bloc/get_patient_bloc/get_patient_bloc.dart';
+import 'package:front_end/features/profile_patient/presentation/bloc/update_patient_bloc/update_patient_bloc.dart';
+import 'package:front_end/features/profile_therapist/data/models/therapist_model.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ManagePatientScreen extends StatefulWidget {
   final String userName;
   final String email;
   final String patientId;
+  final PayoutModel? payout;
 
   const ManagePatientScreen({
     required this.userName,
     required this.email,
     required this.patientId,
+    this.payout,
     super.key,
   });
 
@@ -31,7 +39,6 @@ enum UserNameStatus { unknown, available, notAvailable }
 
 class ManagePatientScreenState extends State<ManagePatientScreen> {
   final _userNameController = TextEditingController();
-  
   TextEditingController currencyController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController firstNameController = TextEditingController();
@@ -45,22 +52,180 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
   String profilePicture = "";
   ValueNotifier<bool> isPasswordUpdating = ValueNotifier(false);
   ValueNotifier<bool> isUserNameUpdating = ValueNotifier(false);
-
-  String? imagePath;
-
-  
- 
-
-
+  File? _imageFile;
+  bool _isImageUploading = false;
 
   @override
   void initState() {
     super.initState();
-    // setState(() {
-    //   hasPassword = hasPassword;
-    // });
     context.read<PatientProfileBloc>().add(GetPatientLoadEvent(patientId: widget.patientId));
     _userNameController.text = widget.userName;
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? pickedFile = await picker.pickImage(source: source);
+
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = File(pickedFile.path);
+        _isImageUploading = true;
+      });
+
+      // Trigger image upload via UpdatePatientBloc
+      context.read<UpdatePatientBloc>().add(
+            UpdatePatientLoadEvent(
+              patient: UpdatePatientModel(
+                profilePictureFile: File(pickedFile.path),
+              ),
+            ),
+          );
+    }
+  }
+
+  void _showPayoutBottomSheet(BuildContext context, {PayoutModel? existingPayout}) {
+    final formKey = GlobalKey<FormState>();
+    final accountNameController = TextEditingController(text: existingPayout?.accountName ?? '');
+    final accountNumberController = TextEditingController(text: existingPayout?.accountNumber ?? '');
+    final bankCodeController = TextEditingController(text: existingPayout?.bankCode ?? '');
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return BlocConsumer<UpdatePatientBloc, UpdatePatientState>(
+          listener: (context, state) {
+            if (state is UpdatePatientLoaded) {
+              Navigator.of(context).pop();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Payout details updated successfully')),
+              );
+              context.read<PatientProfileBloc>().add(GetPatientLoadEvent(patientId: widget.patientId));
+            } else if (state is UpdatePatientError) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(state.message)),
+              );
+            }
+          },
+          builder: (context, state) {
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+                left: 20,
+                right: 20,
+                top: 20,
+              ),
+              child: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      existingPayout == null ? 'Add Payout Method' : 'Update Payout Method',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: accountNameController,
+                      decoration: InputDecoration(
+                        labelText: 'Account Name',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter account name';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: accountNumberController,
+                      decoration: InputDecoration(
+                        labelText: 'Account Number',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter account number';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: bankCodeController,
+                      decoration: InputDecoration(
+                        labelText: 'Bank Code',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter bank code';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: ElevatedButton(
+                        onPressed: state is UpdatePatientLoading
+                            ? null
+                            : () {
+                                if (formKey.currentState!.validate()) {
+                                  final payout = PayoutModel(
+                                    accountName: accountNameController.text,
+                                    accountNumber: accountNumberController.text,
+                                    bankCode: bankCodeController.text,
+                                  );
+                                  context.read<UpdatePatientBloc>().add(
+                                        UpdatePatientLoadEvent(
+                                          patient: UpdatePatientModel(
+                                            payout: payout,
+                                          ),
+                                        ),
+                                      );
+                                }
+                              },
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor: AppColor.hexToColor("#00538C"),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
+                        ),
+                        child: Text(
+                          existingPayout == null ? 'Add Payout' : 'Update Payout',
+                          style: Theme.of(context).textTheme.labelLarge,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -69,68 +234,218 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
     double width = size.width;
 
     return PopScope(
-        onPopInvoked: (v) {
-          context.read<PatientProfileBloc>().add(
-                GetPatientLoadEvent(patientId: widget.patientId),
-              );
-        },
-            child: Scaffold(
-              backgroundColor: Theme.of(context).colorScheme.surface,
-              appBar: AppBar(
-                backgroundColor: Theme.of(context).colorScheme.surface,
-                elevation: 0,
-                scrolledUnderElevation: 0,
-                leading: GestureDetector(
-                  onTap: () {
-                    context.pop();
-                  },
-                  // color: Colors.red,
-                  child: const Icon(
-                    Icons.arrow_back,
-                  ),
-                ),
-              ),
-              body: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: SizedBox(
-                      child: ListView(
-                        children: [
-                          GestureDetector(
-                            onTap: () {},
-                            child: Center(
-                              child: CircleAvatar(
-                                backgroundColor: Theme.of(context)
-                                    .colorScheme
-                                    .surfaceContainerLow,
-                                radius: 30,
-                                child: Stack(
+      onPopInvoked: (v) {
+        context.read<PatientProfileBloc>().add(
+              GetPatientLoadEvent(patientId: widget.patientId),
+            );
+      },
+      child: Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          leading: GestureDetector(
+            onTap: () => context.pop(),
+            child: const Icon(Icons.arrow_back),
+          ),
+        ),
+        body: BlocConsumer<PatientProfileBloc, GetPatientState>(
+          listener: (context, state) {
+            if (state is GetPatientLoaded) {
+              setState(() {
+                profilePicture = state.patient.profilePicture ?? "";
+                userName = state.patient.name;
+                email = state.patient.email;
+                hasPassword = state.patient.hasPassword;
+              });
+            }
+          },
+          builder: (context, state) {
+            return BlocConsumer<UpdatePatientBloc, UpdatePatientState>(
+              listener: (context, updateState) {
+                if (updateState is UpdatePatientLoaded) {
+                  setState(() {
+                    _isImageUploading = false;
+                    _imageFile = null;
+                    profilePicture = updateState.patient.profilePicture ?? profilePicture;
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Profile picture updated successfully')),
+                  );
+                  context.read<PatientProfileBloc>().add(GetPatientLoadEvent(patientId: widget.patientId));
+                } else if (updateState is UpdatePatientError) {
+                  setState(() {
+                    _isImageUploading = false;
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Failed to update profile picture: ${updateState.message}')),
+                  );
+                }
+              },
+              builder: (context, updateState) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: ListView(
+                    children: [
+                      // Profile Picture
+                      GestureDetector(
+                        onTap: _isImageUploading ? null : () => _pickImage(ImageSource.gallery),
+                        child: Center(
+                          child: Stack(
+                            children: [
+                              AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: _isImageUploading
+                                        ? Colors.transparent
+                                        : AppColor.hexToColor("#00538C"),
+                                    width: 2,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                child: CircleAvatar(
+                                  radius: 50,
+                                  backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
+                                  foregroundImage: _imageFile != null
+                                      ? FileImage(_imageFile!)
+                                      : profilePicture.isNotEmpty
+                                          ? CachedNetworkImageProvider(profilePicture)
+                                          : null,
+                                  child: _imageFile == null && profilePicture.isEmpty
+                                      ? const Icon(Icons.person, size: 50, color: Colors.grey)
+                                      : null,
+                                ),
+                              ),
+                              if (_isImageUploading)
+                                const Positioned.fill(
+                                  child: Center(
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              Positioned(
+                                bottom: 0,
+                                right: 0,
+                                child: Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: BoxDecoration(
+                                    color: AppColor.hexToColor("#00538C"),
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.2),
+                                        blurRadius: 4,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: const Icon(
+                                    Icons.edit,
+                                    color: Colors.white,
+                                    size: 20,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Center(
+                        child: Text(
+                          userName,
+                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                          semanticsLabel: 'Username: $userName',
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      // Profile Section
+                      Text(
+                        'Profile',
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                      ),
+                      const SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surfaceContainerLow,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            ListTile(
+                              onTap: () {},
+                              title: Text(
+                                "User Name",
+                                style: Theme.of(context).textTheme.bodyMedium,
+                              ),
+                              trailing: SizedBox(
+                                width: width * 0.4,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
-                                    ClipOval(
-                                      child: CachedNetworkImage(
-                                        height: 60,
-                                        width: 60,
-                                        fit: BoxFit.cover,
-                                        imageUrl: profilePicture,
-                                        placeholder: (context, url) =>
-                                            const Image(
-                                                image: AssetImage(AppImage
-                                                    .loadingPlaceholder)),
-                                        errorWidget: (context, url, error) =>
-                                            const Icon(Icons.error),
+                                    SizedBox(
+                                      width: width * 0.3,
+                                      child: Text(
+                                        userName,
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: AppColor.hexToColor("#73777F"),
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                        textAlign: TextAlign.end,
                                       ),
                                     ),
-                                    Positioned(
-                                      bottom: 0,
-                                      right: 0,
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          color: AppColor.hexToColor("#00538C"),
-                                          borderRadius:
-                                              BorderRadius.circular(50),
-                                        ),
-                                        child: const Icon(
-                                          Icons.edit,
-                                          color: Colors.white,
+                                    const SizedBox(width: 10),
+                                    Icon(
+                                      Icons.arrow_forward_ios,
+                                      size: 14,
+                                      color: AppColor.hexToColor("#73777F"),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            ListTile(
+                              title: Text(
+                                "Email",
+                                style: Theme.of(context).textTheme.bodyMedium,
+                              ),
+                              trailing: SizedBox(
+                                width: width * 0.5,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        email,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: AppColor.hexToColor("#73777F"),
                                         ),
                                       ),
                                     ),
@@ -138,183 +453,240 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
                                 ),
                               ),
                             ),
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          Center(
-                            child: Text(
-                              userName,
-                              style: Theme.of(context).textTheme.bodySmall,
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          Text('Profile',
-                              style: Theme.of(context).textTheme.bodySmall),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .surfaceContainerLow,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Column(
-                              children: [
-                                ListTile(
-                                  onTap: () {
-                                   },
-                                  title: Text("User Name",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyMedium),
-                                  trailing: SizedBox(
-                                    width: width * 0.4,
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        SizedBox(
-                                          width: width * 0.3,
-                                          child: Text(
-                                            widget.userName,
-                                            style: TextStyle(
-                                                fontSize: 12,
-                                                color: AppColor.hexToColor(
-                                                    "#73777F")),
-                                            overflow: TextOverflow.ellipsis,
-                                            textAlign: TextAlign.end,
-                                          ),
-                                        ),
-                                        const SizedBox(
-                                          width: 10,
-                                        ),
-                                        Icon(
-                                          Icons.arrow_forward_ios,
-                                          size: 14,
-                                          color: AppColor.hexToColor("#73777F"),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                ListTile(
-                                  title: Text(
-                                    "Email",
-                                    style:
-                                        Theme.of(context).textTheme.bodyMedium,
-                                  ),
-                                  trailing: SizedBox(
-                                    width: width * 0.5,
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            widget.email,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(
-                                                fontSize: 12,
-                                                color: AppColor.hexToColor(
-                                                    "#73777F")),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          Text('Security',
-                              style: Theme.of(context).textTheme.bodySmall),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .surfaceContainerLow,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Column(
-                              children: [
-                                ListTile(
-                                  onTap: () {
-                                   
-                                  },
-                                  title: Text("Password",
-                                      style:
-                                          Theme.of(context).textTheme.bodyMedium
-                                      // TextStyle(
-                                      //     fontSize: 14,
-                                      //     color: AppColor.hexToColor("#181C21")),
-                                      ),
-                                  trailing: Icon(
-                                    Icons.arrow_forward_ios,
-                                    size: 14,
-                                    color: AppColor.hexToColor("#73777F"),
-                                  ),
-                                ),
-                                ListTile(
-                                  trailing: SvgPicture.asset(AppImage.logoutsvg,
-                                      color: Colors.red),
-                                  subtitle: Text("Do you want to logout?",
-                                      style: TextStyle(
-                                          fontSize: 12,
-                                          color:
-                                              AppColor.hexToColor("#73777F"))),
-                                  title: Text(
-                                    'Log out',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyMedium
-                                        ?.copyWith(color: Colors.red),
-                                  ),
-                                  onTap: () {
-                                    _showDialog(context);
-                                  },
-                                ),
-                                ListTile(
-                                  trailing: const Icon(
-                                    Icons.delete_forever,
-                                    color: Colors.red,
-                                  ),
-                                  subtitle: Text("Your account will be deleted",
-                                      style: TextStyle(
-                                          fontSize: 12,
-                                          color:
-                                              AppColor.hexToColor("#73777F"))),
-                                  title: Text(
-                                    'Delete Account',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyMedium
-                                        ?.copyWith(color: Colors.red),
-                                  ),
-                                  onTap: () {
-                                    _showDeleteAccountDialog(context);
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  )),
+                      const SizedBox(height: 24),
+                      // Payout Section
+                      Text(
+                        'Payout Details',
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                      ),
+                      const SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surfaceContainerLow,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: widget.payout == null
+                            ? Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.account_balance_wallet_outlined,
+                                        color: AppColor.hexToColor("#00538C"),
+                                        size: 24,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        "No Payout Method",
+                                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    "Add a payout method to receive payments.",
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: AppColor.hexToColor("#73777F"),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Align(
+                                    alignment: Alignment.centerRight,
+                                    child: ElevatedButton.icon(
+                                      onPressed: () => _showPayoutBottomSheet(context),
+                                      icon: const Icon(Icons.add, size: 18),
+                                      label: const Text("Add Payout Method"),
+                                      style: ElevatedButton.styleFrom(
+                                        foregroundColor: Colors.white,
+                                        backgroundColor: AppColor.hexToColor("#00538C"),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                          vertical: 12,
+                                        ),
+                                        textStyle: Theme.of(context).textTheme.labelLarge,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  ListTile(
+                                    contentPadding: EdgeInsets.zero,
+                                    leading: Icon(
+                                      Icons.account_balance_wallet_outlined,
+                                      color: AppColor.hexToColor("#00538C"),
+                                      size: 24,
+                                    ),
+                                    title: Text(
+                                      "Payout Method",
+                                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                    ),
+                                    subtitle: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Account Name: ${widget.payout!.accountName}",
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: AppColor.hexToColor("#73777F"),
+                                          ),
+                                        ),
+                                        Text(
+                                          "Account Number: ${widget.payout!.accountNumber}",
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: AppColor.hexToColor("#73777F"),
+                                          ),
+                                        ),
+                                        Text(
+                                          "Bank Code: ${widget.payout!.bankCode}",
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: AppColor.hexToColor("#73777F"),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Align(
+                                    alignment: Alignment.centerRight,
+                                    child: OutlinedButton.icon(
+                                      onPressed: () => _showPayoutBottomSheet(context, existingPayout: widget.payout),
+                                      icon: const Icon(Icons.edit, size: 18),
+                                      label: const Text("Update Payout"),
+                                      style: OutlinedButton.styleFrom(
+                                        foregroundColor: AppColor.hexToColor("#00538C"),
+                                        side: BorderSide(
+                                          color: AppColor.hexToColor("#00538C"),
+                                          width: 1,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                          vertical: 12,
+                                        ),
+                                        textStyle: Theme.of(context).textTheme.labelLarge,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                      ),
+                      const SizedBox(height: 24),
+                      // Security Section
+                      Text(
+                        'Security',
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                      ),
+                      const SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surfaceContainerLow,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            ListTile(
+                              onTap: () {},
+                              title: Text(
+                                "Password",
+                                style: Theme.of(context).textTheme.bodyMedium,
+                              ),
+                              trailing: Icon(
+                                Icons.arrow_forward_ios,
+                                size: 14,
+                                color: AppColor.hexToColor("#73777F"),
+                              ),
+                            ),
+                            ListTile(
+                              trailing: SvgPicture.asset(
+                                AppImage.logoutsvg,
+                                color: Colors.red,
+                              ),
+                              subtitle: Text(
+                                "Do you want to logout?",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: AppColor.hexToColor("#73777F"),
+                                ),
+                              ),
+                              title: Text(
+                                'Log out',
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                      color: Colors.red,
+                                    ),
+                              ),
+                              onTap: () => _showDialog(context),
+                            ),
+                            ListTile(
+                              trailing: const Icon(
+                                Icons.delete_forever,
+                                color: Colors.red,
+                              ),
+                              subtitle: Text(
+                                "Your account will be deleted",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: AppColor.hexToColor("#73777F"),
+                                ),
+                              ),
+                              title: Text(
+                                'Delete Account',
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                      color: Colors.red,
+                                    ),
+                              ),
+                              onTap: () => _showDeleteAccountDialog(context),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                    ],
+                  ),
+                );
+              },
             );
-        //   })),
-        // )
+          },
+        ),
+      ),
+    );
   }
 
   void _showDeleteAccountDialog(BuildContext context) {
@@ -324,12 +696,13 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
         return BlocConsumer<DeletePatientBloc, DeletePatientState>(
           listener: (context, state) {
             if (state is DeletePatientLoaded) {
-                GoRouter.of(context).go(AppPath.login);
-              } else if (state is DeletePatientError) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(state.message)),
-                );
-              }
+              GoRouter.of(context).go(AppPath.login);
+            } else if (state is DeletePatientError) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(state.message)),
+              );
+              Navigator.of(context).pop();
+            }
           },
           builder: (context, state) {
             return AlertDialog(
@@ -337,20 +710,20 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
               content: const Text('Are you sure you want to delete your account?'),
               actions: [
                 TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
+                  onPressed: () => Navigator.of(context).pop(),
                   child: const Text('Cancel'),
                 ),
                 TextButton(
                   onPressed: () {
-                    context.read<DeletePatientBloc>().add(DeletePatientLoadEvent(patientId: widget.patientId));
+                    context.read<DeletePatientBloc>().add(
+                          DeletePatientLoadEvent(patientId: widget.patientId),
+                        );
                   },
                   child: const Text(
                     'Delete Account',
                     style: TextStyle(color: Colors.red),
                   ),
-                )
+                ),
               ],
             );
           },
@@ -358,7 +731,6 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
       },
     );
   }
-
 
   void _showDialog(BuildContext context) {
     showDialog(
@@ -385,9 +757,7 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
               content: const Text('Are you sure you want to log out?'),
               actions: [
                 TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
+                  onPressed: () => Navigator.of(context).pop(),
                   child: const Text('Cancel'),
                 ),
                 TextButton(
@@ -398,7 +768,7 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
                     'Log Out',
                     style: TextStyle(color: Colors.red),
                   ),
-                )
+                ),
               ],
             );
           },

@@ -34,7 +34,7 @@ class SocketService {
       String token = sharedPreferences.getString("token_key") ?? '';
 
       _socket = IO.io(
-        '${ConfigKey.baseUrl2}', // Replace with your backend URL
+        '${ConfigKey.baseUrl2}',
         IO.OptionBuilder()
             .setTransports(['websocket'])
             .disableAutoConnect()

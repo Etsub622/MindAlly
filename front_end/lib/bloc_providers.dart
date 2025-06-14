@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front_end/core/injection/injections.dart';
+import 'package:front_end/features/Home/presentation/bloc/get_all_therapists_bloc/get_all_therapists_bloc.dart';
 import 'package:front_end/features/approve_therapist/presentation/bloc/verify_bloc.dart';
 import 'package:front_end/features/calendar/presentation/bloc/add_event/add_events_bloc.dart';
 import 'package:front_end/features/calendar/presentation/bloc/delete_event/delete_events_bloc.dart';
@@ -76,7 +77,8 @@ class MultiBLOCProvider {
       create: (_) => sl<PaymentBloc>()
     ),
 
-    BlocProvider<VerifyBloc>(create: (_) => sl<VerifyBloc>())
-
+    BlocProvider<VerifyBloc>(create: (_) => sl<VerifyBloc>()),
+    
+   BlocProvider<GetAllTherapistsBloc>(create: (_) => sl<GetAllTherapistsBloc>())
   ];
 }

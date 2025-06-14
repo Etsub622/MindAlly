@@ -3,7 +3,9 @@ import 'package:front_end/core/injection/injections.dart';
 import 'package:front_end/features/Home/data/data_source/home_remote_data_source.dart';
 import 'package:front_end/features/Home/data/repository/home_repository_impl.dart';
 import 'package:front_end/features/Home/domain/repostitory/home_respository.dart';
+import 'package:front_end/features/Home/domain/usecase/get_all_therapists_usecase.dart';
 import 'package:front_end/features/Home/domain/usecase/get_matched_therpaists_usecase.dart';
+import 'package:front_end/features/Home/presentation/bloc/get_all_therapists_bloc/get_all_therapists_bloc.dart';
 import 'package:front_end/features/Home/presentation/bloc/get_matched_therapists_bloc/get_matched_therapists_bloc.dart';
 
 class HomeInjection {
@@ -12,6 +14,9 @@ class HomeInjection {
   sl.registerLazySingleton(
       () => GetMatchedTherpaistsUseCase(homeRepository: sl()));
   
+  sl.registerLazySingleton(
+      () => GetAllTherapistsUsecase(homeRepository: sl()));
+
   // DataSource
   sl.registerLazySingleton<HomeRemoteDataSource>(
       () => HomeRemoteDataSourceImpl());
@@ -27,6 +32,11 @@ class HomeInjection {
   // Bloc
   sl.registerFactory(() => GetMatchedTherapistsBloc(
       getMatchedTherpaistsUsecase: sl(),
+      ));
+  
+  
+  sl.registerFactory(() => GetAllTherapistsBloc(
+       getAllTherapistsUsecase: sl(),
       ));
 
   }

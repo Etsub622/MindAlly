@@ -97,7 +97,9 @@ class _TherapistProfilePageState extends State<TherapistProfilePageBody> {
                                     userName: state.therapist.name,
                                     email: state.therapist.email,
                                     therapistId: state.therapist.id,
-                                  )),
+                                    payout: state.therapist.payout,
+                                  )
+                                  ),
                         );
                       },
                       style: ElevatedButton.styleFrom(
@@ -214,6 +216,7 @@ class _TherapistProfilePageState extends State<TherapistProfilePageBody> {
                                   userName: widget.profile.username,
                                   email: widget.profile.email,
                                   therapistId: widget.profile.therapistId,
+                                  payout: widget.profile.payout,
                                 )),
                       );
                     },

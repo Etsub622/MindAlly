@@ -143,7 +143,7 @@ class _ChatPageState extends State<ChatPage> {
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10)),
                           ),
-                          child: const Text('Pick Date'),
+                          child: selectedDate != null ? Text('Pick') : Text('Update'),
                         ),
                       ],
                     ),
@@ -189,7 +189,7 @@ class _ChatPageState extends State<ChatPage> {
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10)),
                           ),
-                          child: const Text('Pick Time'),
+                          child: selectedTime!= null ? Text('Pick') : Text('Update'),
                         ),
                       ],
                     ),

@@ -1,4 +1,5 @@
 
+import 'package:front_end/features/profile_therapist/data/models/therapist_model.dart';
 import 'package:front_end/features/profile_therapist/domain/entities/update_therapist_entity.dart';
 
 class UpdateTherapistModel  extends UpdateTherapistEntity{
@@ -20,6 +21,8 @@ class UpdateTherapistModel  extends UpdateTherapistEntity{
     super.mode,
     super.experienceYears,
     super.chatId,
+    super.payout,
+    super.profilePictureFile,
     });
 
     factory UpdateTherapistModel.fromJson(Map<String, dynamic> json) {
@@ -32,7 +35,7 @@ class UpdateTherapistModel  extends UpdateTherapistEntity{
       certificate: json['Certificate'],
       bio: json['bio'] ?? "",
       fee: json['fee'] ?? 0,
-      rating: json['rating'] ?? 0.0,
+      rating: json['averageRating'] != null ? json['averageRating'].toDouble(): 0.0,
       gender: json['gender'],
       verified: json['verified'] ?? false,
       specialities: json['specialities'] != null
@@ -49,6 +52,7 @@ class UpdateTherapistModel  extends UpdateTherapistEntity{
             ? (json['mode'] as List<dynamic>).map((e) => e.toString()).toList()
             : null,
       experienceYears:json['experience_years'] ?? 0,
+      payout: json['payout'] != null ? PayoutModel.fromJson(json['payout']) : null,
     );
     }
 
@@ -70,6 +74,7 @@ class UpdateTherapistModel  extends UpdateTherapistEntity{
       'language': language,
       'mode': mode,
       'experience_years': experienceYears,
+      'payout': payout?.toJson(),
     };
     }
 
@@ -90,6 +95,7 @@ class UpdateTherapistModel  extends UpdateTherapistEntity{
     List<String>? language,
     List<String>? mode,
     int? experienceYears,
+    
     }) {
     return UpdateTherapistModel(
       id: id ?? this.id,

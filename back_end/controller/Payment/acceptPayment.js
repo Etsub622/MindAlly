@@ -163,6 +163,19 @@ const acceptPayment = async (req, res) => {
         };
 
         const response = await axios.post(url, data, { headers });
+
+        const transaction = await Transaction({
+            therapistEmail,
+            type: "credit",
+            amount,
+            status: "pending",
+            tx_ref,
+            metadata: {
+                patientEmail,
+                sessionDuration
+            }
+        });
+        transaction.save();
         res.json(response.data);
     } catch (error) {
         console.error('Error:', error.response ? error.response.data : error.message);

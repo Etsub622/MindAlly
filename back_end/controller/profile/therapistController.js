@@ -59,7 +59,7 @@ export const getTherapist = async (req, res) => {
 };
 
 export const updateTherapist = async (req, res) => {
-  const { FullName, Email, Password, modality, Bio, Fee, verified, gender, specialities, available_days, mode,language, experience_years} = req.body;
+  const { FullName, Email, Password, modality, Bio, Fee, verified, gender, specialities, available_days, mode,language, experience_years, payout} = req.body;
 
   console.log(req.body);
 
@@ -78,9 +78,17 @@ export const updateTherapist = async (req, res) => {
     if(Array.isArray(mode) && mode.length > 0) if(mode) updates.mode = mode;
     if(Array.isArray(language) && language.length > 0) if(language) updates.language = language;
     if(experience_years !== undefined) if(experience_years) updates.experience_years = experience_years;
+    if (payout && payout.account_number && payout.account_name && payout.bank_code) {
+      updates.payout = {
+        account_number: payout.account_number,
+        account_name: payout.account_name,
+        bank_code: payout.bank_code,
+      };
+    }
     
     console.log("update data: ", updates);
     const therapist = await Therapist.findByIdAndUpdate(req.params.therapist_id, updates);
+    console.log("updated therapist: ", therapist);
     if (!therapist) return res.status(404).json({ message: "Therapist not found" });
 
     res.json(therapist);

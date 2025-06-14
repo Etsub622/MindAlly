@@ -46,9 +46,27 @@ class PatientProfileRemoteDatasourceImpl extends PatientProfileRemoteDatasource 
         final userData = await getUserCredential();
         final token = await getToken();
         final patientId = userData?['_id'];
+        String? profileImage;
+        if(patient.profilePictureFile != null){
+          final url = Uri.parse('https://api.cloudinary.com/v1_1/dzfbycabj/upload');
+          final request = http.MultipartRequest('POST', url)
+            ..fields['upload_preset'] = 'imagePreset'
+            ..files.add(await http.MultipartFile.fromPath('file', patient.profilePictureFile!.path));
+          final response = await request.send();
 
+          if (response.statusCode == 200) {
+            final responseData = await response.stream.toBytes();
+            final responseString = String.fromCharCodes(responseData);
+            final jsonMap = json.decode(responseString);
+            profileImage = jsonMap['url'];
+          } else {
+            print('Failed to upload image');
+          }
+        }
         try{
-          final reqBody = json.encode(patient.toJson());
+          final Data = patient.toJson();
+          Data["profilePicture"] = profileImage ?? patient.profilePicture;
+          final reqBody = json.encode(Data);
           final response = await client.put(
               Uri.parse('$baseUrl/$patientId'),
               body: reqBody,
