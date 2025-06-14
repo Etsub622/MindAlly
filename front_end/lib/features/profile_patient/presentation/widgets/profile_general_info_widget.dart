@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:front_end/core/routes/app_path.dart';
 import 'package:front_end/core/utils/constants.dart';
 import 'package:go_router/go_router.dart';
 
@@ -156,7 +155,11 @@ class ProfilePageGeneralInfoWidget extends StatelessWidget {
             )
           ,ListTile(
             onTap: () {
-              context.push(AppPath.patientOnboard);
+               GoRouter.of(context).pushNamed(
+              'patient_onboard', 
+            queryParameters: {
+              "isFromSignUp": "false"
+            });
             },
             leading: Icon(
               Icons.filter_list,

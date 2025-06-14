@@ -22,7 +22,7 @@ model_path = os.path.join(script_dir, 'model', 'logreg_rl_model.pth')
 scaler = joblib.load(scaler_path)
 input_dim = 7
 model = LogisticRegressionTorch(input_dim)
-model.load_state_dict(torch.load(model_path))
+model.load_state_dict(torch.load(model_path, weights_only=True)) 
 model.eval()
 
 def create_features(user, therapist):

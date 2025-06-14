@@ -10,6 +10,7 @@ import { promises as fs } from 'fs'; // For async file operations
 import { tmpdir } from 'os'; // Import tmpdir
 import { join } from 'path'; // Import join explicitly
 
+
 // Create a new therapist
 export const createTherapist = async (req, res) => {
   const { FullName, Email, Password, modality, Certificate, Bio, Fee, Rating, verified } = req.body;
@@ -58,7 +59,7 @@ export const getTherapist = async (req, res) => {
 };
 
 export const updateTherapist = async (req, res) => {
-  const { FullName, Email, Password, modality, Bio, Fee, verified, gender, specialities, available_days, mode,language, experience_years} = req.body;
+  const { FullName, Email, Password, modality, Bio, Fee, verified, gender, specialities, available_days, mode,language, experience_years, payout} = req.body;
 
   console.log(req.body);
 
@@ -77,9 +78,17 @@ export const updateTherapist = async (req, res) => {
     if(Array.isArray(mode) && mode.length > 0) if(mode) updates.mode = mode;
     if(Array.isArray(language) && language.length > 0) if(language) updates.language = language;
     if(experience_years !== undefined) if(experience_years) updates.experience_years = experience_years;
+    if (payout && payout.account_number && payout.account_name && payout.bank_code) {
+      updates.payout = {
+        account_number: payout.account_number,
+        account_name: payout.account_name,
+        bank_code: payout.bank_code,
+      };
+    }
     
     console.log("update data: ", updates);
     const therapist = await Therapist.findByIdAndUpdate(req.params.therapist_id, updates);
+    console.log("updated therapist: ", therapist);
     if (!therapist) return res.status(404).json({ message: "Therapist not found" });
 
     res.json(therapist);
@@ -108,7 +117,6 @@ export const getTopTherapists = async (req, res) => {
     if (!user) return res.status(404).json({ message: "User not found" });
 
     const therapists = await Therapist.find();
-    
 
     const userData = {
       preferred_modality: user.preferred_modality || "",
@@ -119,23 +127,26 @@ export const getTopTherapists = async (req, res) => {
       preferred_specialties: Array.isArray(user.preferred_specialties) ? user.preferred_specialties : (user.preferred_specialties || []),
     };
 
-    const therapistsData = therapists.map(t => ({
-      _id: t._id.toString(),
-      FullName: t.FullName,
-      modality: t.modality || "",
-      gender: t.gender || "",
-      language: Array.isArray(t.language) ? t.language : (t.language || []),
-      available_days: Array.isArray(t.available_days) ? t.available_days.join(',') : (t.available_days || ""),
-      mode: Array.isArray(t.mode) ? t.mode : (t.mode || []),
-      AreaofSpecification: Array.isArray(t.specialties) ? t.specialties.join(',') : (t.specialties || ""),
-      experience_years: t.experience_years || 0
-    }));
+    const therapistsData = therapists
+      .filter(t => t.Role !== "pending_therapist")
+      .map(t => ({
+        _id: t._id.toString(),
+        FullName: t.FullName,
+        modality: t.modality || "",
+        gender: t.gender || "",
+        language: Array.isArray(t.language) ? t.language : (t.language || []),
+        available_days: Array.isArray(t.available_days) ? t.available_days.join(',') : (t.available_days || ""),
+        mode: Array.isArray(t.mode) ? t.mode : (t.mode || []),
+        AreaofSpecification: Array.isArray(t.specialities) ? t.specialities.join(',') : (t.specialities || ""),
+        experience_years: t.experience_years || 0
+      }));
 
     const inputData = { user: userData, therapists: therapistsData };
 
+    // Create a temporary file for Python output
+    const tempFile = join(tmpdir(), `therapist_match_${Date.now()}.json`);
 
-    const pythonProcess = spawn('python', ['therapist_matching/therapist_matcher.py']);
-    let output = '';
+    const pythonProcess = spawn('python', ['therapist_matching/therapist_matcher.py', tempFile]);
     let errorOutput = '';
 
     pythonProcess.stdin.write(JSON.stringify(inputData) + '\n');

@@ -54,7 +54,7 @@ class EventScheduleRemoteDataSourceImpl
 
   @override
   Future<EventModel> addEventSchedule(EventEntity event) async {
-    const String endpoint = 'http://10.0.2.2:8000/api/schedule/book';
+    const String endpoint = '${ConfigKey.baseUrl}/schedule/book';
 
     try {
       final response = await client.post(
@@ -87,7 +87,7 @@ class EventScheduleRemoteDataSourceImpl
 
    @override
   Future<bool> updateEventSchedule(String sessionId, double? price) async {
-    String endpoint = 'http://10.0.2.2:8000/api/schedule/$sessionId/confirm';
+    String endpoint = '${ConfigKey.baseUrl}/schedule/$sessionId/confirm';
 
     try {
       final response = await client.patch(
@@ -111,7 +111,7 @@ class EventScheduleRemoteDataSourceImpl
 
   @override
   Future<bool> deleteEventSchedule(String sessionId) async {
-    String endpoint = 'http://192.168.248.220:8000/api/schedule/$sessionId/cancel';
+    String endpoint = '${ConfigKey.baseUrl}/schedule/$sessionId/cancel';
 
     try {
       final response = await client.patch(

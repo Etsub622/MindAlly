@@ -50,7 +50,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     }
     final List<EventEntity> eventForDay = events[normalizedDay] != null
         ? events[normalizedDay]!
-            .where((event) => event.status != "Cancelled")
+            .where((event) => (event.status == "Pending" || event.status == "Confirmed"))
             .toList()
         : [];
     return eventForDay;

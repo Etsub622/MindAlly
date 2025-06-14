@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:front_end/features/profile_therapist/data/models/therapist_model.dart';
 
 class TherapistEntity extends Equatable{
   final String id;
@@ -12,6 +13,7 @@ class TherapistEntity extends Equatable{
   final int fee;
   final double rating;
   final bool verified;
+  final PayoutModel? payout;
 
   const TherapistEntity({
     required this.id,
@@ -24,8 +26,8 @@ class TherapistEntity extends Equatable{
     required this.bio,
     required this.fee,
     required this.rating,
-    required this.verified
-
+    required this.verified,
+    this.payout
   });
 
   @override

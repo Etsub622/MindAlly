@@ -52,7 +52,8 @@ export const updatePatient = async (req, res) => {
     preferred_language,
     preferred_days,
     preferred_mode,
-    preferred_specialties 
+    preferred_specialties,
+    payout
   } = req.body;
   console.log(req.body);
   try {
@@ -70,6 +71,13 @@ export const updatePatient = async (req, res) => {
     if (preferred_days !== undefined) if(preferred_days) updates.preferred_days = preferred_days;
     if (preferred_mode !== undefined) if(preferred_mode) updates.preferred_mode = preferred_mode;
     if (preferred_specialties !== undefined) if(preferred_specialties) updates.preferred_specialties = preferred_specialties;
+    if (payout && payout.account_number && payout.account_name && payout.bank_code) {
+      updates.payout = {
+        account_number: payout.account_number,
+        account_name: payout.account_name,
+        bank_code: payout.bank_code,
+      };
+    }
 
     const patient = await Patient.findByIdAndUpdate(
       req.params.patient_id, 

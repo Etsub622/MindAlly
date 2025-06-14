@@ -1,4 +1,5 @@
 import 'package:front_end/features/profile_patient/domain/entities/update_patient_entity.dart';
+import 'package:front_end/features/profile_therapist/data/models/therapist_model.dart';
 
 class UpdatePatientModel extends UpdatePatientEntity{
   UpdatePatientModel({
@@ -13,7 +14,9 @@ class UpdatePatientModel extends UpdatePatientEntity{
     super.preferredLanguage, 
     super.preferredDays, 
     super.preferredMode, 
-    super.preferredSpecialties
+    super.preferredSpecialties,
+    super.payout,
+    super.profilePictureFile
   });
       factory UpdatePatientModel.fromJson(Map<String, dynamic> json) {
         return UpdatePatientModel(
@@ -24,17 +27,22 @@ class UpdatePatientModel extends UpdatePatientEntity{
           collage: json['Collage'],
           gender: json['gender'],
           preferredModality: json['preferred_modality'],
-          preferredGender: json['preferred_gender'],
+          preferredGender: json['preferred_gender'] != null
+            ? (json['preferred_gender'] as List<dynamic>).map((e) => e.toString()).toList()
+            : null,
           preferredLanguage: json['preferred_language'] != null
             ? (json['preferred_language'] as List<dynamic>).map((e) => e.toString()).toList()
             : null,
           preferredDays:json['preferred_days'] != null
             ? (json['preferred_days'] as List<dynamic>).map((e) => e.toString()).toList()
             : null,
-          preferredMode: json['preferred_mode'],
+          preferredMode: json['preferred_mode'] != null
+            ? (json['preferred_mode'] as List<dynamic>).map((e) => e.toString()).toList()
+            : null,
           preferredSpecialties: json['preferred_specialties'] != null
               ? (json['preferred_specialties'] as List<dynamic>).map((e) => e.toString()).toList()
               : null,
+          payout: json['payout'] != null ? PayoutModel.fromJson(json['payout']) : null,
         );
       }
 
@@ -52,6 +60,7 @@ class UpdatePatientModel extends UpdatePatientEntity{
           'preferred_days': preferredDays,
           'preferred_mode': preferredMode,
           'preferred_specialties': preferredSpecialties,
+          'payout': payout?.toJson(),
         };
       }
 
@@ -63,10 +72,10 @@ class UpdatePatientModel extends UpdatePatientEntity{
         String? collage,
         String? gender,
         String? preferredModality,
-        String? preferredGender,
+        List<String>? preferredGender,
         List<String>? preferredLanguage,
         List<String>? preferredDays,
-        String? preferredMode,
+        List<String>? preferredMode,
         List<String>? preferredSpecialties,
       }) {
         return UpdatePatientModel(

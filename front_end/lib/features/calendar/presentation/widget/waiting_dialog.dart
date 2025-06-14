@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front_end/features/calendar/domain/entity/event_entity.dart';
@@ -12,7 +13,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 
-class WaitingDialog extends StatelessWidget {
+class WaitingDialog extends StatefulWidget {
   final EventEntity event;
   final String userId;
   final bool isTherapist;
@@ -28,13 +29,115 @@ class WaitingDialog extends StatelessWidget {
     required this.userEmail,
   });
 
+  @override
+  State<WaitingDialog> createState() => _WaitingDialogState();
+}
+
+class _WaitingDialogState extends State<WaitingDialog> {
+  String _countdown = '';
+  bool _isPast = false;
+  bool _isJoinable = false;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _updateTimeStatus();
+    if (!_isPast && !_isJoinable && widget.event.status == "Confirmed") {
+      _startCountdown();
+    }
+  }
+
+  void _startCountdown() {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (mounted) {
+        setState(() {
+          _updateTimeStatus();
+        });
+      }
+    });
+  }
+
+  String _normalizeTime(String time) {
+    if (time == "00:00") {
+      return "12:00 AM";
+    }
+    return time
+        .replaceAll(RegExp(r'am', caseSensitive: false), 'AM')
+        .replaceAll(RegExp(r'pm', caseSensitive: false), 'PM');
+  }
+
+  void _updateTimeStatus() {
+    final now = DateTime.now();
+    DateTime? startDateTime;
+    DateTime? endDateTime;
+
+    try {
+      final normalizedStartTime = _normalizeTime(widget.event.startTime);
+      final normalizedEndTime = _normalizeTime(widget.event.endTime);
+
+      // Parse times in local timezone (EAT, UTC+3)
+      startDateTime = DateFormat('yyyy-MM-dd hh:mm a').parse(
+        '${widget.event.date} $normalizedStartTime',
+      );
+
+      endDateTime = DateFormat('yyyy-MM-dd hh:mm a').parse(
+        '${widget.event.date} $normalizedEndTime',
+      );
+
+      if (endDateTime.isBefore(startDateTime)) {
+        endDateTime = endDateTime.add(const Duration(days: 1));
+      }
+    } catch (e) {
+      print('Error parsing date/time: $e, date=${widget.event.date}, start=${widget.event.startTime}, end=${widget.event.endTime}');
+      setState(() {
+        _isPast = true;
+        _countdown = 'Invalid date or time format';
+      });
+      _timer?.cancel();
+      return;
+    }
+
+    if (widget.event.status == "Completed" || now.isAfter(endDateTime)) {
+      _isPast = true;
+      _isJoinable = false;
+      _countdown = 'This session has ended';
+      _timer?.cancel();
+    } else if (widget.event.status == "Confirmed" &&
+        now.isAfter(startDateTime.subtract(const Duration(minutes: 10))) &&
+        now.isBefore(endDateTime)) {
+      _isPast = false;
+      _isJoinable = true;
+      _countdown = 'The session is ready to join!';
+      _timer?.cancel();
+    } else if (widget.event.status == "Confirmed") {
+      _isPast = false;
+      _isJoinable = false;
+      final difference = startDateTime.difference(now);
+      final hours = difference.inHours;
+      final minutes = difference.inMinutes % 60;
+      final seconds = difference.inSeconds % 60;
+      _countdown = 'Starts in ${hours}h ${minutes}m ${seconds}s';
+    } else {
+      _isPast = false;
+      _isJoinable = false;
+      _countdown = 'Waiting for confirmation';
+    }
+  }
+
   bool _isCreator() {
-    return event.createrId == userId;
+    return widget.event.createrId == widget.userId;
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final isPending = event.status == "Pending";
+    final isPending = widget.event.status == "Pending";
     final isCreator = _isCreator();
 
     return MultiBlocListener(
@@ -71,13 +174,13 @@ class WaitingDialog extends StatelessWidget {
         ),
       ],
       child: BlocBuilder<PatientProfileBloc, GetPatientState>(
-        bloc: isTherapist ? context.read<PatientProfileBloc>() : null,
+        bloc: widget.isTherapist ? context.read<PatientProfileBloc>() : null,
         builder: (context, patientState) {
           return BlocBuilder<TherapistProfileBloc, GetTherapistState>(
-            bloc: !isTherapist ? context.read<TherapistProfileBloc>() : null,
+            bloc: !widget.isTherapist ? context.read<TherapistProfileBloc>() : null,
             builder: (context, therapistState) {
               UserEntity? receiver;
-              if (isTherapist && patientState is GetPatientLoaded) {
+              if (widget.isTherapist && patientState is GetPatientLoaded) {
                 receiver = UserEntity(
                   id: patientState.patient.id,
                   name: patientState.patient.name,
@@ -85,7 +188,7 @@ class WaitingDialog extends StatelessWidget {
                   hasPassword: patientState.patient.hasPassword,
                   role: patientState.patient.role,
                 );
-              } else if (!isTherapist && therapistState is GetTherapistLoaded) {
+              } else if (!widget.isTherapist && therapistState is GetTherapistLoaded) {
                 receiver = UserEntity(
                   id: therapistState.therapist.id,
                   name: therapistState.therapist.name,
@@ -95,17 +198,16 @@ class WaitingDialog extends StatelessWidget {
                 );
               }
 
-              if ((isTherapist && patientState is GetPatientLoading) ||
-                  (!isTherapist && therapistState is GetTherapistLoading)) {
+              if ((widget.isTherapist && patientState is GetPatientLoading) ||
+                  (!widget.isTherapist && therapistState is GetTherapistLoading)) {
                 return _buildWaitingShimmer(context);
               }
 
               if (receiver == null) {
-                // Trigger data fetch if not yet loaded
-                if (isTherapist) {
-                  context.read<PatientProfileBloc>().add(GetPatientLoadEvent(patientId: event.patientId));
+                if (widget.isTherapist) {
+                  context.read<PatientProfileBloc>().add(GetPatientLoadEvent(patientId: widget.event.patientId));
                 } else {
-                  context.read<TherapistProfileBloc>().add(GetTherapistLoadEvent(therapistId: event.therapistId));
+                  context.read<TherapistProfileBloc>().add(GetTherapistLoadEvent(therapistId: widget.event.therapistId));
                 }
                 return _buildWaitingShimmer(context);
               }
@@ -170,7 +272,7 @@ class WaitingDialog extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         Text(
-          'Waiting for ${isTherapist ? "patient" : "therapist"} to confirm...',
+          'Waiting for ${widget.isTherapist ? "patient" : "therapist"} to confirm...',
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
         ),
         const SizedBox(height: 16),
@@ -187,12 +289,55 @@ class WaitingDialog extends StatelessWidget {
   }
 
   Widget _buildMeetingDetails(BuildContext context, bool isPending, bool isCreator, UserEntity receiver) {
-    final dateTime = DateFormat('yyyy-MM-dd hh:mm a').parse(
-      '${event.date} ${event.startTime.replaceAll(RegExp(r'am|pm', caseSensitive: false), event.startTime.contains('AM') ? 'AM' : 'PM')}',
-    );
-    final isActive = event.status == "Confirmed" &&
-        DateTime.now().isAfter(dateTime.subtract(const Duration(minutes: 10))) &&
-        DateTime.now().isBefore(DateTime.parse('${event.date} ${event.endTime}'));
+    DateTime? startDateTime;
+    DateTime? endDateTime;
+
+    try {
+      final normalizedStartTime = _normalizeTime(widget.event.startTime);
+      final normalizedEndTime = _normalizeTime(widget.event.endTime);
+
+      startDateTime = DateFormat('yyyy-MM-dd hh:mm a').parse(
+        '${widget.event.date} $normalizedStartTime',
+      );
+
+      endDateTime = DateFormat('yyyy-MM-dd hh:mm a').parse(
+        '${widget.event.date} $normalizedEndTime',
+      );
+
+      if (endDateTime.isBefore(startDateTime)) {
+        endDateTime = endDateTime.add(const Duration(days: 1));
+      }
+    } catch (e) {
+      print('Error parsing date/time: $e');
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'Error',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.red[900],
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text('Invalid date or time format'),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.grey[400],
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            child: const Text('Close'),
+          ),
+        ],
+      );
+    }
+
+    final isActive = widget.event.status == "Confirmed" &&
+        DateTime.now().isAfter(startDateTime.subtract(const Duration(minutes: 10))) &&
+        DateTime.now().isBefore(endDateTime);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -207,15 +352,48 @@ class WaitingDialog extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        Text('Date: ${event.date}'),
-        Text('Start Time: ${event.startTime}'),
-        Text('End Time: ${event.endTime}'),
-        Text('Status: ${event.status}'),
-        Text('Creator ID: ${event.createrId}'),
-        if (event.therapistId == userId)
-          Text('Patient ID: ${event.patientId}')
+        Text('Date: ${widget.event.date}'),
+        Text('Start Time: ${widget.event.startTime}'),
+        Text('End Time: ${widget.event.endTime}'),
+        Text('Status: ${widget.event.status}'),
+        Text('Creator ID: ${widget.event.createrId}'),
+        if (widget.event.therapistId == widget.userId)
+          Text('Patient ID: ${widget.event.patientId}')
         else
-          Text('Therapist ID: ${event.therapistId}'),
+          Text('Therapist ID: ${widget.event.therapistId}'),
+        if (!_isPast && !_isJoinable && widget.event.status == "Confirmed")
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Text(
+              _countdown,
+              style: TextStyle(
+                color: Colors.blue[700],
+                fontSize: 16,
+              ),
+            ),
+          ),
+        if (_isJoinable)
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Text(
+              'The session is ready to join!',
+              style: TextStyle(
+                color: Colors.blue[700],
+                fontSize: 16,
+              ),
+            ),
+          ),
+        if (_isPast)
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Text(
+              'This session has already ended.',
+              style: TextStyle(
+                color: Colors.blue[700],
+                fontSize: 16,
+              ),
+            ),
+          ),
         const SizedBox(height: 16),
         if (isPending && !isCreator) ...[
           Row(
@@ -223,27 +401,26 @@ class WaitingDialog extends StatelessWidget {
             children: [
               ElevatedButton(
                 onPressed: () {
-                  isTherapist
+                  widget.isTherapist
                       ? context.read<UpdateScheduledEventsBloc>().add(
-                          UpdateScheduledEventsEvent(
-                            eventEntity: event.copyWith(status: "Confirmed"),
-                          ),
-                        )
+                            UpdateScheduledEventsEvent(
+                              eventEntity: widget.event.copyWith(status: "Confirmed"),
+                            ),
+                          )
                       : Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => PaymentScreen(
-                              therapistEmail: !isTherapist ? receiver.email : userEmail,
-                              patientEmail: !isTherapist ? userEmail : receiver.email,
-                              sessionHour: event.endTime == "00:00" ? 1 : double.parse(event.endTime.split(':')[0]) - double.parse(event.startTime.split(':')[0]),
-                              event: event,
-                              chatId: chatId,
+                              therapistEmail: !widget.isTherapist ? receiver.email : widget.userEmail,
+                              patientEmail: !widget.isTherapist ? widget.userEmail : receiver.email,
+                              sessionHour: widget.event.endTime == "00:00" ? 1 : double.parse(widget.event.endTime.split(':')[0]) - double.parse(widget.event.startTime.split(':')[0]),
+                              event: widget.event,
+                              chatId: widget.chatId,
                               receiver: receiver,
-                              isCreate:false,
+                              isCreate: false,
                             ),
                           ),
                         );
-                  // Removed duplicate UpdateScheduledEventsEvent call
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue[700],
@@ -254,7 +431,7 @@ class WaitingDialog extends StatelessWidget {
               ElevatedButton(
                 onPressed: () {
                   context.read<DeleteScheduledEventsBloc>().add(
-                        DeleteScheduledEventsEvent(calendarId: event.id),
+                        DeleteScheduledEventsEvent(calendarId: widget.event.id),
                       );
                 },
                 style: ElevatedButton.styleFrom(
@@ -269,19 +446,22 @@ class WaitingDialog extends StatelessWidget {
         if (isActive)
           ElevatedButton(
             onPressed: () {
-              context.goNamed('meeting', extra: {
-                'meetingId': event.meetingId,
-                'token': event.meetingToken,
-                'sessionId': event.id,
-                'userId': userId,
-                'isTherapist': isTherapist,
+               GoRouter.of(context).pushNamed(
+                'meeting', 
+              queryParameters: {
+                'meetingId': widget.event.meetingId,
+                'token': widget.event.meetingToken,
+                'sessionId': widget.event.id,
+                'userId': widget.userId,
+                'isTherapist': widget.isTherapist.toString(),
+                'therapistId': widget.event.therapistId,
               });
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.green[400],
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
-            child: const Text('Join Meeting'),
+            child: const Text('Join'),
           ),
         const SizedBox(height: 8),
         ElevatedButton(

@@ -3,7 +3,7 @@ class AppPath {
 
   static const String signup = '/signup';
 
-  static const String home = '/home';
+  static const String home = '/';
   static const String therapistOnboard = '/therapistOnboard';
   static const String patientOnboard=  '/patientOnboard';
   static const String role = '/role';
@@ -12,11 +12,12 @@ class AppPath {
   static const String forgotPassword = '/forgotPassword';
   static const String resetPassword = '/resetPassword';
   static const String otp = '/otp';
-  static String bookResource ='bookResource';
+  static String bookResource ='/bookResource';
   static const String chat = '/chat';
   static const String chatDetails = '/chatDetails';
   static const String calendar = '/calendar';
   static const String admin = "/admin";
+  static const String meeting = '/meeting';
   static const String profile = '/otpVerification';
 }
 

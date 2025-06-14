@@ -163,6 +163,19 @@ const acceptPayment = async (req, res) => {
         };
 
         const response = await axios.post(url, data, { headers });
+
+        const transaction = await Transaction({
+            therapistEmail,
+            type: "credit",
+            amount,
+            status: "pending",
+            tx_ref,
+            metadata: {
+                patientEmail,
+                sessionDuration
+            }
+        });
+        transaction.save();
         res.json(response.data);
     } catch (error) {
         console.error('Error:', error.response ? error.response.data : error.message);
@@ -236,6 +249,7 @@ const withdrawFromWallet = async (req, res) => {
     }
 
     const therapist = await Therapist.findOne({ Email: therapistEmail });
+    console.log("Therapist found:", therapistEmail);
     if (!therapist) return res.status(404).json({ error: "Therapist not found" });
 
     // Calculate wallet balance from transaction history
@@ -256,7 +270,9 @@ const withdrawFromWallet = async (req, res) => {
     }
 
     const { account_name, account_number, bank_code } = therapist.payout || {};
+    
     if (!account_name || !account_number || !bank_code) {
+      console.log("Therapist payout information is incomplete:", therapist.payout);
       return res.status(400).json({ error: "Therapist payout information is incomplete" });
     }
 

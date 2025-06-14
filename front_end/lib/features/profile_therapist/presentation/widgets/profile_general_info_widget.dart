@@ -156,7 +156,11 @@ class ProfilePageGeneralInfoWidget extends StatelessWidget {
             )
           ,ListTile(
             onTap: () {
-              context.push(AppPath.therapistOnboard);
+              GoRouter.of(context).pushNamed(
+              'therapist_onboard', 
+            queryParameters: {
+              "isFromSignUp": "false"
+            });
             },
             leading: Icon(
               Icons.filter_list,

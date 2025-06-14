@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:front_end/core/routes/app_path.dart';
 import 'package:front_end/features/Home/presentation/screens/home_navigation_screen.dart';
 import 'package:front_end/features/Home/presentation/screens/therapist_detail_screen.dart';
+import 'package:front_end/features/Home/presentation/screens/therapist_verify_screen.dart';
 import 'package:front_end/features/admin/admin_screen.dart';
 import 'package:front_end/features/approve_therapist/domain/entity/therapist_verify_entity.dart';
 import 'package:front_end/features/authentication/data/models/professional_signup_model.dart';
@@ -16,6 +17,7 @@ import 'package:front_end/features/authentication/presentation/screens/role_sele
 import 'package:front_end/features/authentication/presentation/screens/student_signUp.dart';
 import 'package:front_end/features/authentication/presentation/screens/therapist_onboarding.dart';
 import 'package:front_end/features/calendar/presentation/screen/calendar_screen.dart';
+import 'package:front_end/features/calendar/presentation/screen/meeting/meeting_screen.dart';
 import 'package:front_end/features/chat/presentation/screens/chat_page.dart';
 import 'package:front_end/features/chat/presentation/screens/chat_room.dart';
 import 'package:front_end/features/profile_patient/domain/entities/user_entity.dart';
@@ -26,20 +28,28 @@ import 'package:go_router/go_router.dart';
 
 final routes = <GoRoute>[
   GoRoute(
-      name: 'home',
-      path: AppPath.home,
-      builder: (context, state) => const HomeNavigationScreen(index: 0)),
+    name: 'home',
+    path: AppPath.home,
+    builder: (context, state) {
+      final extra = state.extra as Map<String, dynamic>?;
+      return HomeNavigationScreen(index: extra?['index'] ?? 0, extra: extra);
+    },
+  ),
   GoRoute(
     name: 'therapist_onboard',
     path: AppPath.therapistOnboard,
     builder: (BuildContext context, GoRouterState state) =>
-        const TherapistOnboardingScreen(),
+        TherapistOnboardingScreen(
+          isFromSignUp: state.uri.queryParameters['isFromSignUp'] == 'true',
+        ),
   ),
   GoRoute(
     name: 'patient_onboard',
     path: AppPath.patientOnboard,
     builder: (BuildContext context, GoRouterState state) =>
-        const PatientOnboardingSreen(),
+         PatientOnboardingSreen(
+          isFromSignUp: state.uri.queryParameters['isFromSignUp'] == 'true',
+        ),
   ),
   GoRoute(
       path: AppPath.role, builder: (context, state) => const RoleSelection()),
@@ -49,7 +59,9 @@ final routes = <GoRoute>[
   GoRoute(
       path: AppPath.professional,
       builder: (context, state) => const ProfessionalSignup()),
-  GoRoute(path: AppPath.login, builder: (context, state) => const Login()),
+  GoRoute(
+    name: 'login',
+    path: AppPath.login, builder: (context, state) => const Login()),
   GoRoute(
       path: AppPath.forgotPassword,
       builder: (context, state) => const ForgotPassword()),
@@ -61,6 +73,7 @@ final routes = <GoRoute>[
         return ResetPassword(resetToken: resetToken);
       }),
   GoRoute(
+    name:"bookResource",
       path: AppPath.bookResource, builder: (context, state) => BookResource()),
   GoRoute(
     path: AppPath.otp,
@@ -108,9 +121,33 @@ final routes = <GoRoute>[
     name: 'therapistDetails',
     builder: (context, state) {
       final therapist = state.extra as UpdateTherapistEntity;
-      return TherapistDetailPage(therapist: therapist);
+      return TherapistDetailScreen(therapist: therapist);
     },
   ),
+   GoRoute(
+    path: '/therapistVerify',
+    name: 'therapistVerify',
+    builder: (context, state) {
+      final therapist = state.extra as TherapistVerifyEntity;
+      return TherapistVerifyScreen(therapist: therapist);
+    },
+  ),
+  GoRoute(
+    path: '/meeting',
+    name: "meeting",
+    builder: (context, state) {
+      return MeetingScreen(
+        meetingId: state.uri.queryParameters['meetingId'] ?? "",
+        token: state.uri.queryParameters['token'] ?? "",
+        sessionId : state.uri.queryParameters['sessionId'] ?? "",
+        userId: state.uri.queryParameters['userId'] ?? "",
+        isTherapist: state.uri.queryParameters['isTherapist'] == "true",
+        therapistId: state.uri.queryParameters['therapistId'] ?? "",
+
+      );
+    },
+
+  )
 ];
 
 GoRouter routerConfig() {

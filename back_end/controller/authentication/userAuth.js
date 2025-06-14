@@ -132,11 +132,6 @@ const Login = async (req, res) => {
       }
       userModel.lastLogin = new Date();
       await userModel.save();
-
-  
-
-
-        }
         
         console.log("User found:", userModel._id, userModel.Role);
 

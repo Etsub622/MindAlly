@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:front_end/core/config/config_key.dart';
 import 'package:front_end/core/routes/router_config.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
@@ -101,7 +102,7 @@ Future<void> showNotification(RemoteMessage msg) async {
       print(json.encode({'userId': userId, 'token': fcmToken}));
       if (authToken != null && userId != null) {
         final response = await http.post(
-          Uri.parse('http://192.168.78.220:8000/api/notifications/save-token'),
+          Uri.parse('${ConfigKey.baseUrl}/notifications/save-token'),
           headers: {
             'Authorization': 'Bearer $authToken',
             'Content-Type': 'application/json',

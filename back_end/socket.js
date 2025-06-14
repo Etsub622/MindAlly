@@ -2,6 +2,8 @@ import { Server } from "socket.io";
 import { ChatHistory } from "./model/chatsModel.js";
 import { Message } from "./model/messagesModel.js";
 import { Session } from "./model/sessionModel.js";
+import { Rating } from "./model/ratingModel.js";
+import { Therapist } from "./model/therapistModel.js";
 import mongoose from "mongoose";
 
 let io;
@@ -147,6 +149,39 @@ export const initializeSocket = (httpServer) => {
         socket.emit("checkOutError", { error: error.message });
       }
     });
+    // server.js (example)
+  socket.on('submitRating', async (data) => {
+    const { sessionId, patientId, therapistId, rating, comment } = data;
+    console.log(`Rating received: ${rating} for session ${sessionId}, patientId: ${patientId}, therapistId: ${therapistId}, comment: ${comment}`);
+    try {
+      const therapist = await Therapist.findOne({ _id: therapistId});
+      if (!therapist) {
+        console.log(`Therapist not found for ID: ${therapistId}`);
+        socket.emit('ratingFailure', { sessionId, error: 'Therapist not found' });
+        return;
+      }
+
+      // Update therapist's average rating
+      await Therapist.updateOne(
+        { _id: therapistId },
+        {
+          $push: { ratings: rating },
+          $set: {
+            averageRating: await Rating.aggregate([
+              { $match: { therapistId: new mongoose.Types.ObjectId(therapistId) } },
+              { $group: { _id: null, avgRating: { $avg: '$rating' } } },
+            ]).then((result) => result[0]?.avgRating || rating),
+          },
+        },
+      );
+
+      socket.emit('ratingSuccess', { sessionId });
+      console.log(`Rating submitted successfully for session ${sessionId}`);
+    } catch (error) {
+      socket.emit('ratingFailure', { sessionId, error: error.message });
+      console.error("Error submitting rating:", error);
+    }
+  });
 
     socket.on("disconnect", () => {
       console.log("User disconnected:", socket.id);

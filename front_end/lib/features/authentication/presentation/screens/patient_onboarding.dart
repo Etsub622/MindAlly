@@ -8,8 +8,9 @@ import 'package:front_end/features/profile_therapist/presentation/bloc/update_th
 import 'package:go_router/go_router.dart';
 
 class PatientOnboardingSreen extends StatefulWidget {
+  final bool isFromSignUp;
 
-  const PatientOnboardingSreen({super.key});
+  const PatientOnboardingSreen({super.key, required this.isFromSignUp});
 
   @override
   _PatientOnboardingSreenState createState() => _PatientOnboardingSreenState();
@@ -88,10 +89,10 @@ class _PatientOnboardingSreenState extends State<PatientOnboardingSreen> {
      BlocProvider.of<UpdatePatientBloc>(context).add(UpdatePatientLoadEvent(patient: UpdatePatientModel(
       gender: gender,
       preferredModality: preferredModality,
-      preferredGender: preferredGender,
+      preferredGender: preferredGender != null ? [preferredGender!] : null,
       preferredLanguage: [ preferredLanguage ?? ""],
       preferredDays: preferredDays,
-      preferredMode: preferredMode,
+      preferredMode: preferredMode != null ? [preferredMode!] : null,
       preferredSpecialties: preferredSpecialties,
     )));
 
@@ -105,7 +106,9 @@ class _PatientOnboardingSreenState extends State<PatientOnboardingSreen> {
       'preferred_specialties': preferredSpecialties,
     };
     print('Onboarding Data: $onboardingData');
-    context.push(AppPath.home);
+    widget.isFromSignUp
+        ? context.goNamed('login')
+        : context.goNamed('home', extra: {'index': 0});
   }
 
   @override
