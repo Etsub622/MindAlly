@@ -16,6 +16,7 @@ export const createPatient = async (req, res) => {
       Email,
       Password: hashedPassword,
       Collage,
+      EmergencyEmail,
     });
     console.log(newPatient);
 

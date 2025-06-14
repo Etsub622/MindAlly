@@ -1,11 +1,12 @@
 // lib/features/approve_therapist/presentation/screen/therapist_verify_detail.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:front_end/features/approve_therapist/domain/entity/therapist_verify_entity.dart';
+
 import 'package:front_end/features/approve_therapist/presentation/bloc/verify_bloc.dart';
+import 'package:front_end/features/profile_therapist/domain/entities/update_therapist_entity.dart';
 
 class TherapistDetailPage extends StatefulWidget {
-  final TherapistVerifyEntity therapist;
+  final UpdateTherapistEntity therapist;
 
   const TherapistDetailPage({Key? key, required this.therapist})
       : super(key: key);
@@ -46,10 +47,10 @@ class _TherapistDetailPageState extends State<TherapistDetailPage> {
     if (action == 'approve') {
       context
           .read<VerifyBloc>()
-          .add(ApproveTherapistEvent(id: widget.therapist.id));
+          .add(ApproveTherapistEvent(id: widget.therapist.id!));
     } else {
       context.read<VerifyBloc>().add(RejectTherapistEvent(
-            id: widget.therapist.id,
+            id: widget.therapist.id!,
             reason: comment,
           ));
     }
@@ -60,7 +61,7 @@ class _TherapistDetailPageState extends State<TherapistDetailPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          widget.therapist.fullName,
+          widget.therapist.name!,
           style: const TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 20,
@@ -190,7 +191,7 @@ class _TherapistDetailPageState extends State<TherapistDetailPage> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            'Specialization: ${widget.therapist.specialization}',
+                            'Specialization: ${widget.therapist.modality}',
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -219,9 +220,9 @@ class _TherapistDetailPageState extends State<TherapistDetailPage> {
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(12),
-                      child: widget.therapist.certificate.isNotEmpty
+                      child: widget.therapist.certificate!.isNotEmpty
                           ? Image.network(
-                              widget.therapist.certificate,
+                              widget.therapist.certificate!,
                               height: 200,
                               width: double.infinity,
                               fit: BoxFit.contain,

@@ -43,12 +43,9 @@ const registerTherapist = async (req, res) => {
 }
 const registerPatient = async (req, res) => {
     try {
+      console.log('Received signup request:', req.body);
 
-        const { fullName, email, password, collage ,emergencyEmail} = req.body
-
-        const hashpass=await hashedPassword(password)
-    
-  
+   const { fullName, email, password, collage,EmergencyEmail } = req.body
     
     const patient = new Patient({
       FullName:fullName,
@@ -56,7 +53,8 @@ const registerPatient = async (req, res) => {
       Collage:collage,
       Password: hashpass,
       Role:"patient",
-      EmergencyEmail: emergencyEmail
+      EmergencyEmail
+
     })
     
         await patient.save()
@@ -67,6 +65,7 @@ const registerPatient = async (req, res) => {
             token,
             user:patient,
         })
+        console.log('Signup successful');
         
     } catch (error) {
         console.log(error)
@@ -185,7 +184,7 @@ const refreshToken = async (req, res) => {
 
 const Logout= async (req, res) => {
   const refreshToken = req.cookies.refreshToken;
-  if (!refreshToken) return res.sendStatus(204); // No content
+  if (!refreshToken) return res.sendStatus(204); 
 
   await Token.deleteOne({ refreshToken });
   res.clearCookie("refreshToken").sendStatus(200);

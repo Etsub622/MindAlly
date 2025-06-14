@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -31,10 +30,9 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
   final TextEditingController confirmPasswordController =
       TextEditingController();
   final TextEditingController phoneController = TextEditingController();
-  final TextEditingController areaContloller = TextEditingController();
+  final TextEditingController areaController = TextEditingController();
   final TextEditingController documentController = TextEditingController();
 
-  // Pick images from the device
   File? _imageFile;
   String? _imageUrl;
 
@@ -49,7 +47,6 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
     });
   }
 
-  // Image uploading to Cloudinary
   Future<void> _uploadImage() async {
     if (_imageFile == null) return;
 
@@ -67,7 +64,7 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
         _imageUrl = jsonMap['url'];
       });
     } else {
-      print('Failed to upload image');
+      throw Exception('Failed to upload image');
     }
   }
 
@@ -78,7 +75,7 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
     passwordController.dispose();
     confirmPasswordController.dispose();
     phoneController.dispose();
-    areaContloller.dispose();
+    areaController.dispose();
     documentController.dispose();
     super.dispose();
   }
@@ -108,42 +105,55 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
     return null;
   }
 
-  void _professionalSignUp(BuildContext context) {
-    final newUser = ProfessionalSignupModel(
-        id: '',
-        email: emailController.text,
-        password: passwordController.text,
-        fullName: nameController.text,
-        phoneNumber: phoneController.text,
-        specialization: areaContloller.text,
-        certificate: _imageUrl!);
-    context
-        .read<AuthBloc>()
-        .add(ProfessionalsignUpEvent(professionalSignupEntity: newUser));
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocConsumer<AuthBloc, AuthState>(builder: (context, state) {
-        if (state is AuthLoading) {
-          return const CircularIndicator();
-        } else {
-          return _build(context);
-        }
-      }, listener: (context, state) {
-        if (state is AuthSuccess) {
-          final snack = snackBar('User created successfully');
-          ScaffoldMessenger.of(context).showSnackBar(snack);
-
-          Future.delayed(const Duration(seconds: 2), () {
-            context.go(AppPath.therapistOnboard);
-          });
-        } else if (state is AuthError) {
-          final snack = errorsnackBar('Try again later');
-          ScaffoldMessenger.of(context).showSnackBar(snack);
-        }
-      }),
+      body: BlocConsumer<AuthBloc, AuthState>(
+        builder: (context, state) {
+          if (state is AuthLoading) {
+            return const CircularIndicator();
+          } else {
+            return _build(context);
+          }
+        },
+        listener: (context, state) {
+          if (state is AuthOtpSent) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('OTP sent to your email.')),
+            );
+            final professional = ProfessionalSignupModel(
+              id: '',
+              email: emailController.text,
+              password: passwordController.text,
+              fullName: nameController.text,
+              phoneNumber: phoneController.text,
+              specialization: areaController.text,
+              certificate: _imageUrl!,
+            );
+            context.go(
+              AppPath.otp,
+              extra: {
+                'email': emailController.text,
+                'verificationType': 'professionalSignup',
+                'professional': professional,
+              },
+            );
+          } else if (state is AuthOtpSendError) {
+            final snack = errorsnackBar(
+                state.message ?? 'Failed to send OTP. Try again.');
+            ScaffoldMessenger.of(context).showSnackBar(snack);
+          } else if (state is AuthSuccess) {
+            final snack = snackBar('User created successfully');
+            ScaffoldMessenger.of(context).showSnackBar(snack);
+            Future.delayed(const Duration(seconds: 2), () {
+              context.go(AppPath.therapistOnboard);
+            });
+          } else if (state is AuthError) {
+            final snack = errorsnackBar(state.message ?? 'Try again later');
+            ScaffoldMessenger.of(context).showSnackBar(snack);
+          }
+        },
+      ),
     );
   }
 
@@ -162,9 +172,7 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
                   height: 100,
                   width: 100,
                 ),
-                const SizedBox(
-                  height: 30,
-                ),
+                const SizedBox(height: 30),
                 const Text(
                   'Create your account',
                   style: TextStyle(
@@ -174,11 +182,9 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                const SizedBox(
-                  height: 30,
-                ),
+                const SizedBox(height: 30),
                 CustomTextField(
-                  text: "full name",
+                  text: "Full Name",
                   controller: nameController,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -187,33 +193,34 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
                     return null;
                   },
                 ),
-                const SizedBox(
-                  height: 20,
-                ),
+                const SizedBox(height: 20),
                 CustomTextField(
-                    text: "email",
-                    controller: emailController,
-                    validator: _validateEmail),
-                const SizedBox(
-                  height: 20,
+                  text: "Email",
+                  controller: emailController,
+                  validator: _validateEmail,
                 ),
+                const SizedBox(height: 20),
                 CustomTextField(
-                    text: "password",
-                    sign: const Icon(Icons.remove_red_eye),
-                    controller: passwordController,
-                    isPassword: true,
-                    validator: _validatePassword),
-                const SizedBox(
-                  height: 20,
+                  text: "Password",
+                  sign: const Icon(Icons.remove_red_eye),
+                  controller: passwordController,
+                  isPassword: true,
+                  validator: _validatePassword,
                 ),
+                const SizedBox(height: 20),
                 CustomTextField(
-                    text: "confirm password",
-                    sign: const Icon(Icons.remove_red_eye),
-                    controller: confirmPasswordController,
-                    isPassword: true),
-                const SizedBox(
-                  height: 20,
+                  text: "Confirm Password",
+                  sign: const Icon(Icons.remove_red_eye),
+                  controller: confirmPasswordController,
+                  isPassword: true,
+                  validator: (value) {
+                    if (value != passwordController.text) {
+                      return 'Passwords do not match';
+                    }
+                    return null;
+                  },
                 ),
+                const SizedBox(height: 20),
                 CustomTextField(
                   text: "Phone Number",
                   controller: phoneController,
@@ -224,12 +231,10 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
                     return null;
                   },
                 ),
-                const SizedBox(
-                  height: 20,
-                ),
+                const SizedBox(height: 20),
                 CustomTextField(
                   text: "Area of Specialization",
-                  controller: areaContloller,
+                  controller: areaController,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Area of specialization is required';
@@ -237,9 +242,7 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
                     return null;
                   },
                 ),
-                const SizedBox(
-                  height: 20,
-                ),
+                const SizedBox(height: 20),
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -253,26 +256,17 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (_imageFile == null)
-                        Text(
-                          'Upload your certified document',
-                          style: const TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 14,
-                            color: Colors.black,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        )
-                      else
-                        Text(
-                          'Change your certified document',
-                          style: const TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 14,
-                            color: Colors.black,
-                            fontWeight: FontWeight.w500,
-                          ),
+                      Text(
+                        _imageFile == null
+                            ? 'Upload your certified document'
+                            : 'Change your certified document',
+                        style: const TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 14,
+                          color: Colors.black,
+                          fontWeight: FontWeight.w500,
                         ),
+                      ),
                       const SizedBox(height: 8),
                       Center(
                         child: GestureDetector(
@@ -292,7 +286,7 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
                     ],
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 if (_imageFile != null)
                   Container(
                     height: 200,
@@ -302,9 +296,7 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
                       fit: BoxFit.cover,
                     ),
                   ),
-                const SizedBox(
-                  height: 40,
-                ),
+                const SizedBox(height: 40),
                 CustomButton(
                   wdth: double.infinity,
                   rad: 10,
@@ -312,31 +304,40 @@ class _ProfessionalSignupState extends State<ProfessionalSignup> {
                   text: "Sign Up",
                   onPressed: () async {
                     if (_key.currentState!.validate()) {
-                      if (passwordController.text ==
+                      if (passwordController.text !=
                           confirmPasswordController.text) {
-                        if (_imageFile == null) {
-                          final snack = errorsnackBar(
-                              'Please upload your certified document');
-                          ScaffoldMessenger.of(context).showSnackBar(snack);
-                          return;
-                        }
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          errorsnackBar('Passwords do not match!'),
+                        );
+                        return;
+                      }
+                      if (_imageFile == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          errorsnackBar(
+                              'Please upload your certified document'),
+                        );
+                        return;
+                      }
+                      try {
                         await _uploadImage();
                         if (_imageUrl == null) {
-                          final snack = errorsnackBar('Image upload failed');
-                          ScaffoldMessenger.of(context).showSnackBar(snack);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            errorsnackBar('Image upload failed'),
+                          );
                           return;
                         }
-                        _professionalSignUp(context);
-                      } else {
-                        final snack = errorsnackBar('Password does not match');
-                        ScaffoldMessenger.of(context).showSnackBar(snack);
+                        context.read<AuthBloc>().add(
+                              SendOtpEvent(email: emailController.text),
+                            );
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          errorsnackBar('Image upload failed: $e'),
+                        );
                       }
                     }
                   },
                 ),
-                const SizedBox(
-                  height: 15,
-                ),
+                const SizedBox(height: 15),
                 Align(
                   alignment: Alignment.bottomRight,
                   child: GestureDetector(

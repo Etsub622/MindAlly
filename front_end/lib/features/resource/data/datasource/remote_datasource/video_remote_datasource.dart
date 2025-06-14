@@ -67,18 +67,17 @@ class VideoRemoteDataSourceImpl implements VideoRemoteDatasource {
       final response = await client.get(url, headers: {
         'Content-Type': 'application/json',
       });
-      print(url);
-      print(response.body);
-      print(response.statusCode);
+     
       if (response.statusCode == 200) {
-        final List<dynamic> videoJson = json.decode(response.body);
-        if (videoJson.isEmpty) {
-          return [];
-        } else {
-          return videoJson.map((jsonItem) {
-            return VideoModel.fromJson(jsonItem as Map<String, dynamic>);
-          }).toList();
+        final decodedResponse = jsonDecode(response.body);
+
+        final List<VideoModel> videos = [];
+        for (var video in decodedResponse) {
+          videos.add(VideoModel.fromJson(video));
         }
+        return videos;
+      } else if (response.statusCode == 404) {
+        return [];
       } else {
         throw ServerException(
             message: 'Failed to get books:${response.statusCode}');

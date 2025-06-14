@@ -14,5 +14,7 @@ abstract interface class AuthRepository {
       ProfessionalSignupEntity professionalSignup);
   Future<Either<Failure, StudentResponseModel>> login(LoginEntity login);
   Future<Either<Failure, String>> sendOtp(String email);
-  Future<Either<Failure, String>> verifyOtp(String otp,String email);
+  Future<Either<Failure, String>> verifyOtp(String otp,String email, String verificationType);
+  // Future<Either<Failure, String>> verifyOtpForEmail(
+  //     String otp, String email, String verificationType);
 }
