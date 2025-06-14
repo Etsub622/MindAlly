@@ -16,6 +16,8 @@ import NotificationRoute from './routes/chat/notificationRoute.js';
 import { resourceRoutes } from "./routes/resource/resourceRoutes.js";
 import { setIo } from "./controller/chat/chatController.js";
 import paymentRoutes from "./routes/Payment/pay.js";
+import "./utils/track.js"
+import "./utils/trackEmergency.js"
 
 dotenv.config();
 import answerRoutes from "./routes/qanda/answerRoutes.js";

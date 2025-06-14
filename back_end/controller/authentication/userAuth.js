@@ -45,11 +45,7 @@ const registerPatient = async (req, res) => {
     try {
       console.log('Received signup request:', req.body);
 
-        const { fullName, email, password, collage,EmergencyEmail } = req.body
-        
-        const hashpass=await hashedPassword(password)
-    
-  
+   const { fullName, email, password, collage,EmergencyEmail } = req.body
     
     const patient = new Patient({
       FullName:fullName,
@@ -58,6 +54,7 @@ const registerPatient = async (req, res) => {
       Password: hashpass,
       Role:"patient",
       EmergencyEmail
+
     })
     
         await patient.save()
@@ -131,9 +128,18 @@ const Login = async (req, res) => {
         const isMatch = await bcrypt.compare(password, userModel.Password);
         if (!isMatch) {
             return res.status(401).json({ error: "Invalid email or password." });
+
+      }
+      userModel.lastLogin = new Date();
+      await userModel.save();
+
+  
+
+
         }
         
         console.log("User found:", userModel._id, userModel.Role);
+
         const accessToken = generateAccessToken(userModel._id, userModel.Role);
         const refreshToken = generateRefreshToken(userModel._id, userModel.Role);
         
