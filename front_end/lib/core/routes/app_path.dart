@@ -17,6 +17,7 @@ class AppPath {
   static const String chatDetails = '/chatDetails';
   static const String calendar = '/calendar';
   static const String admin = "/admin";
+  static const String profile = '/otpVerification';
 }
 
 const List<String> publicRoutes = [

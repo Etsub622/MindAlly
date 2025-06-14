@@ -39,7 +39,13 @@ class _ForgotPasswordState extends State<ForgotPassword> {
           const snack = SnackBar(content: Text('OTP is sent to your email.'));
           ScaffoldMessenger.of(context).showSnackBar(snack);
 
-          context.go(AppPath.otp, extra: emailController.text);
+          context.go(
+            AppPath.otp,
+            extra: {
+              'email': emailController.text,
+              'verificationType': 'forgotPassword',
+            },
+          );
         } else if (state is AuthOtpSendError) {
           final snack = errorsnackBar('Try again');
           ScaffoldMessenger.of(context).showSnackBar(snack);

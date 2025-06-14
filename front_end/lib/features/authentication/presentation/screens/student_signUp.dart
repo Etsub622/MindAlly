@@ -25,6 +25,8 @@ class _StudentSignUpState extends State<StudentSignUp> {
       TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController college = TextEditingController();
+  final TextEditingController emergencyNumberController =
+      TextEditingController();
 
   @override
   void dispose() {
@@ -33,6 +35,7 @@ class _StudentSignUpState extends State<StudentSignUp> {
     passwordController.dispose();
     confirmPasswordController.dispose();
     phoneController.dispose();
+    emergencyNumberController.dispose();
     college.dispose();
     super.dispose();
   }
@@ -62,203 +65,211 @@ class _StudentSignUpState extends State<StudentSignUp> {
     return null;
   }
 
-  void _studentSignUP(BuildContext context) {
-    final newUser = StudentSignupModel(
-        id: '',
-        email: emailController.text,
-        password: passwordController.text,
-        fullName: nameController.text,
-        phoneNumber: phoneController.text,
-        collage: college.text);
-    context
-        .read<AuthBloc>()
-        .add(StudentsignUpEvent(studentSignupEntity: newUser));
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocConsumer<AuthBloc, AuthState>(builder: (context, state) {
-        if (state is AuthLoading) {
-          return const CircularIndicator();
-        } else {
-          return _buildForm(context);
-        }
-      }, listener: (context, state) {
-        if (state is AuthSuccess) {
-          final snack = snackBar('User created successfully');
-          ScaffoldMessenger.of(context).showSnackBar(snack);
-
-          Future.delayed(const Duration(seconds: 2), () {
-            context.go(AppPath.login);
-          });
-        } else if (state is AuthError) {
-          final snack = errorsnackBar('Try again later');
-          ScaffoldMessenger.of(context).showSnackBar(snack);
-        }
-      }),
+      body: BlocConsumer<AuthBloc, AuthState>(
+        builder: (context, state) {
+          if (state is AuthLoading) {
+            return const CircularIndicator();
+          } else {
+            return _buildForm(context);
+          }
+        },
+        listener: (context, state) {
+          if (state is AuthOtpSent) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('OTP sent to your email.')),
+            );
+            final student = StudentSignupModel(
+              id: '',
+              email: emailController.text,
+              password: passwordController.text,
+              fullName: nameController.text,
+              phoneNumber: phoneController.text,
+              EmergencyEmail: emergencyNumberController.text,
+              collage: college.text,
+            );
+            context.go(
+              AppPath.otp,
+              extra: {
+                'email': emailController.text,
+                'verificationType': 'studentSignup',
+                'student': student,
+              },
+            );
+          } else if (state is AuthOtpSendError) {
+            final snack = errorsnackBar(
+                state.message ?? 'Failed to send OTP. Try again.');
+            ScaffoldMessenger.of(context).showSnackBar(snack);
+          } else if (state is AuthSuccess) {
+            final snack = snackBar('User created successfully');
+            ScaffoldMessenger.of(context).showSnackBar(snack);
+            Future.delayed(const Duration(seconds: 2), () {
+              context.go(AppPath.login);
+            });
+          } else if (state is AuthError) {
+            final snack = errorsnackBar(state.message ?? 'Try again later');
+            ScaffoldMessenger.of(context).showSnackBar(snack);
+          }
+        },
+      ),
     );
   }
 
   Widget _buildForm(BuildContext context) {
-    return Material(
-      child: Padding(
-        padding: const EdgeInsets.all(15.0),
-        child: Form(
-          key: _key,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset(
-                  'asset/image/logo.webp',
-                  height: 100,
-                  width: 100,
-                ),
-                const SizedBox(
-                  height: 30,
-                ),
-                const Text(
-                  'Create your account',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 18,
-                    color: Colors.black,
-                    fontWeight: FontWeight.w600,
+    return SafeArea(
+      child: Material(
+        child: Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: Form(
+            key: _key,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    'asset/image/logo.webp',
+                    height: 100,
+                    width: 100,
                   ),
-                ),
-                const SizedBox(
-                  height: 30,
-                ),
-                CustomTextField(
-                  key: const ValueKey('full_name_field'),
-                  text: "full name",
-                  controller: nameController,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Full name is required';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                CustomTextField(
-                  key: const ValueKey('email_field'),
-                  text: "email",
-                  controller: emailController,
-                  validator: _validateEmail,
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                CustomTextField(
-                  key: const ValueKey('password_field'),
-                  text: "password",
-                  controller: passwordController,
-                  isPassword: true,
-                  validator: _validatePassword,
-                ),
-                const SizedBox(height: 20),
-                CustomTextField(
-                  key: const ValueKey('confirm_password_field'),
-                  text: "confirm password",
-                  controller: confirmPasswordController,
-                  isPassword: true,
-                  validator: (value) {
-                    if (value != passwordController.text) {
-                      return 'Passwords do not match';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                CustomTextField(
-                  key: const ValueKey('phone_field'),
-                  
-                  text: "Phone Number",
-                  controller: phoneController,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Phone number is required';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                CustomTextField(
-                  key: const ValueKey('college_field'),
-                  text: "College",
-                  controller: college,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'College is required';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(
-                  height: 40,
-                ),
-                CustomButton(
-                  key: const ValueKey('sign_up_button'),
-                  wdth: double.infinity,
-                  rad: 10,
-                  hgt: 50,
-                  text: "Sign Up",
-                  onPressed: () {
-                    if (_key.currentState!.validate()) {
-                      if (passwordController.text !=
-                          confirmPasswordController.text) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          errorsnackBar('Passwords do not match!'),
-                        );
-                        return;
+                  const SizedBox(height: 28),
+                  const Text(
+                    'Create your account',
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 18,
+                      color: Colors.black,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 28),
+                  CustomTextField(
+                    key: const ValueKey('full_name_field'),
+                    text: "Full Name",
+                    controller: nameController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Full name is required';
                       }
-                      _studentSignUP(context);
-                    }
-                  },
-                ),
-                const SizedBox(
-                  height: 15,
-                ),
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: GestureDetector(
-                     key: const ValueKey('login_redirect'),
-                    onTap: () {
-                      context.go(AppPath.patientOnboard);
+                      return null;
                     },
-                    child: RichText(
-                      text: const TextSpan(
-                        text: 'Already have an account? ',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 12,
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w500,
-                        ),
-                        children: [
-                          TextSpan(
-                            text: 'Login',
-                            style: TextStyle(
-                              color: Color(0xffB57EDC),
-                              fontSize: 12,
-                              fontFamily: 'Poppins',
-                              fontWeight: FontWeight.w600,
-                            ),
+                  ),
+                  const SizedBox(height: 16),
+                  CustomTextField(
+                    key: const ValueKey('email_field'),
+                    text: "Email",
+                    controller: emailController,
+                    validator: _validateEmail,
+                  ),
+                  const SizedBox(height: 16),
+                  CustomTextField(
+                    key: const ValueKey('password_field'),
+                    text: "Password",
+                    controller: passwordController,
+                    isPassword: true,
+                    validator: _validatePassword,
+                  ),
+                  const SizedBox(height: 16),
+                  CustomTextField(
+                    key: const ValueKey('confirm_password_field'),
+                    text: "Confirm Password",
+                    controller: confirmPasswordController,
+                    isPassword: true,
+                    validator: (value) {
+                      if (value != passwordController.text) {
+                        return 'Passwords do not match';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  CustomTextField(
+                    key: const ValueKey('phone_field'),
+                    text: "Phone Number",
+                    controller: phoneController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Phone number is required';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  CustomTextField(
+                    key: const ValueKey('emergency_email'),
+                    text: "Emergency Email",
+                    controller: emergencyNumberController,
+                    validator: _validateEmail,
+                  ),
+                  const SizedBox(height: 16),
+                  CustomTextField(
+                    key: const ValueKey('college_field'),
+                    text: "College",
+                    controller: college,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'College is required';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 30),
+                  CustomButton(
+                    key: const ValueKey('sign_up_button'),
+                    wdth: double.infinity,
+                    rad: 10,
+                    hgt: 50,
+                    text: "Sign Up",
+                    onPressed: () {
+                      if (_key.currentState!.validate()) {
+                        if (passwordController.text !=
+                            confirmPasswordController.text) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            errorsnackBar('Passwords do not match!'),
+                          );
+                          return;
+                        }
+                        context.read<AuthBloc>().add(
+                              SendOtpEvent(email: emailController.text),
+                            );
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 15),
+                  Align(
+                    alignment: Alignment.bottomRight,
+                    child: GestureDetector(
+                      key: const ValueKey('login_redirect'),
+                      onTap: () {
+                        context.go(AppPath.patientOnboard);
+                      },
+                      child: RichText(
+                        text: const TextSpan(
+                          text: 'Already have an account? ',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 12,
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w500,
                           ),
-                        ],
+                          children: [
+                            TextSpan(
+                              text: 'Login',
+                              style: TextStyle(
+                                color: Color(0xffB57EDC),
+                                fontSize: 12,
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

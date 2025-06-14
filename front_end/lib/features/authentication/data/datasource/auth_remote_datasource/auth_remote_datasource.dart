@@ -14,7 +14,7 @@ abstract class AuthRemoteDatasource {
       ProfessionalSignupModel professionalModel);
   Future<StudentResponseModel> logIn(LoginModel loginModel);
   Future<String> sendOtp(String email);
-  Future<String> verifyOtp(String otp, String email);
+  Future<String> verifyOtp(String otp, String email, String verificationType);
 }
 
 class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
@@ -161,20 +161,42 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   }
 
   @override
-  Future<String> verifyOtp(String otp, String email) async {
+  Future<String> verifyOtp(
+      String otp, String email, String verificationType) async {
     try {
-      var url = Uri.parse('$baseUrl/otp/verifyReset');
-      final res = await client.post(url,
-          body: jsonEncode({'otp': otp, 'email': email}),
-          headers: {'Content-Type': 'application/json; charset=UTF-8'});
-      if (res.statusCode == 200) {
-        return jsonDecode(res.body)['resetToken'];
+      var url = Uri.parse('$baseUrl/otp/verifyOTP');
+      final res = await client.post(
+        url,
+        body: jsonEncode({
+          'otp': otp,
+          'email': email,
+          'verificationType': verificationType,
+        }),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      print('Response status code: ${res.statusCode}');
+      print('Response body: ${res.body}');
+      if (res.statusCode >= 200 && res.statusCode < 300) {
+        final jsonResponse = jsonDecode(res.body);
+      
+        if (verificationType == 'forgotPassword' &&
+            jsonResponse['resetToken'] != null) {
+          final sharedPreferences = await SharedPreferences.getInstance();
+          await sharedPreferences.setString(
+              'reset_token', jsonResponse['resetToken']);
+        }
+        return jsonResponse['message'] ?? 'OTP verified successfully';
       } else {
-        throw ServerException(message: 'Failed to verify OTP');
+        final jsonResponse = jsonDecode(res.body);
+        throw ServerException(
+            message: jsonResponse['error'] ??
+                jsonResponse['message'] ??
+                'Failed to verify OTP');
       }
     } catch (e) {
       throw ServerException(
-          message: 'Unexpected error occured: ${e.toString()}');
+          message: 'Unexpected error occurred: ${e.toString()}');
     }
   }
 }

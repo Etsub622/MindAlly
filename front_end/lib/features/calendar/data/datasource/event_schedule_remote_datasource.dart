@@ -111,7 +111,7 @@ class EventScheduleRemoteDataSourceImpl
 
   @override
   Future<bool> deleteEventSchedule(String sessionId) async {
-    String endpoint = 'http://192.168.79.220:8000/api/schedule/$sessionId/cancel';
+    String endpoint = 'http://192.168.248.220:8000/api/schedule/$sessionId/cancel';
 
     try {
       final response = await client.patch(

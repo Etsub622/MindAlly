@@ -17,6 +17,10 @@ const patientschema = new mongoose.Schema({
     Collage: {
         type: String,
     },
+    EmergencyEmail: {
+        type: String,
+        required:true
+    },
     Role: {
         type: String,
         default:"patient"

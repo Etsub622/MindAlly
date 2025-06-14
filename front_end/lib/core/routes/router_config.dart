@@ -4,6 +4,8 @@ import 'package:front_end/features/Home/presentation/screens/home_navigation_scr
 import 'package:front_end/features/Home/presentation/screens/therapist_detail_screen.dart';
 import 'package:front_end/features/admin/admin_screen.dart';
 import 'package:front_end/features/approve_therapist/domain/entity/therapist_verify_entity.dart';
+import 'package:front_end/features/authentication/data/models/professional_signup_model.dart';
+import 'package:front_end/features/authentication/data/models/student_signup_model.dart';
 import 'package:front_end/features/authentication/presentation/screens/forgot_password.dart';
 import 'package:front_end/features/authentication/presentation/screens/login.dart';
 import 'package:front_end/features/authentication/presentation/screens/otp.dart';
@@ -61,11 +63,17 @@ final routes = <GoRoute>[
   GoRoute(
       path: AppPath.bookResource, builder: (context, state) => BookResource()),
   GoRoute(
-      path: AppPath.otp,
-      builder: (context, state) {
-        final email = state.extra as String;
-        return OtpVerification(email: email);
-      }),
+    path: AppPath.otp,
+    builder: (context, state) {
+      final extra = state.extra as Map<String, dynamic>;
+      return OtpVerification(
+        email: extra['email'] as String,
+        verificationType: extra['verificationType'] as String,
+        student: extra['student'] as StudentSignupModel?,
+        professional: extra['professional'] as ProfessionalSignupModel?,
+      );
+    },
+  ),
   GoRoute(
     name: 'chat',
     path: AppPath.chat,
@@ -95,12 +103,11 @@ final routes = <GoRoute>[
       path: AppPath.admin,
       builder: (BuildContext context, GoRouterState state) =>
           const AdminDashboardScreen()),
-
   GoRoute(
     path: '/therapistDetails',
     name: 'therapistDetails',
     builder: (context, state) {
-      final therapist = state.extra as TherapistVerifyEntity;
+      final therapist = state.extra as UpdateTherapistEntity;
       return TherapistDetailPage(therapist: therapist);
     },
   ),

@@ -96,12 +96,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<VerifyOtpEvent>((event, emit) async {
       emit(AuthLoading());
       final result =
-          await verifyOtpUseCase(verifyOtpParams(event.otp, event.email));
+          await verifyOtpUseCase(verifyOtpParams(event.otp, event.email, event.verificationType));
       result.fold(
         (failure) => emit(AuthOtpVerifyError(failure.message)),
         (success) => emit(AuthOtpVerified(success)),
       );
     });
+
+ 
 
     on<ResetPasswordEvent>((event, emit) async {
       emit(AuthLoading());
