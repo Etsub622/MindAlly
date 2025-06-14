@@ -16,6 +16,7 @@ import NotificationRoute from './routes/chat/notificationRoute.js';
 import { resourceRoutes } from "./routes/resource/resourceRoutes.js";
 import { setIo } from "./controller/chat/chatController.js";
 import paymentRoutes from "./routes/Payment/pay.js";
+import { verifyPayment } from "./controller/Payment/acceptPayment.js";
 import "./utils/track.js"
 import "./utils/trackEmergency.js"
 
@@ -29,6 +30,7 @@ const app = express();
 const httpServer = createServer(app);
 
 // Middleware
+app.use('/api/payment/webhook', express.raw({ type: "*/*" }), verifyPayment);
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(cors({
