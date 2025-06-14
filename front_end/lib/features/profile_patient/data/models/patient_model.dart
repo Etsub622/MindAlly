@@ -12,6 +12,7 @@ class PatientModel extends PatientEntity {
     required  super.role,
     required super.collage,
     required super.payout,
+    super.profilePicture
         });
 
   factory PatientModel.fromJson(Map<String, dynamic> json) {
@@ -23,6 +24,7 @@ class PatientModel extends PatientEntity {
       hasPassword: json['Password'] != null,
       collage: json['Collage'],
       payout: json['payout'] != null ? PayoutModel.fromJson(json['payout']) : null,
+      profilePicture: json['profilePicture'] != null ? json['profilePicture'] : null,
     );
   }
   Map<String, dynamic> toJson() {
@@ -33,6 +35,7 @@ class PatientModel extends PatientEntity {
       'hasPassword': hasPassword,
       'Role': role,
       'Collage': collage,
+      'profilePicture': profilePicture,
     };
   }
     }

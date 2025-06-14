@@ -10,7 +10,7 @@ class TherapistEntity extends Equatable{
   final String? profilePicture;
   final String certificate;
   final String bio;
-  final int fee;
+  final double fee;
   final double rating;
   final bool verified;
   final PayoutModel? payout;
