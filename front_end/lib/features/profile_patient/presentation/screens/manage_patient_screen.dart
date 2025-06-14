@@ -9,13 +9,47 @@ import 'package:front_end/core/routes/routes.dart';
 import 'package:front_end/core/utils/constants.dart';
 import 'package:front_end/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:front_end/features/profile_patient/data/models/update_patient_model.dart';
-import 'package:front_end/features/profile_patient/domain/entities/update_patient_entity.dart';
 import 'package:front_end/features/profile_patient/presentation/bloc/delete_patient_bloc/delete_patient_bloc.dart';
 import 'package:front_end/features/profile_patient/presentation/bloc/get_patient_bloc/get_patient_bloc.dart';
 import 'package:front_end/features/profile_patient/presentation/bloc/update_patient_bloc/update_patient_bloc.dart';
 import 'package:front_end/features/profile_therapist/data/models/therapist_model.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter/services.dart';
+
+// Bank model to hold relevant data
+class Bank {
+  final String slug;
+  final String name;
+  final int acctLength;
+
+  const Bank({
+    required this.slug,
+    required this.name,
+    required this.acctLength,
+  });
+}
+
+// Bank data from CHAPA BANK.txt
+const List<Bank> banks = [
+  Bank(slug: 'abay_bank', name: 'Abay Bank', acctLength: 16),
+  Bank(slug: 'addis_int_bank', name: 'Addis International Bank', acctLength: 15),
+  Bank(slug: 'ahadu_bank', name: 'Ahadu Bank', acctLength: 10),
+  Bank(slug: 'awash_bank', name: 'Awash Bank', acctLength: 14),
+  Bank(slug: 'boa_bank', name: 'Bank of Abyssinia', acctLength: 8),
+  Bank(slug: 'berhan_bank', name: 'Berhan Bank', acctLength: 13),
+  Bank(slug: 'cbebirr', name: 'CBEBirr', acctLength: 10),
+  Bank(slug: 'cbe_bank', name: 'Commercial Bank of Ethiopia (CBE)', acctLength: 13),
+  Bank(slug: 'dashen_bank', name: 'Dashen Bank', acctLength: 13),
+  Bank(slug: 'enat_bank', name: 'Enat Bank', acctLength: 8),
+  Bank(slug: 'global_bank', name: 'Global Bank Ethiopia', acctLength: 13),
+  Bank(slug: 'hibret_bank', name: 'Hibret Bank', acctLength: 16),
+  Bank(slug: 'anbesa_bank', name: 'Lion International Bank', acctLength: 9),
+  Bank(slug: 'mpesa', name: 'M-Pesa', acctLength: 10),
+  Bank(slug: 'nib_bank', name: 'Nib International Bank', acctLength: 13),
+  Bank(slug: 'telebirr', name: 'telebirr', acctLength: 10),
+  Bank(slug: 'wegagen_bank', name: 'Wegagen Bank', acctLength: 13),
+];
 
 class ManagePatientScreen extends StatefulWidget {
   final String userName;
@@ -50,6 +84,7 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
   String email = "your email";
   bool hasPassword = true;
   String profilePicture = "";
+  PayoutModel? payout;
   ValueNotifier<bool> isPasswordUpdating = ValueNotifier(false);
   ValueNotifier<bool> isUserNameUpdating = ValueNotifier(false);
   File? _imageFile;
@@ -58,6 +93,7 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
   @override
   void initState() {
     super.initState();
+    print("Initial widget.payout: ${widget.payout?.toJson()}");
     context.read<PatientProfileBloc>().add(GetPatientLoadEvent(patientId: widget.patientId));
     _userNameController.text = widget.userName;
   }
@@ -87,7 +123,11 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
     final formKey = GlobalKey<FormState>();
     final accountNameController = TextEditingController(text: existingPayout?.accountName ?? '');
     final accountNumberController = TextEditingController(text: existingPayout?.accountNumber ?? '');
-    final bankCodeController = TextEditingController(text: existingPayout?.bankCode ?? '');
+    String? selectedBankSlug = existingPayout?.bankCode ?? banks.first.slug;
+    int? selectedAcctLength = banks.firstWhere(
+      (bank) => bank.slug == selectedBankSlug,
+      orElse: () => banks.first,
+    ).acctLength;
 
     showModalBottomSheet(
       context: context,
@@ -96,131 +136,167 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
-        return BlocConsumer<UpdatePatientBloc, UpdatePatientState>(
-          listener: (context, state) {
-            if (state is UpdatePatientLoaded) {
-              Navigator.of(context).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Payout details updated successfully')),
-              );
-              context.read<PatientProfileBloc>().add(GetPatientLoadEvent(patientId: widget.patientId));
-            } else if (state is UpdatePatientError) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(state.message)),
-              );
-            }
-          },
-          builder: (context, state) {
-            return Padding(
-              padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).viewInsets.bottom,
-                left: 20,
-                right: 20,
-                top: 20,
-              ),
-              child: Form(
-                key: formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      existingPayout == null ? 'Add Payout Method' : 'Update Payout Method',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.w600,
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return BlocConsumer<UpdatePatientBloc, UpdatePatientState>(
+              listener: (context, state) {
+                if (state is UpdatePatientLoaded) {
+                  print("UpdatePatientLoaded: ${state.patient.profilePicture}, Payout: ${state.patient.payout?.toJson()}");
+                  setState(() {
+                    _isImageUploading = false;
+                    _imageFile = null;
+                    profilePicture = state.patient.profilePicture ?? profilePicture;
+                    payout = state.patient.payout ?? payout;
+                  });
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Payout details updated successfully')),
+                  );
+                  context.read<PatientProfileBloc>().add(GetPatientLoadEvent(patientId: widget.patientId));
+                } else if (state is UpdatePatientError) {
+                  print("UpdatePatientError: ${state.message}");
+                  setState(() {
+                    _isImageUploading = false;
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Failed to update profile: ${state.message}')),
+                  );
+                }
+              },
+              builder: (context, state) {
+                return Padding(
+                  padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom,
+                    left: 20,
+                    right: 20,
+                    top: 20,
+                  ),
+                  child: Form(
+                    key: formKey,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          existingPayout == null ? 'Add Payout Method' : 'Update Payout Method',
+                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: accountNameController,
+                          decoration: InputDecoration(
+                            labelText: 'Account Name',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: accountNameController,
-                      decoration: InputDecoration(
-                        labelText: 'Account Name',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter account name';
+                            }
+                            return null;
+                          },
                         ),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter account name';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      controller: accountNumberController,
-                      decoration: InputDecoration(
-                        labelText: 'Account Number',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
+                        const SizedBox(height: 12),
+                        TextFormField(
+                          controller: accountNumberController,
+                          decoration: InputDecoration(
+                            labelText: 'Account Number',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                          maxLength: selectedAcctLength,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter account number';
+                            }
+                            if (value.length != selectedAcctLength) {
+                              final bankName = banks.firstWhere((bank) => bank.slug == selectedBankSlug).name;
+                              return 'Account number must be exactly $selectedAcctLength digits for $bankName';
+                            }
+                            return null;
+                          },
                         ),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter account number';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      controller: bankCodeController,
-                      decoration: InputDecoration(
-                        labelText: 'Bank Code',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
+                        const SizedBox(height: 12),
+                        DropdownButtonFormField<String>(
+                          value: selectedBankSlug,
+                          decoration: InputDecoration(
+                            labelText: 'Bank',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          items: banks.map((bank) {
+                            return DropdownMenuItem<String>(
+                              value: bank.slug,
+                              child: Text(bank.name),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            setModalState(() {
+                              selectedBankSlug = value;
+                              selectedAcctLength = banks.firstWhere((bank) => bank.slug == value).acctLength;
+                              accountNumberController.text = ''; // Clear account number on bank change
+                            });
+                          },
+                          validator: (value) {
+                            if (value == null) {
+                              return 'Please select a bank';
+                            }
+                            return null;
+                          },
+                          hint: const Text('Select Bank'),
                         ),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter bank code';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 20),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: ElevatedButton(
-                        onPressed: state is UpdatePatientLoading
-                            ? null
-                            : () {
-                                if (formKey.currentState!.validate()) {
-                                  final payout = PayoutModel(
-                                    accountName: accountNameController.text,
-                                    accountNumber: accountNumberController.text,
-                                    bankCode: bankCodeController.text,
-                                  );
-                                  context.read<UpdatePatientBloc>().add(
-                                        UpdatePatientLoadEvent(
-                                          patient: UpdatePatientModel(
-                                            payout: payout,
-                                          ),
-                                        ),
+                        const SizedBox(height: 20),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: ElevatedButton(
+                            onPressed: state is UpdatePatientLoading
+                                ? null
+                                : () {
+                                    if (formKey.currentState!.validate()) {
+                                      final payout = PayoutModel(
+                                        accountName: accountNameController.text,
+                                        accountNumber: accountNumberController.text,
+                                        bankCode: selectedBankSlug!,
                                       );
-                                }
-                              },
-                        style: ElevatedButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          backgroundColor: AppColor.hexToColor("#00538C"),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 24,
-                            vertical: 12,
+                                      context.read<UpdatePatientBloc>().add(
+                                            UpdatePatientLoadEvent(
+                                              patient: UpdatePatientModel(
+                                                payout: payout,
+                                              ),
+                                            ),
+                                          );
+                                    }
+                                  },
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              backgroundColor: AppColor.hexToColor("#00538C"),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 12,
+                              ),
+                            ),
+                            child: Text(
+                              existingPayout == null ? 'Add Payout' : 'Update Payout',
+                              style: Theme.of(context).textTheme.labelLarge,
+                            ),
                           ),
                         ),
-                        child: Text(
-                          existingPayout == null ? 'Add Payout' : 'Update Payout',
-                          style: Theme.of(context).textTheme.labelLarge,
-                        ),
-                      ),
+                        const SizedBox(height: 20),
+                      ],
                     ),
-                    const SizedBox(height: 20),
-                  ],
-                ),
-              ),
+                  ),
+                );
+              },
             );
           },
         );
@@ -258,28 +334,33 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
                 userName = state.patient.name;
                 email = state.patient.email;
                 hasPassword = state.patient.hasPassword;
+                payout = state.patient.payout;
               });
+              print("Payout from GetPatientLoaded: ${state.patient.payout?.toJson()}");
             }
           },
           builder: (context, state) {
             return BlocConsumer<UpdatePatientBloc, UpdatePatientState>(
               listener: (context, updateState) {
                 if (updateState is UpdatePatientLoaded) {
+                  print("UpdatePatientLoaded: ${updateState.patient.profilePicture}, Payout: ${updateState.patient.payout?.toJson()}");
                   setState(() {
                     _isImageUploading = false;
                     _imageFile = null;
                     profilePicture = updateState.patient.profilePicture ?? profilePicture;
+                    payout = updateState.patient.payout ?? payout;
                   });
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Profile picture updated successfully')),
+                    const SnackBar(content: Text('Profile updated successfully')),
                   );
                   context.read<PatientProfileBloc>().add(GetPatientLoadEvent(patientId: widget.patientId));
                 } else if (updateState is UpdatePatientError) {
+                  print("UpdatePatientError: ${updateState.message}");
                   setState(() {
                     _isImageUploading = false;
                   });
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Failed to update profile picture: ${updateState.message}')),
+                    SnackBar(content: Text('Failed to update profile: ${updateState.message}')),
                   );
                 }
               },
@@ -318,7 +399,7 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
                                   foregroundImage: _imageFile != null
                                       ? FileImage(_imageFile!)
                                       : profilePicture.isNotEmpty
-                                          ? CachedNetworkImageProvider(profilePicture)
+                                          ? CachedNetworkImageProvider(profilePicture, cacheKey: profilePicture)
                                           : null,
                                   child: _imageFile == null && profilePicture.isEmpty
                                       ? const Icon(Icons.person, size: 50, color: Colors.grey)
@@ -478,7 +559,7 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
                             ),
                           ],
                         ),
-                        child: widget.payout == null
+                        child: payout == null
                             ? Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -549,21 +630,21 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          "Account Name: ${widget.payout!.accountName}",
+                                          "Account Name: ${payout!.accountName}",
                                           style: TextStyle(
                                             fontSize: 12,
                                             color: AppColor.hexToColor("#73777F"),
                                           ),
                                         ),
                                         Text(
-                                          "Account Number: ${widget.payout!.accountNumber}",
+                                          "Account Number: ${payout!.accountNumber}",
                                           style: TextStyle(
                                             fontSize: 12,
                                             color: AppColor.hexToColor("#73777F"),
                                           ),
                                         ),
                                         Text(
-                                          "Bank Code: ${widget.payout!.bankCode}",
+                                          "Bank: ${banks.firstWhere((bank) => bank.slug == payout!.bankCode, orElse: () => Bank(slug: payout!.bankCode, name: 'Unknown Bank', acctLength: 0)).name}",
                                           style: TextStyle(
                                             fontSize: 12,
                                             color: AppColor.hexToColor("#73777F"),
@@ -575,7 +656,7 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
                                   Align(
                                     alignment: Alignment.centerRight,
                                     child: OutlinedButton.icon(
-                                      onPressed: () => _showPayoutBottomSheet(context, existingPayout: widget.payout),
+                                      onPressed: () => _showPayoutBottomSheet(context, existingPayout: payout),
                                       icon: const Icon(Icons.edit, size: 18),
                                       label: const Text("Update Payout"),
                                       style: OutlinedButton.styleFrom(
