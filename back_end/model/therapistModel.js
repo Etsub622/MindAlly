@@ -75,7 +75,7 @@ const therapistschema = new mongoose.Schema({
     payout: {
         account_name: { type: String },
         account_number: { type: String },
-        bank_code: { type: String },
+        bank_code: { type: Number },
     },
     lastLogin: { type: Date }
 

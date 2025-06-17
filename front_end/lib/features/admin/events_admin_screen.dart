@@ -344,10 +344,17 @@ class _EventsAdminScreenState extends State<EventsAdminScreen> {
                   onPressed: () {
                     final bloc = context.read<PaymentBloc>();
                     bloc.add(
-                      WithdrawPaymentEvent(
-                        email: action == 'approve' ? therapistEmail! : patientEmail!,
+                     action == 'approve' ? WithdrawPaymentEvent(
+                        email: therapistEmail!,
                         amount: event.price,
-                      ),
+                        sessionId: event.id
+                      ) :
+                      RefundPaymentEvent(
+                        therapistEmail: therapistEmail!,
+                        patientEmail: patientEmail!,
+                        sessionId: event.id     
+                      )
+
                     );
                     Navigator.pop(dialogContext);
                     ScaffoldMessenger.of(context).showSnackBar(

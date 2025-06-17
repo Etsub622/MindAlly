@@ -143,7 +143,7 @@ class _ChatPageState extends State<ChatPage> {
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10)),
                           ),
-                          child: selectedDate != null ? Text('Pick') : Text('Update'),
+                          child: selectedDate == null ? Text('Pick') : Text('Update'),
                         ),
                       ],
                     ),
@@ -189,7 +189,7 @@ class _ChatPageState extends State<ChatPage> {
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10)),
                           ),
-                          child: selectedTime!= null ? Text('Pick') : Text('Update'),
+                          child: selectedTime == null ? Text('Pick') : Text('Update'),
                         ),
                       ],
                     ),
@@ -355,44 +355,38 @@ class _ChatPageState extends State<ChatPage> {
         }
       },
       child: Scaffold(
-        body: SafeArea(
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Colors.blue[50]!, Colors.white],
-              ),
-            ),
-            child: Column(
-              children: [
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        appBar: AppBar(
+                flexibleSpace: Container(
                   decoration: BoxDecoration(
-                    color: Colors.blue[700],
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.3),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
+                    gradient: LinearGradient(
+                      colors: [
+                        Theme.of(context).colorScheme.primary.withOpacity(0.9),
+                        Theme.of(context).colorScheme.secondary.withOpacity(0.7),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: const BorderRadius.vertical(bottom: Radius.circular(20)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                   ),
+                ),
+                title: SafeArea(
                   child: Row(
                     children: [
-                      IconButton(
-                        icon: const Icon(Icons.arrow_back, color: Colors.white),
-                        onPressed: () => Navigator.pop(context),
-                      ),
                       const SizedBox(width: 8),
                       CircleAvatar(
-                        radius: 20,
+                        radius: 26,
                         backgroundColor: Colors.blue[900],
                         child: CircleAvatar(
-                          radius: 18,
-                          backgroundImage: const NetworkImage(
-                            "https://cache.lovethispic.com/uploaded_images/thumbs/213123-Kiss-The-Sun.jpg",
+                          radius: 25,
+                          backgroundImage: NetworkImage(
+                            widget.receiver.profilePicture ?? "https://cache.lovethispic.com/uploaded_images/thumbs/213123-Kiss-The-Sun.jpg",
                           ),
                           backgroundColor: Colors.grey[200],
                         ),
@@ -424,7 +418,22 @@ class _ChatPageState extends State<ChatPage> {
                       ),
                     ],
                   ),
-                ),
+  ),
+  centerTitle: true, // Ensures the title is centered
+  toolbarHeight: 80, // Adjust height for better appearance
+  elevation: 0, // Optional: Remove shadow for a cleaner look
+),
+        body: SafeArea(
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Colors.blue[50]!, Colors.white],
+              ),
+            ),
+            child: Column(
+              children: [
                 Expanded(
                   child: BlocBuilder<ChatBloc, ChatState>(
                     builder: (context, state) {

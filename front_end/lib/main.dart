@@ -21,7 +21,7 @@ void main() async {
   // Initialize other dependencies
   await di.init();
   runApp(MultiBlocProvider(
-      providers: MultiBLOCProvider.blocProvider, child: const NotificationWrapper()));
+      providers: MultiBLOCProvider.blocProvider, child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {

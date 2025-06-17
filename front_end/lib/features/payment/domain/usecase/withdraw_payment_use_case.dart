@@ -12,16 +12,18 @@ class WithdrawPaymentUseCase extends Usecase<String, PaymentWithDrawPharam> {
 
   @override
   Future<Either<Failure, String>> call(PaymentWithDrawPharam pharam) async {
-    return await repository.withdrawPayment(pharam.email, pharam.amount);
+    return await repository.withdrawPayment(pharam.email, pharam.amount, pharam.sessionId);
   }
 }
 
 class PaymentWithDrawPharam {
   String email;
   double amount;
+  String sessionId;
 
   PaymentWithDrawPharam({
     required this.email,
     required this.amount,
+    required this.sessionId,
   });
 }

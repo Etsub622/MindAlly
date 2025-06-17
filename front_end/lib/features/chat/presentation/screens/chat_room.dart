@@ -28,41 +28,66 @@ class _ChatRoomState extends State<ChatRoom> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+  flexibleSpace: Container(
+    decoration: BoxDecoration(
+      gradient: LinearGradient(
+        colors: [
+          Theme.of(context).colorScheme.primary.withOpacity(0.9),
+          Theme.of(context).colorScheme.secondary.withOpacity(0.7),
+        ],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(20)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+    ),
+  ),
+  title: const SafeArea(
+    child: Padding(
+      padding: EdgeInsets.symmetric(vertical: 12),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Icon(
+            Icons.chat_bubble_outline,
+            color: Colors.white,
+            size: 28,
+          ),
+          SizedBox(width: 8),
+          Text(
+            "Chats",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    ),
+  ),
+  centerTitle: true, // Ensures the title is centered
+  toolbarHeight: 80, // Adjust height for better appearance
+  elevation: 0, // Optional: Remove shadow for a cleaner look
+),
       body: SafeArea(
         child: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [Colors.blue[50]!, Colors.white],
+              colors: [Colors.white, Colors.white],
             ),
           ),
           child: Column(
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: Colors.blue[700],
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.3),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    Text(
-                      'Chats',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                  ],
-                ),
-              ),
               Expanded(
                 child: BlocBuilder<ChatListBloc, ChatListState>(
                   builder: (context, state) {
@@ -138,16 +163,16 @@ class _ChatRoomState extends State<ChatRoom> {
                                   );
                                 },
                                 child: Card(
-                                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                                  elevation: 4,
+                                  margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                                  elevation: 2,
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                  color: Colors.white,
+                                  color: Colors.blue[50]!,
                                   child: ListTile(
                                     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                                     leading: CircleAvatar(
                                       radius: 30,
-                                      backgroundImage: const NetworkImage(
-                                        "https://cache.lovethispic.com/uploaded_images/thumbs/213123-Kiss-The-Sun.jpg",
+                                      backgroundImage: NetworkImage(
+                                       chats[index].receiver.profilePicture ?? "https://cache.lovethispic.com/uploaded_images/thumbs/213123-Kiss-The-Sun.jpg",
                                       ),
                                       backgroundColor: Colors.grey[200],
                                     ),
@@ -155,7 +180,7 @@ class _ChatRoomState extends State<ChatRoom> {
                                       chats[index].receiver.name,
                                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                             fontWeight: FontWeight.bold,
-                                            color: Colors.blue[900],
+                                            color: Colors.black,
                                           ),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,

@@ -1,11 +1,11 @@
-import 'dart:collection';
-import 'dart:io';
 
+import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:front_end/core/routes/routes.dart';
+import 'package:front_end/core/utils/banks.dart';
 import 'package:front_end/core/utils/constants.dart';
 import 'package:front_end/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:front_end/features/profile_patient/data/models/update_patient_model.dart';
@@ -16,40 +16,6 @@ import 'package:front_end/features/profile_therapist/data/models/therapist_model
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/services.dart';
-
-// Bank model to hold relevant data
-class Bank {
-  final String slug;
-  final String name;
-  final int acctLength;
-
-  const Bank({
-    required this.slug,
-    required this.name,
-    required this.acctLength,
-  });
-}
-
-// Bank data from CHAPA BANK.txt
-const List<Bank> banks = [
-  Bank(slug: 'abay_bank', name: 'Abay Bank', acctLength: 16),
-  Bank(slug: 'addis_int_bank', name: 'Addis International Bank', acctLength: 15),
-  Bank(slug: 'ahadu_bank', name: 'Ahadu Bank', acctLength: 10),
-  Bank(slug: 'awash_bank', name: 'Awash Bank', acctLength: 14),
-  Bank(slug: 'boa_bank', name: 'Bank of Abyssinia', acctLength: 8),
-  Bank(slug: 'berhan_bank', name: 'Berhan Bank', acctLength: 13),
-  Bank(slug: 'cbebirr', name: 'CBEBirr', acctLength: 10),
-  Bank(slug: 'cbe_bank', name: 'Commercial Bank of Ethiopia (CBE)', acctLength: 13),
-  Bank(slug: 'dashen_bank', name: 'Dashen Bank', acctLength: 13),
-  Bank(slug: 'enat_bank', name: 'Enat Bank', acctLength: 8),
-  Bank(slug: 'global_bank', name: 'Global Bank Ethiopia', acctLength: 13),
-  Bank(slug: 'hibret_bank', name: 'Hibret Bank', acctLength: 16),
-  Bank(slug: 'anbesa_bank', name: 'Lion International Bank', acctLength: 9),
-  Bank(slug: 'mpesa', name: 'M-Pesa', acctLength: 10),
-  Bank(slug: 'nib_bank', name: 'Nib International Bank', acctLength: 13),
-  Bank(slug: 'telebirr', name: 'telebirr', acctLength: 10),
-  Bank(slug: 'wegagen_bank', name: 'Wegagen Bank', acctLength: 13),
-];
 
 class ManagePatientScreen extends StatefulWidget {
   final String userName;
@@ -108,7 +74,6 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
         _isImageUploading = true;
       });
 
-      // Trigger image upload via UpdatePatientBloc
       context.read<UpdatePatientBloc>().add(
             UpdatePatientLoadEvent(
               patient: UpdatePatientModel(
@@ -123,9 +88,24 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
     final formKey = GlobalKey<FormState>();
     final accountNameController = TextEditingController(text: existingPayout?.accountName ?? '');
     final accountNumberController = TextEditingController(text: existingPayout?.accountNumber ?? '');
-    String? selectedBankSlug = existingPayout?.bankCode ?? banks.first.slug;
-    int? selectedAcctLength = banks.firstWhere(
-      (bank) => bank.slug == selectedBankSlug,
+
+    // Handle existing bankCode, converting string to int if necessary
+    int? selectedBankCode;
+    if (existingPayout?.bankCode != null) {
+      try {
+        selectedBankCode = existingPayout!.bankCode;
+        if (!banks.any((bank) => bank.code == selectedBankCode)) {
+          selectedBankCode = banks.first.code;
+        }
+      } catch (e) {
+        selectedBankCode = banks.first.code;
+      }
+    } else {
+      selectedBankCode = banks.first.code;
+    }
+
+    int selectedAcctLength = banks.firstWhere(
+      (bank) => bank.code == selectedBankCode,
       orElse: () => banks.first,
     ).acctLength;
 
@@ -179,18 +159,21 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
                       children: [
                         Text(
                           existingPayout == null ? 'Add Payout Method' : 'Update Payout Method',
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
                         ),
+                        if (existingPayout?.bankCode != null && !banks.any((bank) => bank.code == selectedBankCode)) ...[
+                          const SizedBox(height: 8),
+                          Text(
+                            'Warning: Invalid bank code "${existingPayout!.bankCode}" detected. Please select a valid bank.',
+                            style: const TextStyle(color: Colors.red, fontSize: 12),
+                          ),
+                        ],
                         const SizedBox(height: 16),
                         TextFormField(
                           controller: accountNameController,
                           decoration: InputDecoration(
                             labelText: 'Account Name',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -204,9 +187,7 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
                           controller: accountNumberController,
                           decoration: InputDecoration(
                             labelText: 'Account Number',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                           ),
                           keyboardType: TextInputType.number,
                           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -216,32 +197,30 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
                               return 'Please enter account number';
                             }
                             if (value.length != selectedAcctLength) {
-                              final bankName = banks.firstWhere((bank) => bank.slug == selectedBankSlug).name;
+                              final bankName = banks.firstWhere((bank) => bank.code == selectedBankCode).name;
                               return 'Account number must be exactly $selectedAcctLength digits for $bankName';
                             }
                             return null;
                           },
                         ),
                         const SizedBox(height: 12),
-                        DropdownButtonFormField<String>(
-                          value: selectedBankSlug,
+                        DropdownButtonFormField<int>(
+                          value: selectedBankCode,
                           decoration: InputDecoration(
                             labelText: 'Bank',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                           ),
                           items: banks.map((bank) {
-                            return DropdownMenuItem<String>(
-                              value: bank.slug,
+                            return DropdownMenuItem<int>(
+                              value: bank.code,
                               child: Text(bank.name),
                             );
                           }).toList(),
                           onChanged: (value) {
                             setModalState(() {
-                              selectedBankSlug = value;
-                              selectedAcctLength = banks.firstWhere((bank) => bank.slug == value).acctLength;
-                              accountNumberController.text = ''; // Clear account number on bank change
+                              selectedBankCode = value;
+                              selectedAcctLength = banks.firstWhere((bank) => bank.code == value!).acctLength;
+                              accountNumberController.text = '';
                             });
                           },
                           validator: (value) {
@@ -263,7 +242,7 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
                                       final payout = PayoutModel(
                                         accountName: accountNameController.text,
                                         accountNumber: accountNumberController.text,
-                                        bankCode: selectedBankSlug!,
+                                        bankCode: selectedBankCode!,
                                       );
                                       context.read<UpdatePatientBloc>().add(
                                             UpdatePatientLoadEvent(
@@ -277,13 +256,8 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
                             style: ElevatedButton.styleFrom(
                               foregroundColor: Colors.white,
                               backgroundColor: AppColor.hexToColor("#00538C"),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 24,
-                                vertical: 12,
-                              ),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                             ),
                             child: Text(
                               existingPayout == null ? 'Add Payout' : 'Update Payout',
@@ -311,9 +285,7 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
 
     return PopScope(
       onPopInvoked: (v) {
-        context.read<PatientProfileBloc>().add(
-              GetPatientLoadEvent(patientId: widget.patientId),
-            );
+        context.read<PatientProfileBloc>().add(GetPatientLoadEvent(patientId: widget.patientId));
       },
       child: Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
@@ -369,7 +341,6 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: ListView(
                     children: [
-                      // Profile Picture
                       GestureDetector(
                         onTap: _isImageUploading ? null : () => _pickImage(ImageSource.gallery),
                         child: Center(
@@ -409,10 +380,7 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
                               if (_isImageUploading)
                                 const Positioned.fill(
                                   child: Center(
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: Colors.white,
-                                    ),
+                                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                                   ),
                                 ),
                               Positioned(
@@ -431,11 +399,7 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
                                       ),
                                     ],
                                   ),
-                                  child: const Icon(
-                                    Icons.edit,
-                                    color: Colors.white,
-                                    size: 20,
-                                  ),
+                                  child: const Icon(Icons.edit, color: Colors.white, size: 20),
                                 ),
                               ),
                             ],
@@ -449,17 +413,14 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
                           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                 fontWeight: FontWeight.w600,
                                 color: Theme.of(context).colorScheme.onSurface,
-                              ),
+                          ),
                           semanticsLabel: 'Username: $userName',
                         ),
                       ),
                       const SizedBox(height: 24),
-                      // Profile Section
                       Text(
                         'Profile',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
                       ),
                       const SizedBox(height: 12),
                       Container(
@@ -479,10 +440,7 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
                           children: [
                             ListTile(
                               onTap: () {},
-                              title: Text(
-                                "User Name",
-                                style: Theme.of(context).textTheme.bodyMedium,
-                              ),
+                              title: Text("User Name", style: Theme.of(context).textTheme.bodyMedium),
                               trailing: SizedBox(
                                 width: width * 0.4,
                                 child: Row(
@@ -492,10 +450,7 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
                                       width: width * 0.3,
                                       child: Text(
                                         userName,
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: AppColor.hexToColor("#73777F"),
-                                        ),
+                                        style: TextStyle(fontSize: 12, color: AppColor.hexToColor("#73777F")),
                                         overflow: TextOverflow.ellipsis,
                                         textAlign: TextAlign.end,
                                       ),
@@ -511,10 +466,7 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
                               ),
                             ),
                             ListTile(
-                              title: Text(
-                                "Email",
-                                style: Theme.of(context).textTheme.bodyMedium,
-                              ),
+                              title: Text("Email", style: Theme.of(context).textTheme.bodyMedium),
                               trailing: SizedBox(
                                 width: width * 0.5,
                                 child: Row(
@@ -524,10 +476,7 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
                                       child: Text(
                                         email,
                                         overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: AppColor.hexToColor("#73777F"),
-                                        ),
+                                        style: TextStyle(fontSize: 12, color: AppColor.hexToColor("#73777F")),
                                       ),
                                     ),
                                   ],
@@ -538,12 +487,9 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
                         ),
                       ),
                       const SizedBox(height: 24),
-                      // Payout Section
                       Text(
                         'Payout Details',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
                       ),
                       const SizedBox(height: 12),
                       Container(
@@ -582,10 +528,7 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
                                   const SizedBox(height: 8),
                                   Text(
                                     "Add a payout method to receive payments.",
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: AppColor.hexToColor("#73777F"),
-                                    ),
+                                    style: TextStyle(fontSize: 12, color: AppColor.hexToColor("#73777F")),
                                   ),
                                   const SizedBox(height: 12),
                                   Align(
@@ -597,13 +540,8 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
                                       style: ElevatedButton.styleFrom(
                                         foregroundColor: Colors.white,
                                         backgroundColor: AppColor.hexToColor("#00538C"),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(12),
-                                        ),
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 16,
-                                          vertical: 12,
-                                        ),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                                         textStyle: Theme.of(context).textTheme.labelLarge,
                                       ),
                                     ),
@@ -631,24 +569,24 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
                                       children: [
                                         Text(
                                           "Account Name: ${payout!.accountName}",
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: AppColor.hexToColor("#73777F"),
-                                          ),
+                                          style: TextStyle(fontSize: 12, color: AppColor.hexToColor("#73777F")),
                                         ),
                                         Text(
                                           "Account Number: ${payout!.accountNumber}",
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: AppColor.hexToColor("#73777F"),
-                                          ),
+                                          style: TextStyle(fontSize: 12, color: AppColor.hexToColor("#73777F")),
                                         ),
                                         Text(
-                                          "Bank: ${banks.firstWhere((bank) => bank.slug == payout!.bankCode, orElse: () => Bank(slug: payout!.bankCode, name: 'Unknown Bank', acctLength: 0)).name}",
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: AppColor.hexToColor("#73777F"),
-                                          ),
+                                          "Bank: ${banks.firstWhere(
+                                            (bank) {
+                                              try {
+                                                return bank.code == payout!.bankCode;
+                                              } catch (e) {
+                                                return false;
+                                              }
+                                            },
+                                            orElse: () => Bank(id: 0, name: 'Unknown Bank', acctLength: 0, code: 0),
+                                          ).name}",
+                                          style: TextStyle(fontSize: 12, color: AppColor.hexToColor("#73777F")),
                                         ),
                                       ],
                                     ),
@@ -661,17 +599,9 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
                                       label: const Text("Update Payout"),
                                       style: OutlinedButton.styleFrom(
                                         foregroundColor: AppColor.hexToColor("#00538C"),
-                                        side: BorderSide(
-                                          color: AppColor.hexToColor("#00538C"),
-                                          width: 1,
-                                        ),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(12),
-                                        ),
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 16,
-                                          vertical: 12,
-                                        ),
+                                        side: BorderSide(color: AppColor.hexToColor("#00538C"), width: 1),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                                         textStyle: Theme.of(context).textTheme.labelLarge,
                                       ),
                                     ),
@@ -680,12 +610,9 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
                               ),
                       ),
                       const SizedBox(height: 24),
-                      // Security Section
                       Text(
                         'Security',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
                       ),
                       const SizedBox(height: 12),
                       Container(
@@ -705,10 +632,7 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
                           children: [
                             ListTile(
                               onTap: () {},
-                              title: Text(
-                                "Password",
-                                style: Theme.of(context).textTheme.bodyMedium,
-                              ),
+                              title: Text("Password", style: Theme.of(context).textTheme.bodyMedium),
                               trailing: Icon(
                                 Icons.arrow_forward_ios,
                                 size: 14,
@@ -716,42 +640,26 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
                               ),
                             ),
                             ListTile(
-                              trailing: SvgPicture.asset(
-                                AppImage.logoutsvg,
-                                color: Colors.red,
-                              ),
+                              trailing: SvgPicture.asset(AppImage.logoutsvg, color: Colors.red),
                               subtitle: Text(
                                 "Do you want to logout?",
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: AppColor.hexToColor("#73777F"),
-                                ),
+                                style: TextStyle(fontSize: 12, color: AppColor.hexToColor("#73777F")),
                               ),
                               title: Text(
                                 'Log out',
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                      color: Colors.red,
-                                    ),
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.red),
                               ),
                               onTap: () => _showDialog(context),
                             ),
                             ListTile(
-                              trailing: const Icon(
-                                Icons.delete_forever,
-                                color: Colors.red,
-                              ),
+                              trailing: const Icon(Icons.delete_forever, color: Colors.red),
                               subtitle: Text(
                                 "Your account will be deleted",
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: AppColor.hexToColor("#73777F"),
-                                ),
+                                style: TextStyle(fontSize: 12, color: AppColor.hexToColor("#73777F")),
                               ),
                               title: Text(
                                 'Delete Account',
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                      color: Colors.red,
-                                    ),
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.red),
                               ),
                               onTap: () => _showDeleteAccountDialog(context),
                             ),
@@ -779,9 +687,7 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
             if (state is DeletePatientLoaded) {
               GoRouter.of(context).go(AppPath.login);
             } else if (state is DeletePatientError) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(state.message)),
-              );
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
               Navigator.of(context).pop();
             }
           },
@@ -790,20 +696,12 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
               title: const Text('Delete Account'),
               content: const Text('Are you sure you want to delete your account?'),
               actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Cancel'),
-                ),
+                TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Cancel')),
                 TextButton(
                   onPressed: () {
-                    context.read<DeletePatientBloc>().add(
-                          DeletePatientLoadEvent(patientId: widget.patientId),
-                        );
+                    context.read<DeletePatientBloc>().add(DeletePatientLoadEvent(patientId: widget.patientId));
                   },
-                  child: const Text(
-                    'Delete Account',
-                    style: TextStyle(color: Colors.red),
-                  ),
+                  child: const Text('Delete Account', style: TextStyle(color: Colors.red)),
                 ),
               ],
             );
@@ -821,14 +719,10 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
           listener: (context, state) {
             if (state is UserLogoutState) {
               if (state.status == AuthStatus.loaded) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(state.message)),
-                );
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
                 GoRouter.of(context).go(AppPath.login);
               } else if (state.status == AuthStatus.error) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(state.message)),
-                );
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
               }
             }
           },
@@ -837,18 +731,12 @@ class ManagePatientScreenState extends State<ManagePatientScreen> {
               title: const Text('Log Out'),
               content: const Text('Are you sure you want to log out?'),
               actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Cancel'),
-                ),
+                TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Cancel')),
                 TextButton(
                   onPressed: () {
                     context.read<AuthBloc>().add(LogoutEvent());
                   },
-                  child: const Text(
-                    'Log Out',
-                    style: TextStyle(color: Colors.red),
-                  ),
+                  child: const Text('Log Out', style: TextStyle(color: Colors.red)),
                 ),
               ],
             );

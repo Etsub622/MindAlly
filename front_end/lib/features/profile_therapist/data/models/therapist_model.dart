@@ -56,34 +56,32 @@ class   TherapistModel extends TherapistEntity {
   }
     }
     
-class PayoutModel extends Equatable {
-  final String accountNumber;
+class PayoutModel {
   final String accountName;
-  final String bankCode;
+  final String accountNumber;
+  final int bankCode;
 
-  const PayoutModel({
-    required this.accountNumber,
+  PayoutModel({
     required this.accountName,
+    required this.accountNumber,
     required this.bankCode,
   });
 
-  @override
-  List<Object?> get props => [bankCode, accountName, accountNumber];
-
-
-  factory PayoutModel.fromJson(Map<String, dynamic> json) {
-    return PayoutModel(
-      accountNumber: json['account_number'] ?? '',
-      accountName: json['account_name'] ?? '',
-      bankCode: json['bank_code'] ?? '',
-    );
-  }
-  
-  toJson() {
-    return {
+  Map<String, dynamic> toJson(){
+        return {
       'account_number': accountNumber,
       'account_name': accountName,
       'bank_code': bankCode,
     };
   }
+
+  factory PayoutModel.fromJson(Map<String, dynamic> json) => PayoutModel(
+        accountName: json['account_name'] ?? '',
+        accountNumber: json['account_number'] ?? '',
+        bankCode: (json['bank_code'] is String)
+            ? int.parse(json['bank_code']) // Handle old string bankCode
+            : json['bank_code'] ?? 0,
+      );
+  
+
 }

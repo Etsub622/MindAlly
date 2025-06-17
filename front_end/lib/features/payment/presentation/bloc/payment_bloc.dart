@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front_end/features/payment/data/model/payment_request_model.dart';
 import 'package:front_end/features/payment/domain/usecase/initiate_payment_use_case.dart';
+import 'package:front_end/features/payment/domain/usecase/refund_payment_usecase.dart';
 import 'package:front_end/features/payment/domain/usecase/withdraw_payment_use_case.dart';
 
 part 'payment_event.dart';
@@ -10,10 +11,12 @@ part 'payment_state.dart';
 class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
   final InitiatePaymentUseCase initiatePaymentUseCase;
   final WithdrawPaymentUseCase withdrawPaymentUseCase;
+  final RefundPaymentUseCase refundPaymentUseCase;
 
-  PaymentBloc(this.initiatePaymentUseCase, this.withdrawPaymentUseCase) : super(PaymentInitial()) {
+  PaymentBloc(this.initiatePaymentUseCase, this.withdrawPaymentUseCase, this.refundPaymentUseCase) : super(PaymentInitial()) {
     on<InitiatePaymentEvent>(_onInitiatePayment);
     on<WithdrawPaymentEvent>(_onWithdrawPayment);
+    on<RefundPaymentEvent> (_onRefundPayment);
   }
 
   Future<void> _onInitiatePayment(
@@ -36,7 +39,18 @@ class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
       WithdrawPaymentEvent event, Emitter<PaymentState> emit) async {
     emit(PaymentLoading());
 
-      final checkoutUrl = await withdrawPaymentUseCase(PaymentWithDrawPharam(email: event.email, amount: event.amount));
+      final checkoutUrl = await withdrawPaymentUseCase(PaymentWithDrawPharam(email: event.email, amount: event.amount, sessionId: event.sessionId));
+      checkoutUrl.fold(
+        (failure) => emit(PaymentFailure(error: failure.message)),
+        (checkoutUrl) => emit(PaymentSuccess(checkoutUrl: checkoutUrl)),
+      );
+  }
+
+  Future<void> _onRefundPayment(
+    RefundPaymentEvent event, Emitter<PaymentState> emit) async {
+    emit(PaymentLoading());
+
+      final checkoutUrl = await refundPaymentUseCase(PaymentRefundPharam(therapistEmail: event.therapistEmail, patientEmail: event.patientEmail, sessionId: event.sessionId));
       checkoutUrl.fold(
         (failure) => emit(PaymentFailure(error: failure.message)),
         (checkoutUrl) => emit(PaymentSuccess(checkoutUrl: checkoutUrl)),
