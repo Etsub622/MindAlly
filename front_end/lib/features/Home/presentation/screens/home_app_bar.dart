@@ -28,15 +28,20 @@ class AppbarHome extends StatefulWidget implements PreferredSizeWidget {
 }
 
 class _AppbarHomeState extends State<AppbarHome> {
-  final FlutterSecureStorage flutterSecureStorage = const FlutterSecureStorage();
+  final FlutterSecureStorage flutterSecureStorage =
+      const FlutterSecureStorage();
 
   @override
   void initState() {
     super.initState();
     if (widget.role == "therapist" || widget.role == "pending_therapist") {
-      context.read<TherapistProfileBloc>().add(GetTherapistLoadEvent(therapistId: widget.userId));
+      context
+          .read<TherapistProfileBloc>()
+          .add(GetTherapistLoadEvent(therapistId: widget.userId));
     } else if (widget.role == "patient") {
-      context.read<PatientProfileBloc>().add(GetPatientLoadEvent(patientId: widget.userId));
+      context
+          .read<PatientProfileBloc>()
+          .add(GetPatientLoadEvent(patientId: widget.userId));
     }
   }
 
@@ -47,7 +52,9 @@ class _AppbarHomeState extends State<AppbarHome> {
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarIconBrightness: Theme.of(context).brightness == Brightness.dark ? Brightness.light : Brightness.dark,
+      statusBarIconBrightness: Theme.of(context).brightness == Brightness.dark
+          ? Brightness.light
+          : Brightness.dark,
       statusBarColor: Colors.transparent,
     ));
 
@@ -67,7 +74,8 @@ class _AppbarHomeState extends State<AppbarHome> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          borderRadius: const BorderRadius.vertical(bottom: Radius.circular(20)),
+          borderRadius:
+              const BorderRadius.vertical(bottom: Radius.circular(20)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
@@ -84,10 +92,12 @@ class _AppbarHomeState extends State<AppbarHome> {
               children: [
                 widget.role == "therapist" || widget.role == "pending_therapist"
                     ? BlocBuilder<TherapistProfileBloc, GetTherapistState>(
-                        builder: (context, state) => buildProfileContent(context, state),
+                        builder: (context, state) =>
+                            buildProfileContent(context, state),
                       )
                     : BlocBuilder<PatientProfileBloc, GetPatientState>(
-                        builder: (context, state) => buildProfileContent(context, state),
+                        builder: (context, state) =>
+                            buildProfileContent(context, state),
                       ),
                 Row(
                   children: [
@@ -95,7 +105,8 @@ class _AppbarHomeState extends State<AppbarHome> {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const CalendarScreen()),
+                          MaterialPageRoute(
+                              builder: (context) => const CalendarScreen()),
                         );
                       },
                       icon: Stack(
@@ -114,7 +125,8 @@ class _AppbarHomeState extends State<AppbarHome> {
                                 ),
                               ],
                             ),
-                            child: const Icon(Icons.calendar_month_sharp, size: 24),
+                            child: const Icon(Icons.calendar_month_sharp,
+                                size: 24),
                           ),
                           Container(
                             width: 12,
@@ -149,12 +161,21 @@ class _AppbarHomeState extends State<AppbarHome> {
       );
     } else if ((widget.role == "therapist" && state is GetTherapistLoaded) ||
         (widget.role == "patient" && state is GetPatientLoaded)) {
-      final userName = widget.role == "therapist" ? (state as GetTherapistLoaded).therapist.name : (state as GetPatientLoaded).patient.name;
-      final profilePicture = widget.role == "therapist" ? state.therapist.profilePicture ?? "" : state.patient.profilePicture ?? "";
-      final hasPassword = widget.role == "therapist" ? state.therapist.hasPassword : state.patient.hasPassword;
-      final email = widget.role == "therapist" ? state.therapist.email : state.patient.email;
+      final userName = widget.role == "therapist"
+          ? (state as GetTherapistLoaded).therapist.name
+          : (state as GetPatientLoaded).patient.name;
+      final profilePicture = widget.role == "therapist"
+          ? state.therapist.profilePicture ?? ""
+          : state.patient.profilePicture ?? "";
+      final hasPassword = widget.role == "therapist"
+          ? state.therapist.hasPassword
+          : state.patient.hasPassword;
+      final email = widget.role == "therapist"
+          ? state.therapist.email
+          : state.patient.email;
 
-      return buildProfileUI(context, userName, profilePicture, hasPassword, email);
+      return buildProfileUI(
+          context, userName, profilePicture, hasPassword, email);
     } else if ((widget.role == "therapist" && state is GetTherapistError) ||
         (widget.role == "patient" && state is GetPatientError) ||
         (widget.role == "pending_therapist" && state is GetTherapistError)) {
@@ -167,7 +188,8 @@ class _AppbarHomeState extends State<AppbarHome> {
     }
   }
 
-  Widget buildProfileUI(BuildContext context, String userName, String profilePicture, bool hasPassword, String email) {
+  Widget buildProfileUI(BuildContext context, String userName,
+      String profilePicture, bool hasPassword, String email) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -213,17 +235,23 @@ class _AppbarHomeState extends State<AppbarHome> {
                   width: 56,
                   height: 56,
                   fit: BoxFit.cover,
-                  placeholder: (context, url) => const CircularProgressIndicator(strokeWidth: 2),
-                  errorWidget: (context, url, error) => const Icon(Icons.person, size: 30, color: Colors.grey),
+                  placeholder: (context, url) =>
+                      const CircularProgressIndicator(strokeWidth: 2),
+                  errorWidget: (context, url, error) =>
+                      const Icon(Icons.person, size: 30, color: Colors.grey),
                 ),
               ),
             ),
-          ).animate().scale(
+          )
+              .animate()
+              .scale(
                 duration: const Duration(milliseconds: 2000),
                 curve: Curves.easeInOut,
                 begin: Offset(1.0, 1.0),
                 end: Offset(1.05, 1.05),
-              ).then().scale(
+              )
+              .then()
+              .scale(
                 duration: const Duration(milliseconds: 2000),
                 begin: Offset(1.05, 1.05),
                 end: Offset(1.0, 1.0),
@@ -237,17 +265,18 @@ class _AppbarHomeState extends State<AppbarHome> {
                 animatedTexts: [
                   TypewriterAnimatedText(
                     'Hello, ${cutUsername(userName)}',
-                    textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
+                    textStyle:
+                        Theme.of(context).textTheme.titleMedium?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
                     speed: const Duration(milliseconds: 100),
                   ),
                 ],
                 totalRepeatCount: 1,
               ),
               Text(
-                widget.role == "therapist" ? 'Therapist' : 'Patient',
+                widget.role == "therapist" ? 'Therapist' : 'User',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Colors.white70,
                     ),
@@ -259,7 +288,8 @@ class _AppbarHomeState extends State<AppbarHome> {
     );
   }
 
-  Widget buildPendingTherapistUI(BuildContext context, String userName, String profilePicture, String email) {
+  Widget buildPendingTherapistUI(BuildContext context, String userName,
+      String profilePicture, String email) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -298,17 +328,25 @@ class _AppbarHomeState extends State<AppbarHome> {
                       width: 56,
                       height: 56,
                       fit: BoxFit.cover,
-                      placeholder: (context, url) => const CircularProgressIndicator(strokeWidth: 2),
-                      errorWidget: (context, url, error) => const Icon(Icons.person, size: 30, color: Colors.grey),
+                      placeholder: (context, url) =>
+                          const CircularProgressIndicator(strokeWidth: 2),
+                      errorWidget: (context, url, error) => const Icon(
+                          Icons.person,
+                          size: 30,
+                          color: Colors.grey),
                     ),
                   ),
                 ),
-              ).animate().scale(
+              )
+                  .animate()
+                  .scale(
                     duration: const Duration(milliseconds: 2000),
                     curve: Curves.easeInOut,
                     begin: Offset(1.0, 1.0),
                     end: Offset(1.05, 1.05),
-                  ).then().scale(
+                  )
+                  .then()
+                  .scale(
                     duration: const Duration(milliseconds: 2000),
                     begin: Offset(1.05, 1.05),
                     end: Offset(1.0, 1.0),
@@ -346,10 +384,11 @@ class _AppbarHomeState extends State<AppbarHome> {
                 animatedTexts: [
                   TypewriterAnimatedText(
                     'Hi, ${cutUsername(userName)}',
-                    textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
+                    textStyle:
+                        Theme.of(context).textTheme.titleMedium?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
                     speed: const Duration(milliseconds: 100),
                   ),
                 ],
@@ -374,9 +413,10 @@ class _AppbarHomeState extends State<AppbarHome> {
       icon: const Icon(Icons.more_vert, color: Colors.white),
       onSelected: (value) {
         if (value == 'profile') {
-          final state = widget.role == "therapist" || widget.role == "pending_therapist"
-              ? context.read<TherapistProfileBloc>().state
-              : context.read<PatientProfileBloc>().state;
+          final state =
+              widget.role == "therapist" || widget.role == "pending_therapist"
+                  ? context.read<TherapistProfileBloc>().state
+                  : context.read<PatientProfileBloc>().state;
           String userName = "User";
           String profilePicture = "";
           bool hasPassword = true;
@@ -493,7 +533,8 @@ class PendingTherapistScreen extends StatelessWidget {
               children: [
                 Card(
                   elevation: 4,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16)),
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
@@ -504,7 +545,8 @@ class PendingTherapistScreen extends StatelessWidget {
                             CircleAvatar(
                               radius: 30,
                               backgroundColor: Colors.grey[300],
-                              child: const Icon(Icons.person, size: 40, color: Colors.grey),
+                              child: const Icon(Icons.person,
+                                  size: 40, color: Colors.grey),
                             ),
                             const SizedBox(width: 16),
                             Column(
@@ -512,13 +554,19 @@ class PendingTherapistScreen extends StatelessWidget {
                               children: [
                                 Text(
                                   'Hello, $username!',
-                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleLarge
+                                      ?.copyWith(
                                         fontWeight: FontWeight.bold,
                                       ),
                                 ),
                                 Text(
                                   email,
-                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.copyWith(
                                         color: Colors.grey[600],
                                       ),
                                 ),
@@ -528,17 +576,19 @@ class PendingTherapistScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 16),
                         LinearProgressIndicator(
-                          value: 0.5, // Placeholder; update dynamically if API provides progress
+                          value:
+                              0.5, // Placeholder; update dynamically if API provides progress
                           backgroundColor: Colors.grey[200],
                           color: Theme.of(context).colorScheme.primary,
                         ),
                         const SizedBox(height: 8),
                         Text(
                           'Your account is under review',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: Colors.orange[600],
-                                fontWeight: FontWeight.bold,
-                              ),
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Colors.orange[600],
+                                    fontWeight: FontWeight.bold,
+                                  ),
                         ),
                       ],
                     ),
@@ -552,9 +602,12 @@ class PendingTherapistScreen extends StatelessWidget {
                       ),
                 ),
                 const SizedBox(height: 12),
-                _buildInfoTile(context, '📩', 'Approval Email', 'You’ll receive an email once your account is approved.'),
-                _buildInfoTile(context, '⏰', 'Verification Time', 'Typically takes 1-3 business days.'),
-                _buildInfoTile(context, '📞', 'Support', 'Contact support for any questions.'),
+                _buildInfoTile(context, '📩', 'Approval Email',
+                    'You’ll receive an email once your account is approved.'),
+                _buildInfoTile(context, '⏰', 'Verification Time',
+                    'Typically takes 1-3 business days.'),
+                _buildInfoTile(context, '📞', 'Support',
+                    'Contact support for any questions.'),
                 const SizedBox(height: 24),
                 Center(
                   child: ElevatedButton.icon(
@@ -566,8 +619,10 @@ class PendingTherapistScreen extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red[600],
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
                     ),
                   ).animate().slideY(
                         begin: 0.5,
@@ -584,7 +639,8 @@ class PendingTherapistScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoTile(BuildContext context, String emoji, String title, String description) {
+  Widget _buildInfoTile(
+      BuildContext context, String emoji, String title, String description) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(

@@ -88,13 +88,13 @@ class _QuestionCardState extends State<QuestionCard> {
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
-                      Text(
-                        widget.role == 'therapist' ? 'Therapist' : 'User',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                        ),
-                      ),
+                      // Text(
+                      //   widget.role == 'therapist' ? 'Therapist' : 'User',
+                      //   style: TextStyle(
+                      //     fontSize: 12,
+                      //     color: Colors.grey[600],
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),

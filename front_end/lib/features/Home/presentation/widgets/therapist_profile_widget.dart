@@ -42,16 +42,18 @@ class _TherapistProfileWidgetState extends State<TherapistProfileWidget> {
           scale: _isTapped ? 0.98 : 1.0,
           duration: const Duration(milliseconds: 100),
           child: Card(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             margin: widget.isCompact
                 ? const EdgeInsets.symmetric(horizontal: 4, vertical: 4)
                 : const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-            color: Colors.white,
+            color: Color.fromARGB(255, 249, 246, 251),
             elevation: 2,
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppColor.hexToColor("#E6F0FA"), width: 1),
+                border:
+                    Border.all(color: AppColor.hexToColor("#E6F0FA"), width: 1),
               ),
               child: widget.isCompact
                   ? _buildCompactLayout(context)
@@ -64,10 +66,10 @@ class _TherapistProfileWidgetState extends State<TherapistProfileWidget> {
   }
 
   Widget _buildCompactLayout(BuildContext context) {
-    return Center
-(
+    return Center(
       child: Container(
-        constraints: const BoxConstraints(maxWidth: 140, minHeight: 160, maxHeight: 160),
+        constraints:
+            const BoxConstraints(maxWidth: 140, minHeight: 160, maxHeight: 160),
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -89,42 +91,42 @@ class _TherapistProfileWidgetState extends State<TherapistProfileWidget> {
               ),
             ),
             const SizedBox(height: 6),
-           Column(
-            children: [
-               Text(
-              widget.therapist.name ?? "Unknown",
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: AppColor.hexToColor("#181C21"),
-                    fontSize: 14,
-                  ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              widget.therapist.modality ?? "Not specified",
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: AppColor.hexToColor("#73777F"),
-                    fontSize: 12,
-                  ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              "${widget.therapist.experienceYears ?? 0} yrs",
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: AppColor.hexToColor("#73777F"),
-                    fontSize: 12,
-                  ),
-              maxLines: 1,
-              textAlign: TextAlign.center,
-            ),
-            ],
-           )
+            Column(
+              children: [
+                Text(
+                  widget.therapist.name ?? "Unknown",
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: AppColor.hexToColor("#181C21"),
+                        fontSize: 14,
+                      ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  widget.therapist.modality ?? "Not specified",
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: AppColor.hexToColor("#73777F"),
+                        fontSize: 12,
+                      ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  "${widget.therapist.experienceYears ?? 0} yrs",
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: AppColor.hexToColor("#73777F"),
+                        fontSize: 12,
+                      ),
+                  maxLines: 1,
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            )
           ],
         ),
       ),
@@ -206,8 +208,7 @@ class _TherapistProfileWidgetState extends State<TherapistProfileWidget> {
           //             color: AppColor.hexToColor("#00538C"),
           //           ),
           //     ),
-              
-        
+
           //   ],
           // ),
         ],

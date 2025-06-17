@@ -152,29 +152,36 @@ class ArticleRemoteDataSourceImpl implements ArticleRemoteDatasource {
       throw ServerException(message: e.toString());
     }
   }
-  
+
   @override
-  Future<List<ArticleModel>> searchArticleByCategory(String category) async{
-  try{
-    var url = Uri.parse('$baseUrl/category/$category');
-    final response = await client.get(url, headers: {
-      'Content-Type': 'application/json',
-    });
-    if (response.statusCode == 200) {
-      final List<dynamic> articleJson = json.decode(response.body);
-      if (articleJson.isEmpty) {
-        return [];
-      } else {
+  Future<List<ArticleModel>> searchArticleByCategory(String category) async {
+    try {
+      var url = Uri.parse('$baseUrl/category/$category');
+      final response = await client.get(url, headers: {
+        'Content-Type': 'application/json',
+      });
+
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final List<dynamic> articleJson = json.decode(response.body);
         return articleJson.map((jsonItem) {
           return ArticleModel.fromJson(jsonItem as Map<String, dynamic>);
         }).toList();
+      } else if (response.statusCode == 404) {
+        final Map<String, dynamic> errorResponse = json.decode(response.body);
+        final errorMessage =
+            errorResponse['message'] ?? 'No articles found in this category.';
+        print('Error: $errorMessage');
+        return [];
+      } else {
+        throw ServerException(
+            message:
+                'Failed to get articles by category: ${response.statusCode}');
       }
-    } else {
-      throw ServerException(
-          message: 'Failed to get articles by category:${response.statusCode}');
+    } catch (e) {
+      throw ServerException(message: e.toString());
     }
-  } catch (e) {
-    throw ServerException(message: e.toString());
-  }
   }
 }

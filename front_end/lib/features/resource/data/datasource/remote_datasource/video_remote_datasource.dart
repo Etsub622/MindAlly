@@ -67,7 +67,7 @@ class VideoRemoteDataSourceImpl implements VideoRemoteDatasource {
       final response = await client.get(url, headers: {
         'Content-Type': 'application/json',
       });
-     
+
       if (response.statusCode == 200) {
         final decodedResponse = jsonDecode(response.body);
 
@@ -167,20 +167,24 @@ class VideoRemoteDataSourceImpl implements VideoRemoteDatasource {
       final response = await client.get(url, headers: {
         'Content-Type': 'application/json',
       });
+
       print('Response status: ${response.statusCode}');
       print('Response body: ${response.body}');
+
       if (response.statusCode == 200) {
         final List<dynamic> videoJson = json.decode(response.body);
-        if (videoJson.isEmpty) {
-          return [];
-        } else {
-          return videoJson.map((jsonItem) {
-            return VideoModel.fromJson(jsonItem as Map<String, dynamic>);
-          }).toList();
-        }
+        return videoJson.map((jsonItem) {
+          return VideoModel.fromJson(jsonItem as Map<String, dynamic>);
+        }).toList();
+      } else if (response.statusCode == 404) {
+        final Map<String, dynamic> errorResponse = json.decode(response.body);
+        final errorMessage =
+            errorResponse['message'] ?? 'No videos found in this category.';
+        print('Error: $errorMessage');
+        return [];
       } else {
         throw ServerException(
-            message: 'Failed to get videos:${response.statusCode}');
+            message: 'Failed to get videos: ${response.statusCode}');
       }
     } catch (e) {
       throw ServerException(message: e.toString());

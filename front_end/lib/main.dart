@@ -9,19 +9,21 @@ import 'package:front_end/core/service/socket_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   final socketService = SocketService();
   await socketService.ensureInitialized();
-
-  
 
   // Initialize Firebase
   await Firebase.initializeApp();
 
   // Initialize other dependencies
   await di.init();
-  runApp(MultiBlocProvider(
-      providers: MultiBLOCProvider.blocProvider, child: const MyApp()));
+  runApp(
+    MultiBlocProvider(
+      providers: MultiBLOCProvider.blocProvider,
+      child: const NotificationWrapper(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
