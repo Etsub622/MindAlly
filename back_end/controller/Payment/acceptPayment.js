@@ -3,6 +3,7 @@ import { Therapist } from "../../model/therapistModel.js";
 import crypto from "crypto";
 import { Transaction } from "../../model/transaction.js";
 import { Patient } from "../../model/patientModel.js";
+import { Session } from "../../model/sessionModel.js";
 import nodemailer from "nodemailer";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
@@ -174,7 +175,7 @@ const getPaymentStatus = async (req, res) => {
 
 const withdrawFromWallet = async (req, res) => {
   try {
-    const { therapistEmail, amount } = req.body;
+    const { therapistEmail, amount, sessionId } = req.body;
     const amountNumber = Number(amount);
 
     if (isNaN(amountNumber) || amountNumber <= 0) {
@@ -182,7 +183,7 @@ const withdrawFromWallet = async (req, res) => {
     }
 
     const therapist = await Therapist.findOne({ Email: therapistEmail });
-    console.log("Therapist found:", therapistEmail);
+    
     if (!therapist) return res.status(404).json({ error: "Therapist not found" });
 
     // Calculate wallet balance from transaction history
@@ -203,6 +204,7 @@ const withdrawFromWallet = async (req, res) => {
     }
 
     const { account_name, account_number, bank_code } = therapist.payout || {};
+    console.log("Therapist found:", therapistEmail, account_name, account_number, bank_code);
     
     if (!account_name || !account_number || !bank_code) {
       console.log("Therapist payout information is incomplete:", therapist.payout);
@@ -247,6 +249,14 @@ const withdrawFromWallet = async (req, res) => {
         reference: transferData.reference
       });
 
+      if(sessionId) {
+        // If sessionId is provided, update the session status
+        const session = await Session.findByIdAndDelete(sessionId);
+        if (!session) {
+          return res.status(404).json({ error: "Session not found" });
+        }
+      }
+
       return res.status(200).json({
         success: true,
         newBalance: currentBalance - amountNumber,
@@ -259,6 +269,8 @@ const withdrawFromWallet = async (req, res) => {
         detail: response.data
       });
     }
+    
+   
   } catch (err) {
     console.error("Error during withdrawal:", err.response?.data || err.message);
     res.status(500).json({ error: err.message });
@@ -270,10 +282,10 @@ const withdrawFromWallet = async (req, res) => {
 
 const refundToPatient = async (req, res) => {
   try {
-    const { patientEmail, therapistEmail, patientAccountNumber, patientBankCode, patientAccountName } = req.body;
+    const { patientEmail, therapistEmail, sessionId} = req.body;
 
     // 1. Check for all required fields first
-    if (!patientEmail || !therapistEmail || !patientAccountNumber || !patientBankCode || !patientAccountName) {
+    if (!patientEmail || !therapistEmail) {
       return res.status(400).json({
         error: "All patient and therapist details are required for a refund."
       });
@@ -295,6 +307,8 @@ const refundToPatient = async (req, res) => {
       reference: { $exists: true, $ne: null }
     }).sort({ createdAt: -1 });
 
+    console.log("Last payment transaction:", lastPaymentTransaction);
+
     if (!lastPaymentTransaction) {
       return res.status(404).json({ error: "No completed payment with a valid reference found from this patient to this therapist to refund." });
     }
@@ -305,6 +319,8 @@ const refundToPatient = async (req, res) => {
       type: "refund_to_patient",
       status: { $in: ["completed", "pending_account_details"] }
     });
+
+    console.log("Existing refund transaction:", existingRefund);
 
     if (existingRefund) {
       return res.status(400).json({ error: "A refund for this specific payment has already been initiated or completed." });
@@ -317,6 +333,8 @@ const refundToPatient = async (req, res) => {
     const currentTherapistBalance = totalCredit - totalDebit;
     const refundAmount = lastPaymentTransaction.amount;
     const originalTxRef = lastPaymentTransaction.reference;
+
+    console.log("Current therapist balance:", currentTherapistBalance, transactions);
 
     if (currentTherapistBalance < refundAmount) {
       return res.status(400).json({ error: "Therapist has insufficient wallet balance for this refund." });
@@ -332,6 +350,7 @@ const refundToPatient = async (req, res) => {
       bank_code: patientBankCode,
       reference: refundReference
     };
+    console.log("Transfer data:", transferData);
 
     let response;
     if (process.env.NODE_ENV === "test") {
@@ -354,6 +373,14 @@ const refundToPatient = async (req, res) => {
         reference: refundReference,
         originalTxRef: originalTxRef
       });
+
+      if(sessioId) {
+        // If sessionId is provided, update the session status
+        const session = await Session.findByIdAndDelete(sessionId);
+        if (!session) {
+          return res.status(404).json({ error: "Session not found" });
+        }
+      }
 
       return res.status(200).json({
         success: true,

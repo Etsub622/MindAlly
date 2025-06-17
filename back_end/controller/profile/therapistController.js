@@ -51,7 +51,8 @@ export const getTherapist = async (req, res) => {
   try {
     const therapist = await Therapist.findById(req.params.therapist_id);
     if (!therapist) return res.status(404).json({ message: "Therapist not found" });
-
+    
+    console.log("Fetched therapist for hungur: ", therapist);
     res.json(therapist);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -59,9 +60,25 @@ export const getTherapist = async (req, res) => {
 };
 
 export const updateTherapist = async (req, res) => {
-  const { FullName, Email, Password, modality, Bio, Fee, verified, gender, specialities, available_days, mode,language, experience_years, payout} = req.body;
+  const {
+    FullName,
+    Email,
+    Password,
+    modality,
+    Bio,
+    Fee,
+    verified,
+    gender,
+    specialities,
+    available_days,
+    mode,
+    language,
+    experience_years,
+    payout,
+    profilePicture,
+  } = req.body;
 
-  console.log(req.body);
+  console.log("Request body:", req.body);
 
   try {
     const updates = {};
@@ -71,13 +88,15 @@ export const updateTherapist = async (req, res) => {
     if (modality) updates.modality = modality;
     if (Bio) updates.Bio = Bio;
     if (Fee) updates.Fee = Fee;
-    if (verified !== undefined) if(verified) updates.verified = verified
-    if(gender !== undefined) if(gender) updates.gender = gender;
-    if(Array.isArray(specialities) && specialities.length > 0) if(specialities) updates.specialities = specialities;
+    if (verified !== undefined && verified) updates.verified = verified;
+    if (gender !== undefined && gender) updates.gender = gender;
+    if (Array.isArray(specialities) && specialities.length > 0) updates.specialities = specialities;
     if (Array.isArray(available_days) && available_days.length > 0) updates.available_days = available_days;
-    if(Array.isArray(mode) && mode.length > 0) if(mode) updates.mode = mode;
-    if(Array.isArray(language) && language.length > 0) if(language) updates.language = language;
-    if(experience_years !== undefined) if(experience_years) updates.experience_years = experience_years;
+    if (Array.isArray(mode) && mode.length > 0) updates.mode = mode;
+    if (Array.isArray(language) && language.length > 0) updates.language = language;
+    if (experience_years !== undefined && experience_years) updates.experience_years = experience_years;
+    console.log("Profile picture:", profilePicture, updates, profilePicture);
+    if (profilePicture) updates.profilePicture = profilePicture;
     if (payout && payout.account_number && payout.account_name && payout.bank_code) {
       updates.payout = {
         account_number: payout.account_number,
@@ -85,18 +104,26 @@ export const updateTherapist = async (req, res) => {
         bank_code: payout.bank_code,
       };
     }
-    
-    console.log("update data: ", updates);
-    const therapist = await Therapist.findByIdAndUpdate(req.params.therapist_id, updates);
-    console.log("updated therapist: ", therapist);
+
+    console.log("Update data:", updates);
+
+    // Use { new: true } to return the updated document
+    const therapist = await Therapist.findByIdAndUpdate(
+      req.params.therapist_id,
+      { $set: updates },
+      { new: true }
+    );
+
+    console.log("Updated therapist:", therapist);
+
     if (!therapist) return res.status(404).json({ message: "Therapist not found" });
 
     res.json(therapist);
   } catch (err) {
+    console.error("Error updating therapist:", err);
     res.status(500).json({ message: err.message });
   }
 };
-
 // Delete a therapist by ID
 export const deleteTherapist = async (req, res) => {
   try {

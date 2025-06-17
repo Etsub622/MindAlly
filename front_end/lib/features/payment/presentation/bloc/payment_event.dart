@@ -28,12 +28,31 @@ class InitiatePaymentEvent extends PaymentEvent {
 class WithdrawPaymentEvent extends PaymentEvent {
   final String email;
   final double amount;
+  final  String sessionId;
 
   const WithdrawPaymentEvent({
     required this.email,
     required this.amount,
+    required this.sessionId,
   });
 
   @override
   List<Object> get props => [email, amount];
+}
+
+
+
+class RefundPaymentEvent extends PaymentEvent {
+  final String therapistEmail;
+  final String patientEmail;
+  final String sessionId;
+
+  const RefundPaymentEvent({
+    required this.therapistEmail,
+    required this.patientEmail,
+    required this.sessionId,
+  });
+
+  @override
+  List<Object> get props => [therapistEmail, patientEmail];
 }

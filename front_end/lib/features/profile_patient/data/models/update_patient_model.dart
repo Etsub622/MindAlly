@@ -16,7 +16,8 @@ class UpdatePatientModel extends UpdatePatientEntity{
     super.preferredMode, 
     super.preferredSpecialties,
     super.payout,
-    super.profilePictureFile
+    super.profilePictureFile,
+    super.profilePicture,
   });
       factory UpdatePatientModel.fromJson(Map<String, dynamic> json) {
         return UpdatePatientModel(
@@ -26,6 +27,7 @@ class UpdatePatientModel extends UpdatePatientEntity{
           role: json['Role'],
           collage: json['Collage'],
           gender: json['gender'],
+          profilePicture: json['profilePicture'],
           preferredModality: json['preferred_modality'],
           preferredGender: json['preferred_gender'] != null
             ? (json['preferred_gender'] as List<dynamic>).map((e) => e.toString()).toList()
@@ -61,6 +63,7 @@ class UpdatePatientModel extends UpdatePatientEntity{
           'preferred_mode': preferredMode,
           'preferred_specialties': preferredSpecialties,
           'payout': payout?.toJson(),
+          'profilePicture': profilePicture,
         };
       }
 

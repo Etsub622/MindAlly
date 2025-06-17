@@ -53,7 +53,8 @@ export const updatePatient = async (req, res) => {
     preferred_days,
     preferred_mode,
     preferred_specialties,
-    payout
+    payout,
+    profilePicture,
   } = req.body;
   console.log(req.body);
   try {
@@ -63,7 +64,8 @@ export const updatePatient = async (req, res) => {
     if (Email) updates.Email = Email;
     if (Collage) updates.Collage = Collage;
     if (Password) updates.Password = await bcrypt.hash(Password, 10);
-
+    if(profilePicture) updates.profilePicture = profilePicture;
+    console.log("dfghjklfghj",  updates.profilePicture, profilePicture);
     if (gender !== undefined) if(gender) updates.gender = gender;
     if (preferred_modality !== undefined) if(preferred_modality) updates.preferred_modality = preferred;
     if (preferred_gender !== undefined)  if(preferred_gender) updates.preferred_gender = preferred_gender;
@@ -89,7 +91,7 @@ export const updatePatient = async (req, res) => {
     );
 
     if (!patient) return res.status(404).json({ message: "Patient not found" });
-
+    
     res.json({
       message: "Patient updated successfully",
       patient

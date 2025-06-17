@@ -59,10 +59,14 @@ const patientschema = new mongoose.Schema({
    fcmToken: {
         type: String,
    },
+   profilePicture: {
+    type: String,
+    default: ""
+   },
    payout: {
     account_name: { type: String },
     account_number: { type: String },
-    bank_code: { type: String },
+    bank_code: { type: Number },
 },
 })
 
