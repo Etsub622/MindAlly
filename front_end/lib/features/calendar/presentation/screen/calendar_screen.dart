@@ -340,7 +340,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                         subtitle: Text(event.startTime),
                                         trailing: Chip(
                                           label: Text(
-                                            status.toString().split('.').last,
+                                            status.toString().split('.').last == "Confirm" ? "Confirmed" :  status.toString().split('.').last,
                                             style: const TextStyle(
                                                 fontSize: 12,
                                                 fontWeight: FontWeight.w600),

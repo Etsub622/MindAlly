@@ -8,6 +8,7 @@ admin.initializeApp({
 });
 
 export const sendNotification = async (fcmToken, title, body, data) => {
+    console.log("sendNotification called with:", { fcmToken, title, body, data });
     if (!fcmToken || !title || !body) {
         throw new Error('Missing required fields: fcmToken, title, or body');
     }

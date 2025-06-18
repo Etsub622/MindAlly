@@ -1,8 +1,8 @@
-// lib/features/approve_therapist/presentation/screen/therapist_verify_detail.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front_end/features/approve_therapist/domain/entity/therapist_verify_entity.dart';
 import 'package:front_end/features/approve_therapist/presentation/bloc/verify_bloc.dart';
+import 'package:photo_view/photo_view.dart';
 
 class TherapistDetailPage extends StatefulWidget {
   final TherapistVerifyEntity therapist;
@@ -16,7 +16,8 @@ class TherapistDetailPage extends StatefulWidget {
 
 class _TherapistDetailPageState extends State<TherapistDetailPage> {
   final TextEditingController _commentController = TextEditingController();
-  bool _isLoading = false;
+  bool _isApproving = false;
+  bool _isDeclining = false;
 
   @override
   void dispose() {
@@ -32,7 +33,13 @@ class _TherapistDetailPageState extends State<TherapistDetailPage> {
       );
       return;
     }
-    setState(() => _isLoading = true);
+    setState(() {
+      if (action == 'approve') {
+        _isApproving = true;
+      } else {
+        _isDeclining = true;
+      }
+    });
     if (action == 'approve') {
       context
           .read<VerifyBloc>()
@@ -67,7 +74,10 @@ class _TherapistDetailPageState extends State<TherapistDetailPage> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.message)),
             );
-            setState(() => _isLoading = false);
+            setState(() {
+              _isApproving = false;
+              _isDeclining = false;
+            });
           }
         },
         child: Padding(
@@ -139,17 +149,62 @@ class _TherapistDetailPageState extends State<TherapistDetailPage> {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: widget.therapist.certificate.isNotEmpty
-                      ? Image.network(
-                          widget.therapist.certificate,
-                          height: 200,
-                          width: double.infinity,
-                          fit: BoxFit.contain,
-                          errorBuilder: (context, error, stackTrace) =>
-                              Container(
+                      ? GestureDetector(
+                          onTap: () {
+                            // Show the image in a full-screen dialog with zoom
+                            showDialog(
+                              context: context,
+                              builder: (context) => Dialog(
+                                backgroundColor: Colors.black,
+                                child: Stack(
+                                  children: [
+                                    PhotoView(
+                                      imageProvider: NetworkImage(
+                                          widget.therapist.certificate),
+                                      backgroundDecoration: const BoxDecoration(
+                                          color: Colors.black),
+                                      minScale:
+                                          PhotoViewComputedScale.contained,
+                                      maxScale:
+                                          PhotoViewComputedScale.covered * 3.0,
+                                      errorBuilder:
+                                          (context, error, stackTrace) =>
+                                              const Center(
+                                        child: Icon(
+                                          Icons.error,
+                                          color: Color.fromARGB(
+                                              255, 196, 196, 196),
+                                          size: 50,
+                                        ),
+                                      ),
+                                    ),
+                                    Positioned(
+                                      top: 10,
+                                      right: 10,
+                                      child: IconButton(
+                                        icon: const Icon(Icons.close,
+                                            color: Colors.white),
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                          child: Image.network(
+                            widget.therapist.certificate,
                             height: 200,
-                            color: Colors.grey[200],
-                            child: Icon(Icons.description,
-                                size: 50, color: Colors.grey[600]),
+                            width: double.infinity,
+                            fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) =>
+                                Container(
+                              height: 200,
+                              color: Colors.grey[200],
+                              child: Icon(Icons.description,
+                                  size: 50, color: Colors.grey[600]),
+                            ),
                           ),
                         )
                       : Container(
@@ -176,23 +231,24 @@ class _TherapistDetailPageState extends State<TherapistDetailPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     ElevatedButton(
-                      onPressed: _isLoading
+                      onPressed: (_isApproving || _isDeclining)
                           ? null
                           : () => _handleAction(context, 'approve'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
                       ),
-                      child: _isLoading
+                      child: _isApproving
                           ? const CircularProgressIndicator(color: Colors.white)
                           : const Text('Approve'),
                     ),
                     ElevatedButton(
-                      onPressed: _isLoading
+                      onPressed: (_isApproving || _isDeclining)
                           ? null
                           : () => _handleAction(context, 'decline'),
-                      style:
-                          ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                      child: _isLoading
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                      ),
+                      child: _isDeclining
                           ? const CircularProgressIndicator(color: Colors.white)
                           : const Text('Decline'),
                     ),

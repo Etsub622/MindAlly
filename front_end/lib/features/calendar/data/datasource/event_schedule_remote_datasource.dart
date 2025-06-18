@@ -77,11 +77,14 @@ class EventScheduleRemoteDataSourceImpl
         final jsonResponse = jsonDecode(response.body);
         return EventModel.fromJson(jsonResponse['session']);
       } else {
+        final jsonResponse = jsonDecode(response.body);
         throw ServerException(
-            message: 'Failed to   session: ${response.statusCode}');
+            message: jsonResponse["message"] ?? 'Failed to add session: ${response.statusCode}');
       }
-    } catch (e) {
-      throw ServerException(message: 'Network error: $e');
+    } on ServerException catch (e) {
+      throw ServerException(message: '${e.message}');
+    } on Exception catch (e) {
+      throw ServerException(message: '${e}');
     }
   }
 

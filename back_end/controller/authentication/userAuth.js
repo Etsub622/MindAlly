@@ -46,12 +46,14 @@ const registerPatient = async (req, res) => {
       console.log('Received signup request:', req.body);
 
    const { fullName, email, password, collage,EmergencyEmail } = req.body
+
+   const hashedPass= await hashedPassword(password)
     
     const patient = new Patient({
       FullName:fullName,
       Email:email,
       Collage:collage,
-      Password: hashpass,
+      Password: hashedPass,
       Role:"patient",
       EmergencyEmail
 

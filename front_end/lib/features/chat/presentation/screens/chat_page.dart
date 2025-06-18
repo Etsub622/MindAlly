@@ -10,6 +10,7 @@ import 'package:front_end/features/chat/data/models/single_chat_model.dart';
 import 'package:front_end/features/chat/domain/entities/message_entity.dart';
 import 'package:front_end/features/payment/presentation/screens/payment_screen.dart';
 import 'package:front_end/features/profile_patient/domain/entities/user_entity.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 class ChatPage extends StatefulWidget {
@@ -339,6 +340,10 @@ class _ChatPageState extends State<ChatPage> {
     return BlocListener<AddScheduledEventsBloc, AddScheduledEventsState>(
       listener: (context, state) {
         if (state is AddScheduledEventsLoaded) {
+          context.goNamed('home', extra: {'index': 0});
+          context.pop();
+          context.pop();
+          context.pop();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: const Text('Session booked successfully'),

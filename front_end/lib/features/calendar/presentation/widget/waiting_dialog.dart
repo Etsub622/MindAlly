@@ -145,11 +145,11 @@ class _WaitingDialogState extends State<WaitingDialog> {
         BlocListener<UpdateScheduledEventsBloc, UpdateScheduledEventsState>(
           listener: (context, state) {
             if (state is UpdateScheduledEventsLoaded) {
+              context.pop();
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Meeting confirmed successfully')),
               );
               context.read<GetScheduledEventsBloc>().add(GetScheduledEventsEvent());
-              Navigator.pop(context);
             } else if (state is UpdateScheduledEventsError) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text('Error: ${state.errorMessage}')),
@@ -214,6 +214,8 @@ class _WaitingDialogState extends State<WaitingDialog> {
 
               return Dialog(
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                elevation: 8,
+                backgroundColor: Colors.white,
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: isPending && isCreator
@@ -229,62 +231,71 @@ class _WaitingDialogState extends State<WaitingDialog> {
   }
 
   Widget _buildWaitingShimmer(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Shimmer.fromColors(
-          baseColor: Colors.grey[300]!,
-          highlightColor: Colors.grey[100]!,
-          child: Container(
-            height: 24,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Shimmer.fromColors(
+              baseColor: Colors.grey[300]!,
+              highlightColor: Colors.grey[100]!,
+              child: Container(
+                height: 24,
+                width: 200,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
             ),
-          ),
-        ),
-        const SizedBox(height: 16),
-        Shimmer.fromColors(
-          baseColor: Colors.grey[300]!,
-          highlightColor: Colors.grey[100]!,
-          child: Container(
-            height: 16,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
+            const SizedBox(height: 16),
+            Shimmer.fromColors(
+              baseColor: Colors.grey[300]!,
+              highlightColor: Colors.grey[100]!,
+              child: Container(
+                height: 16,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
             ),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Shimmer.fromColors(
-          baseColor: Colors.grey[300]!,
-          highlightColor: Colors.grey[100]!,
-          child: Container(
-            height: 16,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
+            const SizedBox(height: 8),
+            Shimmer.fromColors(
+              baseColor: Colors.grey[300]!,
+              highlightColor: Colors.grey[100]!,
+              child: Container(
+                height: 16,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
             ),
-          ),
+            const SizedBox(height: 16),
+            Text(
+              'Waiting for ${widget.isTherapist ? "patient" : "therapist"} to confirm...',
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: Colors.blueGrey,
+              ),
+            ),
+            const SizedBox(height: 16),
+            _buildActionButton(
+              context: context,
+              label: 'Close',
+              color: Colors.grey[400]!,
+              onPressed: () => Navigator.pop(context),
+            ),
+          ],
         ),
-        const SizedBox(height: 16),
-        Text(
-          'Waiting for ${widget.isTherapist ? "patient" : "therapist"} to confirm...',
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-        ),
-        const SizedBox(height: 16),
-        ElevatedButton(
-          onPressed: () => Navigator.pop(context),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.grey[400],
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          ),
-          child: const Text('Close'),
-        ),
-      ],
+      ),
     );
   }
 
@@ -309,29 +320,39 @@ class _WaitingDialogState extends State<WaitingDialog> {
       }
     } catch (e) {
       print('Error parsing date/time: $e');
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            'Error',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.red[900],
-            ),
+      return Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.error, color: Colors.red[900], size: 40),
+              const SizedBox(height: 8),
+              Text(
+                'Error',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.red[900],
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Invalid date or time format',
+                style: TextStyle(fontSize: 16, color: Colors.grey),
+              ),
+              const SizedBox(height: 16),
+              _buildActionButton(
+                context: context,
+                label: 'Close',
+                color: Colors.grey[400]!,
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
           ),
-          const SizedBox(height: 8),
-          Text('Invalid date or time format'),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.grey[400],
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            ),
-            child: const Text('Close'),
-          ),
-        ],
+        ),
       );
     }
 
@@ -339,81 +360,150 @@ class _WaitingDialogState extends State<WaitingDialog> {
         DateTime.now().isAfter(startDateTime.subtract(const Duration(minutes: 10))) &&
         DateTime.now().isBefore(endDateTime);
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Meeting Session',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.blue[900],
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text('Date: ${widget.event.date}'),
-        Text('Start Time: ${widget.event.startTime}'),
-        Text('End Time: ${widget.event.endTime}'),
-        Text('Status: ${widget.event.status}'),
-        Text('Creator ID: ${widget.event.createrId}'),
-        if (widget.event.therapistId == widget.userId)
-          Text('Patient ID: ${widget.event.patientId}')
-        else
-          Text('Therapist ID: ${widget.event.therapistId}'),
-        if (!_isPast && !_isJoinable && widget.event.status == "Confirmed")
-          Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: Text(
-              _countdown,
-              style: TextStyle(
-                color: Colors.blue[700],
-                fontSize: 16,
-              ),
+    return 
+    Padding(
+        padding: const EdgeInsets.all(0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header
+            Row(
+              children: [
+                Icon(Icons.event, color: Colors.blue[900], size: 28),
+                const SizedBox(width: 8),
+                Text(
+                  'Meeting Session',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue[900],
+                  ),
+                ),
+              ],
             ),
-          ),
-        if (_isJoinable)
-          Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: Text(
-              'The session is ready to join!',
-              style: TextStyle(
-                color: Colors.blue[700],
-                fontSize: 16,
-              ),
+            const SizedBox(height: 12),
+            const Divider(height: 1, thickness: 1, color: Colors.grey),
+            const SizedBox(height: 12),
+            // Details Section
+            _buildDetailRow(
+              icon: Icons.calendar_today,
+              label: 'Date',
+              value: widget.event.date,
             ),
-          ),
-        if (_isPast)
-          Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: Text(
-              'This session has already ended.',
-              style: TextStyle(
-                color: Colors.blue[700],
-                fontSize: 16,
-              ),
+            const SizedBox(height: 8),
+            _buildDetailRow(
+              icon: Icons.access_time,
+              label: 'Start Time',
+              value: widget.event.startTime,
             ),
-          ),
-        const SizedBox(height: 16),
-        if (isPending && !isCreator) ...[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  widget.isTherapist
-                      ? context.read<UpdateScheduledEventsBloc>().add(
-                            UpdateScheduledEventsEvent(
-                              eventEntity: widget.event.copyWith(status: "Confirmed"),
-                            ),
-                          )
-                      : Navigator.push(
+            const SizedBox(height: 8),
+            _buildDetailRow(
+              icon: Icons.access_time_filled,
+              label: 'End Time',
+              value: widget.event.endTime,
+            ),
+            const SizedBox(height: 8),
+            _buildDetailRow(
+              icon: Icons.check_circle,
+              label: 'Status',
+              value: widget.event.status,
+              valueColor: widget.event.status == "Confirmed" ? Color(Colors.blue.value) : Color(Colors.yellow.value),
+            ),
+            const SizedBox(height: 8),
+            _buildDetailRow(
+              icon: Icons.monetization_on,
+              label: 'Price',
+              value: widget.event.price != null
+                  ? NumberFormat.currency(locale: 'en_US', symbol: 'ETB ', decimalDigits: 2).format(widget.event.price)
+                  : 'Not set',
+            ),
+            _buildDetailRow(
+              icon: Icons.monetization_on,
+              label: 'Creator',
+              value: receiver.name
+            ),
+            const SizedBox(height: 12),
+            const Divider(height: 1, thickness: 1, color: Colors.grey),
+            const SizedBox(height: 12),
+            // Status Messages
+            if (!_isPast && !_isJoinable && widget.event.status == "Confirmed")
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.blue[50],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  _countdown,
+                  style: TextStyle(
+                    color: Colors.blue[700],
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            if (_isJoinable)
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.green[50],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  'The session is ready to join!',
+                  style: TextStyle(
+                    color: Colors.green[700],
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            if (_isPast)
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  'This session has already ended.',
+                  style: TextStyle(
+                    color: Colors.grey[700],
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            const SizedBox(height: 16),
+            // Action Buttons
+            if (isPending && !isCreator) ...[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildActionButton(
+                    context: context,
+                    label: 'Confirm',
+                    color: Colors.blue[700]!,
+                    icon: Icons.check,
+                    onPressed: () {
+                      if (widget.isTherapist) {
+                        context.read<UpdateScheduledEventsBloc>().add(
+                              UpdateScheduledEventsEvent(
+                                eventEntity: widget.event.copyWith(status: "Confirmed"),
+                              ),
+                            );
+                      } else {
+                        Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => PaymentScreen(
                               therapistEmail: !widget.isTherapist ? receiver.email : widget.userEmail,
                               patientEmail: !widget.isTherapist ? widget.userEmail : receiver.email,
-                              sessionHour: widget.event.endTime == "00:00" ? 1 : double.parse(widget.event.endTime.split(':')[0]) - double.parse(widget.event.startTime.split(':')[0]),
+                              sessionHour: widget.event.endTime == "00:00"
+                                  ? 1
+                                  : double.parse(widget.event.endTime.split(':')[0]) -
+                                      double.parse(widget.event.startTime.split(':')[0]),
                               event: widget.event,
                               chatId: widget.chatId,
                               receiver: receiver,
@@ -421,58 +511,115 @@ class _WaitingDialogState extends State<WaitingDialog> {
                             ),
                           ),
                         );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue[700],
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                ),
-                child: const Text('Confirm'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  context.read<DeleteScheduledEventsBloc>().add(
-                        DeleteScheduledEventsEvent(calendarId: widget.event.id),
-                      );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red[400],
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                ),
-                child: const Text('Cancel'),
+                      }
+                    },
+                  ),
+                  _buildActionButton(
+                    context: context,
+                    label: 'Cancel',
+                    color: Colors.red[400]!,
+                    icon: Icons.cancel,
+                    onPressed: () {
+                      context.read<DeleteScheduledEventsBloc>().add(
+                            DeleteScheduledEventsEvent(calendarId: widget.event.id),
+                          );
+                    },
+                  ),
+                ],
               ),
             ],
-          ),
-        ],
-        if (isActive)
-          ElevatedButton(
-            onPressed: () {
-               GoRouter.of(context).pushNamed(
-                'meeting', 
-              queryParameters: {
-                'meetingId': widget.event.meetingId,
-                'token': widget.event.meetingToken,
-                'sessionId': widget.event.id,
-                'userId': widget.userId,
-                'isTherapist': widget.isTherapist.toString(),
-                'therapistId': widget.event.therapistId,
-              });
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green[400],
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            if (isActive)
+              _buildActionButton(
+                context: context,
+                label: 'Join',
+                color: Colors.green[400]!,
+                icon: Icons.video_call,
+                onPressed: () {
+                  GoRouter.of(context).pushNamed(
+                    'meeting',
+                    queryParameters: {
+                      'meetingId': widget.event.meetingId,
+                      'token': widget.event.meetingToken,
+                      'sessionId': widget.event.id,
+                      'userId': widget.userId,
+                      'isTherapist': widget.isTherapist.toString(),
+                      'therapistId': widget.event.therapistId,
+                    },
+                  );
+                },
+              ),
+            const SizedBox(height: 8),
+            _buildActionButton(
+              context: context,
+              label: 'Close',
+              color: Colors.grey[400]!,
+              icon: Icons.close,
+              onPressed: () => Navigator.pop(context),
             ),
-            child: const Text('Join'),
+          ],
+        ),
+      );
+  }
+
+  // Helper method to build detail rows
+  Widget _buildDetailRow({
+    required IconData icon,
+    required String label,
+    required String value,
+    Color? valueColor,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, color: Colors.blue[900], size: 20),
+        const SizedBox(width: 8),
+        Expanded(
+          child: RichText(
+            text: TextSpan(
+              style: const TextStyle(fontSize: 16, color: Colors.black87),
+              children: [
+                TextSpan(
+                  text: '$label: ',
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+                TextSpan(
+                  text: value,
+                  style: TextStyle(color: valueColor ?? Colors.black87),
+                ),
+              ],
+            ),
           ),
-        const SizedBox(height: 8),
-        ElevatedButton(
-          onPressed: () => Navigator.pop(context),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.grey[400],
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          ),
-          child: const Text('Close'),
         ),
       ],
+    );
+  }
+
+  // Helper method to build action buttons
+  Widget _buildActionButton({
+    required BuildContext context,
+    required String label,
+    required Color color,
+    IconData? icon,
+    required VoidCallback onPressed,
+  }) {
+    return AnimatedOpacity(
+      opacity: 1.0,
+      duration: const Duration(milliseconds: 300),
+      child: ElevatedButton.icon(
+        onPressed: onPressed,
+        icon: icon != null ? Icon(icon, size: 20, color: Colors.white) : const SizedBox.shrink(),
+        label: Text(
+          label,
+          style: const TextStyle(fontSize: 16, color: Colors.white),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color,
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          elevation: 2,
+          shadowColor: color.withOpacity(0.4),
+        ),
+      ),
     );
   }
 }
