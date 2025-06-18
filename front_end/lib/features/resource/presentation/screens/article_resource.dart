@@ -255,7 +255,7 @@ class _ArticleResourceState extends State<ArticleResource> {
                         );
                       },
                       child: Icon(Icons.add),
-                      backgroundColor: Colors.purple,
+                      backgroundColor: Theme.of(context).colorScheme.primary,
                     )
                   : null),
     );

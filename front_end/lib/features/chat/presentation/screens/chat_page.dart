@@ -340,10 +340,11 @@ class _ChatPageState extends State<ChatPage> {
     return BlocListener<AddScheduledEventsBloc, AddScheduledEventsState>(
       listener: (context, state) {
         if (state is AddScheduledEventsLoaded) {
-          context.goNamed('home', extra: {'index': 0});
-          context.pop();
-          context.pop();
-          context.pop();
+          if(widget.receiver.role == "therapist"){
+            context.pop();
+            context.pop();
+            context.pop();
+          }
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: const Text('Session booked successfully'),

@@ -8,13 +8,21 @@ admin.initializeApp({
 });
 
 export const sendNotification = async (fcmToken, title, body, data) => {
+
     console.log("sendNotification called with:", { fcmToken, title, body, data });
+
     if (!fcmToken || !title || !body) {
         throw new Error('Missing required fields: fcmToken, title, or body');
     }
     const message = {
-        notification: { title, body },
-        data,
+        notification: {
+            title: "Hello",
+            body: "Test Notification"
+        },
+        data: {
+            click_action: "FLUTTER_NOTIFICATION_CLICK",
+            notificationType: "test"
+        },
         token: fcmToken,
     };
     try {

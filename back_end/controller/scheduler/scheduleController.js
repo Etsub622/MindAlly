@@ -1,7 +1,17 @@
 import { Session } from "../../model/sessionModel.js";
 import { Therapist } from "../../model/therapistModel.js";
 import { sendAppNotification } from '../../utils/notification.js';
+import { sendNotification } from "../../utils/notificationUtils.js";
+import { Patient } from "../../model/patientModel.js";
 
+
+const getSecondUser = async (userId) => {
+  const secondUser = await Patient.findOne({ _id: userId }) || await Therapist.findOne({ _id: userId });
+  if (!secondUser) {
+    throw new Error("User not found");
+  }
+  return secondUser;
+};
 // Fetch therapist availability
 export const getAvailableSlots = async (req, res) => {
   try {
@@ -135,25 +145,26 @@ export const cancelSession = async (req, res) => {
   try {
     const { sessionId } = req.params;
     console.log(`Cancelling session with ID: ${sessionId}`);
-
+    
     const session = await Session.findById(sessionId);
-    if (!session) {
-      return res.status(404).json({ message: "Session not found" });
-    }
-
-    if (session.status === 'Cancelled') {
-      return res.status(400).json({ message: "Session is already cancelled." });
-    }
-
-    session.status = 'Cancelled';
-    await session.save();
+    const sessionTime = `${convertTo24HourFormat(session.startTime)}:00`;
+    await Session.findByIdAndDelete(sessionId);
 
     // // Optional: Notify both sides
     // sendAppNotification(session.userId, "Your session has been cancelled.");
     // sendAppNotification(session.therapistId, "A session has been cancelled.");
     // io.emit("sessionCancelled", session);
 
-    res.status(200).json({ message: "Session cancelled successfully.", session });
+    const receiver = await getSecondUser(session.createrId);
+    const receiverFcmToken = receiver.fcmToken;
+
+    if (receiverFcmToken) {
+      // Send notification to receiver
+      await sendNotification(receiverFcmToken, "Meeting Cancled", `Session at ${sessionTime} got canceled`, {
+        chatId: finalChatId,
+      });
+  }
+  res.status(200).json({ message: "Session cancelled successfully.", session });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

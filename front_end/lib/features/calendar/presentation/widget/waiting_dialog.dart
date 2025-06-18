@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:front_end/core/routes/app_path.dart';
 import 'package:front_end/features/calendar/domain/entity/event_entity.dart';
 import 'package:front_end/features/calendar/presentation/bloc/delete_event/delete_events_bloc.dart';
 import 'package:front_end/features/calendar/presentation/bloc/get_events/get_events_bloc.dart';
@@ -145,7 +146,9 @@ class _WaitingDialogState extends State<WaitingDialog> {
         BlocListener<UpdateScheduledEventsBloc, UpdateScheduledEventsState>(
           listener: (context, state) {
             if (state is UpdateScheduledEventsLoaded) {
-              context.pop();
+              while(context.canPop()){
+                 context.pop();
+              }
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Meeting confirmed successfully')),
               );
