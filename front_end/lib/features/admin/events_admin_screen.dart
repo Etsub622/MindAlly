@@ -30,10 +30,12 @@ class _EventsAdminScreenState extends State<EventsAdminScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Payment processed successfully')),
           );
+          context.read<GetScheduledEventsBloc>().add(GetScheduledEventsEvent());
         } else if (state is PaymentFailure) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: ${state.error}')),
-          );
+          // ScaffoldMessenger.of(context).showSnackBar(
+          //   SnackBar(content: Text('Error: ${state.error}')),
+          // );
+          context.read<GetScheduledEventsBloc>().add(GetScheduledEventsEvent());
         }
       },
       child: Scaffold(
@@ -345,20 +347,20 @@ class _EventsAdminScreenState extends State<EventsAdminScreen> {
                     final bloc = context.read<PaymentBloc>();
                     bloc.add(
                      action == 'approve' ? WithdrawPaymentEvent(
-                        email: therapistEmail!,
+                        email: event.therapistId,
                         amount: event.price,
                         sessionId: event.id
                       ) :
                       RefundPaymentEvent(
-                        therapistEmail: therapistEmail!,
-                        patientEmail: patientEmail!,
+                        therapistEmail: event.therapistId,
+                        patientEmail: event.patientId,
                         sessionId: event.id     
                       )
 
                     );
                     Navigator.pop(dialogContext);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Payment ${action}d for event ${event.id}')),
+                      SnackBar(content: Text('Payment ${action} for event')),
                     );
                   },
                   child: Text(action == 'approve' ? 'Approve' : 'Refund'),

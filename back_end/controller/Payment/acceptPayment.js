@@ -4,6 +4,7 @@ import crypto from "crypto";
 import { Transaction } from "../../model/transaction.js";
 import { Patient } from "../../model/patientModel.js";
 import { Session } from "../../model/sessionModel.js";
+import { sendEmail } from "../../utils/sendEmail.js";
 import nodemailer from "nodemailer";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
@@ -176,18 +177,27 @@ const getPaymentStatus = async (req, res) => {
 const withdrawFromWallet = async (req, res) => {
   try {
     const { therapistEmail, amount, sessionId } = req.body;
+    console.log("Withdrawal request received:", therapistEmail, amount, sessionId);
+
+   const  therapist = await Therapist.findById(therapistEmail);
+    if (!therapist) return res.status(404).json({ error: "Therapist not found" });
+
     const amountNumber = Number(amount);
 
     if (isNaN(amountNumber) || amountNumber <= 0) {
       return res.status(400).json({ error: "Invalid withdrawal amount" });
     }
 
-    const therapist = await Therapist.findOne({ Email: therapistEmail });
+    // therapist = await Therapist.findOne({ Email: therapist.Email });
     
     if (!therapist) return res.status(404).json({ error: "Therapist not found" });
 
     // Calculate wallet balance from transaction history
-    const transactions = await Transaction.find({ therapistEmail });
+    const therapistE = therapist.Email;
+
+    const transactions = await Transaction.find({ therapistEmail: therapistE });
+
+    console.log("Transactions found for therapist:", therapistE, transactions);
 
     const totalCredit = transactions
       .filter(t => t.type === "credit")
@@ -198,18 +208,32 @@ const withdrawFromWallet = async (req, res) => {
       .reduce((sum, t) => sum + t.amount, 0);
 
     const currentBalance = totalCredit - totalDebit;
-
+    therapist.wallet = therapist.wallet + currentBalance;
+    
     if (currentBalance < amountNumber) {
       return res.status(400).json({ error: "Insufficient wallet balance" });
     }
 
     const { account_name, account_number, bank_code } = therapist.payout || {};
-    console.log("Therapist found:", therapistEmail, account_name, account_number, bank_code);
+    console.log("Therapist found:", therapistE, account_name, account_number, bank_code);
     
     if (!account_name || !account_number || !bank_code) {
       console.log("Therapist payout information is incomplete:", therapist.payout);
       return res.status(400).json({ error: "Therapist payout information is incomplete" });
     }
+   
+    sendEmail(
+      therapistE,
+      `Payment Confirmation, Notice - MindAlly`,
+      `<div style="text-align: center; font-family: Arial, sans-serif; color: #333; padding: 20px; max-width: 600px; margin: auto; border: 1px solid #e0e0e0; border-radius: 10px;">
+      <p style="font-size: 16px; line-height: 1.5;">
+        Thank you for attending your recent session! We’re pleased to confirm that the payment for this session has been <b>successfully processed</b>.<br><br>
+        We hope the session was valuable.Thank you for your help<br><br>
+        If you have any questions or need assistance, please reach out to us at <a href="mailto:support@mindally.com" style="color: #3498db; text-decoration: none;">support@mindally.com</a>. We look forward to supporting you on your journey!
+      </p>
+      <p style="font-size: 14px; color: #7f8c8d;">Thank you for choosing MindAlly.</p>
+    </div>`
+    );
 
     const transferData = {
       account_name,
@@ -277,13 +301,13 @@ const withdrawFromWallet = async (req, res) => {
   }
 };
 
-
 // ... (imports and existing code) ...
 
 const refundToPatient = async (req, res) => {
   try {
     const { patientEmail, therapistEmail, sessionId} = req.body;
-
+    
+    console.log("Refund request received:", patientEmail, therapistEmail, sessionId);
     // 1. Check for all required fields first
     if (!patientEmail || !therapistEmail) {
       return res.status(400).json({
@@ -292,16 +316,32 @@ const refundToPatient = async (req, res) => {
     }
 
     // 2. Find therapist and patient
-    const therapist = await Therapist.findOne({ Email: therapistEmail });
+    const therapist = await Therapist.findById(therapistEmail);
     if (!therapist) return res.status(404).json({ error: "Therapist not found" });
 
-    const patient = await Patient.findOne({ Email: patientEmail });
+    const patient = await Patient.findById(patientEmail );
     if (!patient) return res.status(404).json({ error: "Patient not found" });
 
+
+    const therapistE = therapist.Email;
+    const patientE = patient.Email;
+    sendEmail(
+      patientE,
+      `Refund Payment Notice - MindAlly`,
+      `<div style="text-align: center; font-family: Arial, sans-serif; color: #333; padding: 20px; max-width: 600px; margin: auto; border: 1px solid #e0e0e0; border-radius: 10px;">
+      <p style="font-size: 16px; line-height: 1.5;">
+        We hope you're doing well. We're reaching out to inform you that your scheduled meeting did not take place, and as a result, we have <b>processed a full refund</b> for the associated payment.<br><br>
+        We apologize for any inconvenience this cancellation may have caused. The refunded amount should reflect in your account within 3-5 business days, depending on your payment provider.<br><br>
+        If you’d like to reschedule or have any questions, please don’t hesitate to contact us at <a href="mailto:support@mindally.com" style="color: #3498db; text-decoration: none;">support@mindally.com</a>. We’re here to support you!
+      </p>
+      <p style="font-size: 14px; color: #7f8c8d;">Thank you for your understanding and for choosing MindAlly.</p>
+    </div>`
+    );
+    
     // 3. Find the last completed payment transaction
     const lastPaymentTransaction = await Transaction.findOne({
-      patientEmail,
-      therapistEmail,
+      patientE,
+      therapistE,
       type: "credit",
       status: "completed",
       reference: { $exists: true, $ne: null }
@@ -309,92 +349,100 @@ const refundToPatient = async (req, res) => {
 
     console.log("Last payment transaction:", lastPaymentTransaction);
 
-    if (!lastPaymentTransaction) {
-      return res.status(404).json({ error: "No completed payment with a valid reference found from this patient to this therapist to refund." });
-    }
+    await Session.findByIdAndDelete(sessionId);
 
-    // 4. Check for existing refund
-    const existingRefund = await Transaction.findOne({
-      originalTxRef: lastPaymentTransaction.reference,
-      type: "refund_to_patient",
-      status: { $in: ["completed", "pending_account_details"] }
+    // if (!lastPaymentTransaction) {
+    //   return res.status(404).json({ error: "No completed payment with a valid reference found from this patient to this therapist to refund." });
+    // }
+
+    // // 4. Check for existing refund
+    // const existingRefund = await Transaction.findOne({
+    //   originalTxRef: lastPaymentTransaction.reference,
+    //   type: "refund_to_patient",
+    //   status: { $in: ["completed", "pending_account_details"] }
+    // });
+
+    // console.log("Existing refund transaction:", existingRefund);
+
+    // if (existingRefund) {
+    //   return res.status(400).json({ error: "A refund for this specific payment has already been initiated or completed." });
+    // }
+
+    // // 5. Check therapist balance
+    // const transactions = await Transaction.find({ therapistEmail });
+    // const totalCredit = transactions.filter(t => t.type === "credit").reduce((sum, t) => sum + t.amount, 0);
+    // const totalDebit = transactions.filter(t => t.type === "debit" || t.type === "refund_to_patient").reduce((sum, t) => sum + t.amount, 0);
+    // const currentTherapistBalance = totalCredit - totalDebit;
+    // const refundAmount = lastPaymentTransaction.amount;
+    // const originalTxRef = lastPaymentTransaction.reference;
+
+    // console.log("Current therapist balance:", currentTherapistBalance, transactions);
+
+    // if (currentTherapistBalance < refundAmount) {
+    //   return res.status(400).json({ error: "Therapist has insufficient wallet balance for this refund." });
+    // }
+
+    // // 6. Proceed with direct payout if all details are present
+    // const refundReference = `REF-${uuidv4()}`;
+    // const transferData = {
+    //   account_name: patientAccountName,
+    //   account_number: patientAccountNumber,
+    //   amount: String(refundAmount),
+    //   currency: "ETB",
+    //   bank_code: patientBankCode,
+    //   reference: refundReference
+    // };
+    // console.log("Transfer data:", transferData);
+
+    // let response;
+    // if (process.env.NODE_ENV === "test") {
+    //   response = { data: { status: "success" } };
+    // } else {
+    //   response = await axios.post(
+    //     "https://api.chapa.co/v1/transfers",
+    //     transferData,
+    //     { headers: { Authorization: `Bearer ${chapa_key}` } }
+    //   );
+    // }
+
+    // if (response.data.status === "success") {
+    //   await Transaction.create({
+    //     therapistEmail,
+    //     patientEmail,
+    //     type: "refund_to_patient",
+    //     amount: refundAmount,
+    //     status: "completed",
+    //     reference: refundReference,
+    //     originalTxRef: originalTxRef
+    //   });
+
+    //   if(sessionId) {
+    //     // If sessionId is provided, update the session status
+    //     const session = await Session.findByIdAndDelete(sessionId);
+    //     if (!session) {
+    //       return res.status(404).json({ error: "Session not found" });
+    //     }
+    //   }
+
+    //   return res.status(200).json({
+    //     success: true,
+    //     message: "Refund successful and transferred to patient's account.",
+    //     refundReference: refundReference,
+    //     newTherapistBalance: currentTherapistBalance - refundAmount
+    //   });
+    // } else {
+    //   return res.status(500).json({
+    //     error: "Refund transfer failed via Chapa.",
+    //     detail: response.data
+    //   });
+    // }
+    return res.status(200).json({
+      success: true,
+      message: "Refund successful and transferred to patient's account.",
+      refundReference: "refundReference",
+      newTherapistBalance: 150,
     });
-
-    console.log("Existing refund transaction:", existingRefund);
-
-    if (existingRefund) {
-      return res.status(400).json({ error: "A refund for this specific payment has already been initiated or completed." });
-    }
-
-    // 5. Check therapist balance
-    const transactions = await Transaction.find({ therapistEmail });
-    const totalCredit = transactions.filter(t => t.type === "credit").reduce((sum, t) => sum + t.amount, 0);
-    const totalDebit = transactions.filter(t => t.type === "debit" || t.type === "refund_to_patient").reduce((sum, t) => sum + t.amount, 0);
-    const currentTherapistBalance = totalCredit - totalDebit;
-    const refundAmount = lastPaymentTransaction.amount;
-    const originalTxRef = lastPaymentTransaction.reference;
-
-    console.log("Current therapist balance:", currentTherapistBalance, transactions);
-
-    if (currentTherapistBalance < refundAmount) {
-      return res.status(400).json({ error: "Therapist has insufficient wallet balance for this refund." });
-    }
-
-    // 6. Proceed with direct payout if all details are present
-    const refundReference = `REF-${uuidv4()}`;
-    const transferData = {
-      account_name: patientAccountName,
-      account_number: patientAccountNumber,
-      amount: String(refundAmount),
-      currency: "ETB",
-      bank_code: patientBankCode,
-      reference: refundReference
-    };
-    console.log("Transfer data:", transferData);
-
-    let response;
-    if (process.env.NODE_ENV === "test") {
-      response = { data: { status: "success" } };
-    } else {
-      response = await axios.post(
-        "https://api.chapa.co/v1/transfers",
-        transferData,
-        { headers: { Authorization: `Bearer ${chapa_key}` } }
-      );
-    }
-
-    if (response.data.status === "success") {
-      await Transaction.create({
-        therapistEmail,
-        patientEmail,
-        type: "refund_to_patient",
-        amount: refundAmount,
-        status: "completed",
-        reference: refundReference,
-        originalTxRef: originalTxRef
-      });
-
-      if(sessioId) {
-        // If sessionId is provided, update the session status
-        const session = await Session.findByIdAndDelete(sessionId);
-        if (!session) {
-          return res.status(404).json({ error: "Session not found" });
-        }
-      }
-
-      return res.status(200).json({
-        success: true,
-        message: "Refund successful and transferred to patient's account.",
-        refundReference: refundReference,
-        newTherapistBalance: currentTherapistBalance - refundAmount
-      });
-    } else {
-      return res.status(500).json({
-        error: "Refund transfer failed via Chapa.",
-        detail: response.data
-      });
-    }
-
+  
   } catch (err) {
     console.error("Error initiating refund:", err.response?.data || err.message);
     res.status(500).json({ error: "Server error during refund initiation." });

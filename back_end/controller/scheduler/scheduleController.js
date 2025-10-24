@@ -3,7 +3,7 @@ import { Therapist } from "../../model/therapistModel.js";
 import { sendAppNotification } from '../../utils/notification.js';
 import { sendNotification } from "../../utils/notificationUtils.js";
 import { Patient } from "../../model/patientModel.js";
-
+import { sendEmail } from "../../utils/sendEmail.js";
 
 const getSecondUser = async (userId) => {
   const secondUser = await Patient.findOne({ _id: userId }) || await Therapist.findOne({ _id: userId });
@@ -147,26 +147,78 @@ export const cancelSession = async (req, res) => {
     console.log(`Cancelling session with ID: ${sessionId}`);
     
     const session = await Session.findById(sessionId);
-    const sessionTime = `${convertTo24HourFormat(session.startTime)}:00`;
-    await Session.findByIdAndDelete(sessionId);
+    if (!session) {
+      return res.status(404).json({ message: "Session not found" });
+    }
 
-    // // Optional: Notify both sides
-    // sendAppNotification(session.userId, "Your session has been cancelled.");
-    // sendAppNotification(session.therapistId, "A session has been cancelled.");
-    // io.emit("sessionCancelled", session);
+    if (session.status === 'Cancelled') {
+      return res.status(400).json({ message: "Session is already cancelled." });
+    }
 
-    const receiver = await getSecondUser(session.createrId);
-    const receiverFcmToken = receiver.fcmToken;
+    session.status = 'Cancelled';
+    await session.save();
 
-    if (receiverFcmToken) {
-      // Send notification to receiver
-      await sendNotification(receiverFcmToken, "Meeting Cancled", `Session at ${sessionTime} got canceled`, {
-        chatId: finalChatId,
-      });
-  }
-  res.status(200).json({ message: "Session cancelled successfully.", session });
+    // Fetch patient and therapist
+    const patient = await Patient.findById(session.userId);
+    const therapist = await Therapist.findById(session.therapistId);
+
+    const title = "Session Cancelled";
+    const body = `Your session on ${session.date} has been cancelled.`;
+    const data = {
+      notificationType: "session_cancelled",
+      sessionId: session._id.toString(),
+    };
+     
+    sendEmail(
+      therapist.Email,
+      `Meeting Cancellation Notice - MindAlly`,
+      `<div style="text-align: center; font-family: Arial, sans-serif; color: #333; padding: 20px; max-width: 600px; margin: auto; border: 1px solid #e0e0e0; border-radius: 10px;">
+      <p style="font-size: 16px; line-height: 1.5;">
+        We hope this message finds you well. We regret to inform you that your scheduled meeting has been <b>cancelled</b>.<br><br>
+        We understand this may be inconvenient, and we sincerely apologize for any disruption. Our team is here to support you, and we’ll reach out soon to reschedule at a time that works best for you.<br><br>
+        In the meantime, feel free to access your MindAlly professional features or contact us at <a href="mailto:support@mindally.com" style="color: #3498db; text-decoration: none;">support@mindally.com</a> with any questions.
+      </p>
+      <p style="font-size: 14px; color: #7f8c8d;">Thank you for your understanding and continued partnership with MindAlly.</p>
+    </div>`
+    );
+
+    sendEmail(
+      patient.Email,
+      `Meeting Cancellation Notice - MindAlly`,
+      `<div style="text-align: center; font-family: Arial, sans-serif; color: #333; padding: 20px; max-width: 600px; margin: auto; border: 1px solid #e0e0e0; border-radius: 10px;">
+      <p style="font-size: 16px; line-height: 1.5;">
+        We hope this message finds you well. We regret to inform you that your scheduled meeting has been <b>cancelled</b>.<br><br>
+        We understand this may be inconvenient, and we sincerely apologize for any disruption. Our team is here to support you, and we’ll reach out soon to reschedule at a time that works best for you.<br><br>
+        In the meantime, feel free to access your MindAlly professional features or contact us at <a href="mailto:support@mindally.com" style="color: #3498db; text-decoration: none;">support@mindally.com</a> with any questions.
+      </p>
+      <p style="font-size: 14px; color: #7f8c8d;">Thank you for your understanding and continued partnership with MindAlly.</p>
+    </div>`
+    );
+
+    // // Send notification to patient
+    // if (patient?.fcmToken) {
+    //   await sendNotification(patient.fcmToken, title, body, {
+    //     ...data,
+    //     userRole: "patient",
+    //   });
+    // }
+
+    // // Send notification to therapist
+    // if (therapist?.fcmToken) {
+    //   await sendNotification(therapist.fcmToken, title, body, {
+    //     ...data,
+    //     userRole: "therapist",
+    //   });
+    // }
+    
+    res.status(200).json({
+      success: true,
+      message: "Session cancelled and notifications sent.",
+      session,
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Error cancelling session:", error.message);
+    res.status(500).json({ success: false, error: error.message });
   }
 };
 
@@ -270,10 +322,37 @@ export const autoCancelUnconfirmedSessions = async () => {
     console.log(`🕓 Session: ${session._id}, Starts: ${sessionStartString}, Diff: ${diffMins} mins`);
 
     if (diffMins <= 30) {
-      session.status = 'Cancelled';
-      await session.save();
+      await Session.findByIdAndDelete(session._id);
+      const therapist = await Therapist.findById(session.therapistId);
+      const patient = await Patient.findById(session.userId);
 
-      console.log(`❌ Session ${session._id} cancelled`);
+      sendEmail(
+        therapist.Email,
+        `Meeting Cancellation Notice - MindAlly`,
+        `<div style="text-align: center; font-family: Arial, sans-serif; color: #333; padding: 20px; max-width: 600px; margin: auto; border: 1px solid #e0e0e0; border-radius: 10px;">
+        <p style="font-size: 16px; line-height: 1.5;">
+          We hope this message finds you well. We regret to inform you that your scheduled meeting has been <b>cancelled</b>.<br><br>
+          We understand this may be inconvenient, and we sincerely apologize for any disruption. Our team is here to support you, and we’ll reach out soon to reschedule at a time that works best for you.<br><br>
+          In the meantime, feel free to access your MindAlly professional features or contact us at <a href="mailto:support@mindally.com" style="color: #3498db; text-decoration: none;">support@mindally.com</a> with any questions.
+        </p>
+        <p style="font-size: 14px; color: #7f8c8d;">Thank you for your understanding and continued partnership with MindAlly.</p>
+      </div>`
+      );
+
+      sendEmail(
+        patient.Email,
+        `Meeting Cancellation Notice - MindAlly`,
+        `<div style="text-align: center; font-family: Arial, sans-serif; color: #333; padding: 20px; max-width: 600px; margin: auto; border: 1px solid #e0e0e0; border-radius: 10px;">
+        <p style="font-size: 16px; line-height: 1.5;">
+          We hope this message finds you well. We regret to inform you that your scheduled meeting has been <b>cancelled</b>.<br><br>
+          We understand this may be inconvenient, and we sincerely apologize for any disruption. Our team is here to support you, and we’ll reach out soon to reschedule at a time that works best for you.<br><br>
+          In the meantime, feel free to access your MindAlly professional features or contact us at <a href="mailto:support@mindally.com" style="color: #3498db; text-decoration: none;">support@mindally.com</a> with any questions.
+        </p>
+        <p style="font-size: 14px; color: #7f8c8d;">Thank you for your understanding and continued partnership with MindAlly.</p>
+      </div>`
+      );
+
+      
 
       // sendAppNotification(session.userId, "Your session was cancelled because it wasn't confirmed 30 minutes in advance.");
       // sendAppNotification(session.therapistId, "A pending session was cancelled due to no confirmation.");

@@ -170,14 +170,14 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       print('Response body: ${res.body}');
       if (res.statusCode >= 200 && res.statusCode < 300) {
         final jsonResponse = jsonDecode(res.body);
-      
+
         if (verificationType == 'forgotPassword' &&
             jsonResponse['resetToken'] != null) {
           final sharedPreferences = await SharedPreferences.getInstance();
           await sharedPreferences.setString(
               'reset_token', jsonResponse['resetToken']);
         }
-        return jsonResponse['message'] ?? 'OTP verified successfully';
+        return jsonResponse['resetToken'] ?? 'OTP verified successfully';
       } else {
         final jsonResponse = jsonDecode(res.body);
         throw ServerException(

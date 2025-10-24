@@ -144,7 +144,9 @@ class _ChatPageState extends State<ChatPage> {
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10)),
                           ),
-                          child: selectedDate == null ? Text('Pick') : Text('Update'),
+                          child: selectedDate == null
+                              ? Text('Pick')
+                              : Text('Update'),
                         ),
                       ],
                     ),
@@ -190,7 +192,9 @@ class _ChatPageState extends State<ChatPage> {
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10)),
                           ),
-                          child: selectedTime == null ? Text('Pick') : Text('Update'),
+                          child: selectedTime == null
+                              ? Text('Pick')
+                              : Text('Update'),
                         ),
                       ],
                     ),
@@ -246,7 +250,7 @@ class _ChatPageState extends State<ChatPage> {
                                   selectedTime != null &&
                                   selectedDuration != null
                               ? () async {
-                                EventModel? event;
+                                  EventModel? event;
                                   // call api to create meeting and then navigate to MeetingScreen with meetingId,token
                                   await createMeeting().then((meetingId) {
                                     if (!context.mounted) return;
@@ -270,46 +274,56 @@ class _ChatPageState extends State<ChatPage> {
 
                                     event = EventModel(
                                       id: '',
-                                      patientId: widget.receiver.role == "therapist" ? userId : widget.receiver.id,
-                                      therapistId: widget.receiver.role == "therapist" ? widget.receiver.id : userId,
-                                      createrId: userId, 
+                                      patientId:
+                                          widget.receiver.role == "therapist"
+                                              ? userId
+                                              : widget.receiver.id,
+                                      therapistId:
+                                          widget.receiver.role == "therapist"
+                                              ? widget.receiver.id
+                                              : userId,
+                                      createrId: userId,
                                       date:
                                           '${selectedDate!.year}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.day.toString().padLeft(2, '0')}',
                                       startTime: startTimeFormatted,
                                       endTime: endTimeFormatted,
                                       status: 'Pending',
                                       createdAt: DateTime.now(),
-                                      updatedAt: DateTime.now(), 
-                                      meetingId: meetingId,
+                                      updatedAt: DateTime.now(),
+                                      meetingId: 'meetingId',
                                       meetingToken: token,
                                       price: 0.0,
                                     );
-
-                                   
                                   });
-                              if(widget.receiver.role == "patient") {
-                                      context.read<AddScheduledEventsBloc>().add(
-                                          AddScheduledEventsEvent(eventEntity: event!),
+                                  if (widget.receiver.role == "patient") {
+                                    context.read<AddScheduledEventsBloc>().add(
+                                          AddScheduledEventsEvent(
+                                              eventEntity: event!),
                                         );
-                                        Navigator.pop(context);
-                                    }else{
-                                      Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => PaymentScreen(
-                                                therapistEmail: widget.receiver.role == "therapist" ? widget.receiver.email : userEmail,
-                                                patientEmail: widget.receiver.role == "therapist" ? userEmail : widget.receiver.email,
-                                                sessionHour: selectedDuration! / 60,
-                                                event: event!,
-                                                chatId: currentChatId ?? '',
-                                                receiver: widget.receiver,
-                                                isCreate: true,
-                                              ),
-                                            ),
-                                  );
-                                    }
-                                  
-                                              
+                                    Navigator.pop(context);
+                                  } else {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => PaymentScreen(
+                                          therapistEmail:
+                                              widget.receiver.role ==
+                                                      "therapist"
+                                                  ? widget.receiver.email
+                                                  : userEmail,
+                                          patientEmail: widget.receiver.role ==
+                                                  "therapist"
+                                              ? userEmail
+                                              : widget.receiver.email,
+                                          sessionHour: selectedDuration! / 60,
+                                          event: event!,
+                                          chatId: currentChatId ?? '',
+                                          receiver: widget.receiver,
+                                          isCreate: true,
+                                        ),
+                                      ),
+                                    );
+                                  }
                                 }
                               : null,
                           style: ElevatedButton.styleFrom(
@@ -340,7 +354,7 @@ class _ChatPageState extends State<ChatPage> {
     return BlocListener<AddScheduledEventsBloc, AddScheduledEventsState>(
       listener: (context, state) {
         if (state is AddScheduledEventsLoaded) {
-          if(widget.receiver.role == "therapist"){
+          if (widget.receiver.role == "therapist") {
             context.pop();
             context.pop();
             context.pop();
@@ -362,73 +376,74 @@ class _ChatPageState extends State<ChatPage> {
       },
       child: Scaffold(
         appBar: AppBar(
-                flexibleSpace: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Theme.of(context).colorScheme.primary.withOpacity(0.9),
-                        Theme.of(context).colorScheme.secondary.withOpacity(0.7),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Theme.of(context).colorScheme.primary.withOpacity(0.9),
+                  Theme.of(context).colorScheme.secondary.withOpacity(0.7),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius:
+                  const BorderRadius.vertical(bottom: Radius.circular(20)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+          ),
+          title: SafeArea(
+            child: Row(
+              children: [
+                const SizedBox(width: 8),
+                CircleAvatar(
+                  radius: 26,
+                  backgroundColor: Colors.blue[900],
+                  child: CircleAvatar(
+                    radius: 25,
+                    backgroundImage: NetworkImage(
+                      widget.receiver.profilePicture ??
+                          "https://cache.lovethispic.com/uploaded_images/thumbs/213123-Kiss-The-Sun.jpg",
                     ),
-                    borderRadius: const BorderRadius.vertical(bottom: Radius.circular(20)),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
+                    backgroundColor: Colors.grey[200],
                   ),
                 ),
-                title: SafeArea(
-                  child: Row(
-                    children: [
-                      const SizedBox(width: 8),
-                      CircleAvatar(
-                        radius: 26,
-                        backgroundColor: Colors.blue[900],
-                        child: CircleAvatar(
-                          radius: 25,
-                          backgroundImage: NetworkImage(
-                            widget.receiver.profilePicture ?? "https://cache.lovethispic.com/uploaded_images/thumbs/213123-Kiss-The-Sun.jpg",
-                          ),
-                          backgroundColor: Colors.grey[200],
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          widget.receiver.name,
-                          style:
-                              Theme.of(context).textTheme.titleLarge?.copyWith(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () => _showBookSessionDialog(context),
-                        // backgroundColor: Colors.blue[700],
-                        // foregroundColor: Colors.white,
-                        // elevation: 8,
-                        // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                        child: const Icon(
-                          Icons.calendar_month_sharp,
-                          size: 28,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    widget.receiver.name,
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           color: Colors.white,
+                          fontWeight: FontWeight.bold,
                         ),
-                      ),
-                    ],
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-  ),
-  centerTitle: true, // Ensures the title is centered
-  toolbarHeight: 80, // Adjust height for better appearance
-  elevation: 0, // Optional: Remove shadow for a cleaner look
-),
+                ),
+                GestureDetector(
+                  onTap: () => _showBookSessionDialog(context),
+                  // backgroundColor: Colors.blue[700],
+                  // foregroundColor: Colors.white,
+                  // elevation: 8,
+                  // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  child: const Icon(
+                    Icons.calendar_month_sharp,
+                    size: 28,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          centerTitle: true, // Ensures the title is centered
+          toolbarHeight: 80, // Adjust height for better appearance
+          elevation: 0, // Optional: Remove shadow for a cleaner look
+        ),
         body: SafeArea(
           child: Container(
             decoration: BoxDecoration(

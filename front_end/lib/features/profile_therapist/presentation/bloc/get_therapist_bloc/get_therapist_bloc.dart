@@ -24,15 +24,6 @@ class TherapistProfileBloc extends Bloc<GetTherapistEvent, GetTherapistState> {
  _getTherapistProfile(
       GetTherapistLoadEvent event, Emitter<GetTherapistState> emit) async {
     emit(const GetTherapistLoading());
-    const flutterSecureStorage = FlutterSecureStorage();
-    final userData = await flutterSecureStorage.read(key: 'user_profile');
-    late TherapistModel? therapist;
-
-    if(userData != null){
-      final resData = json.decode(userData);
-      therapist = TherapistModel.fromJson(resData);
-      emit(GetTherapistLoaded(therapist: therapist));
-    }
     
     Either<Failure, TherapistModel> response = await getTherapistUsecase(event.therapistId);
       

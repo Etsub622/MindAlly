@@ -168,30 +168,30 @@ class _LoginState extends State<Login> {
                 SizedBox(
                   height: 50,
                 ),
-                Text(
-                  'Or continue with',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 14,
-                    color: Colors.black,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
+                // Text(
+                //   'Or continue with',
+                //   style: TextStyle(
+                //     fontFamily: 'Poppins',
+                //     fontSize: 14,
+                //     color: Colors.black,
+                //     fontWeight: FontWeight.w600,
+                //   ),
+                // ),
                 SizedBox(
                   height: 20,
                 ),
-                CustomButton(
-                  rad: 10,
-                  wdth: double.infinity,
-                  hgt: 50,
-                  text: 'Log in with Google',
-                  onPressed: () {},
-                  icon: Image.asset(
-                    'asset/image/student.png',
-                    height: 40,
-                    width: 40,
-                  ),
-                )
+                // CustomButton(
+                //   rad: 10,
+                //   wdth: double.infinity,
+                //   hgt: 50,
+                //   text: 'Log in with Google',
+                //   onPressed: () {},
+                //   icon: Image.asset(
+                //     'asset/image/student.png',
+                //     height: 40,
+                //     width: 40,
+                //   ),
+                // )
               ],
             ),
           ),
