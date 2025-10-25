@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:front_end/core/error/exception.dart';
 import 'package:front_end/features/payment/data/model/payment_request_model.dart';
@@ -76,10 +77,12 @@ class PaymentRemoteDataSourceImpl implements PaymentRemoteDataSource {
           "amount": amount,
           "sessionId": sessionId,
         }),
-      );
+      ).timeout(Duration(seconds: 1000), onTimeout: () {
+          throw TimeoutException('Request to $url timed out after 30 seconds');
+        });
       if (response.statusCode == 200) {
         final Map<String, dynamic> decodedBody = jsonDecode(response.body);
-        return decodedBody["data"]["checkout_url"];
+        return "${decodedBody["message"]}";
       } else {
         final Map<String, dynamic> decodedError = jsonDecode(response.body);
         throw ServerException(

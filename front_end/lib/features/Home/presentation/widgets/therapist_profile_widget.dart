@@ -157,7 +157,7 @@ class _TherapistProfileWidgetState extends State<TherapistProfileWidget> {
                   ),
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 8),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -171,7 +171,7 @@ class _TherapistProfileWidgetState extends State<TherapistProfileWidget> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 2),
                     Text(
                       widget.therapist.modality ?? "Not specified",
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -189,7 +189,7 @@ class _TherapistProfileWidgetState extends State<TherapistProfileWidget> {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          // const SizedBox(height: 8),
           Text(
             widget.therapist.bio ?? "No bio available",
             style: Theme.of(context).textTheme.bodySmall?.copyWith(

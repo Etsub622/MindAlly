@@ -24,7 +24,8 @@ export const getResourcesByType = async (req, res) => {
   try {
     const { type } = req.params;
     const resources = await Resource.find({ type }).sort({ createdAt: -1 });
-    if (!resources.length) {
+
+    if (resources.length == null) {
       return res.status(404).json({ message: `No resources found for type: ${type}` });
     }
     res.status(200).json(resources);

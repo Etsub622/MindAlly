@@ -51,13 +51,15 @@ class PushNotificationService {
   }
 
   void decodeNotification(GoRouter router, RemoteMessage message) {
-    if (message.data.containsKey("notificationType") &&
-        message.data["notificationType"] == "new_message") {
-      debugPrint("Navigating to ChatRoom via notification");
-      router.go(
-          '/chat'); 
+    final type = message.data["notificationType"];
+
+    if (type == "new_message") {
+      router.go('/chat');
+    } else if (type == "session_cancelled") {
+      router.go('/sessions'); 
     }
   }
+
 
 Future<void> showNotification(RemoteMessage msg) async {
     if (msg.notification == null || msg.data.isEmpty) return;
@@ -90,8 +92,7 @@ Future<void> showNotification(RemoteMessage msg) async {
       debugPrint("Notification skipped: User is the sender.");
     }
   }
-
-  Future<void> _sendFcmTokenToBackend() async {
+    Future<void> _sendFcmTokenToBackend() async {
     try {
       String? fcmToken = await _firebaseMessaging.getToken();
       if (fcmToken == null) return;

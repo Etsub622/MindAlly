@@ -37,7 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: widget.role == "patient" ? _buildPatientHome(context) : _buildTherapistHome(context),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showChatBot(context),
-        backgroundColor: AppColor.hexToColor("#00538C"),
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
         child: Image.asset("asset/image/chatbot_icon.png", width: 24, height: 24),
       ),
     );

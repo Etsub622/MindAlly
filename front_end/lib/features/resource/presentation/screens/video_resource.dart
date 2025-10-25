@@ -250,7 +250,7 @@ class _VideoResourceState extends State<VideoResource> {
                         );
                       },
                       child: Icon(Icons.add),
-                      backgroundColor: Colors.purple,
+                      backgroundColor: Theme.of(context).colorScheme.primary,
                     )
                   : null),
     );

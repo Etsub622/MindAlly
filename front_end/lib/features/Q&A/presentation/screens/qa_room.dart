@@ -132,7 +132,7 @@ class _QARoomState extends State<QARoom> {
               context.read<QuestionBloc>().add(GetQuestionEvent());
             },
           ),
-          IconButton(
+          currentUserRole == "patient" ? IconButton(
             onPressed: () {
               showModalBottomSheet(
                 // isScrollControlled: true,
@@ -142,18 +142,20 @@ class _QARoomState extends State<QARoom> {
                 },
               );
             },
-            icon: Icon(
+            icon:
+            const  Icon(
               Icons.add,
               color: Color.fromARGB(239, 130, 5, 220),
               size: 30,
-            ),
-          ),
+            )
+          )
+          : const SizedBox.shrink(),
         ],
       ),
       body: SafeArea(
         child: Column(
           children: [
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Expanded(
               child: BlocConsumer<QuestionBloc, QuestionState>(
                 listener: (context, state) {

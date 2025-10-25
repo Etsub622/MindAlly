@@ -58,7 +58,15 @@ class _AnswerCardState extends State<AnswerCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
+           
+            GestureDetector(
+              onTap: () =>{
+          //        GoRouter.of(context).pushNamed(
+          //   'therapistDetails',
+          //   extra: widget.therapist,
+          // );
+              },
+              child: Row(
               children: [
                 CircleAvatar(
                   radius: 24,
@@ -120,7 +128,8 @@ class _AnswerCardState extends State<AnswerCard> {
                   ),
               ],
             ),
-            const SizedBox(height: 12),
+            
+            ), SizedBox(height: 12),
             AnimatedCrossFade(
               duration: const Duration(milliseconds: 250),
               crossFadeState: _isExpanded

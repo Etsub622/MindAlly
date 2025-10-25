@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:front_end/core/common_widget.dart/circular_indicator.dart';
 import 'package:front_end/core/common_widget.dart/snack_bar.dart';
+import 'package:front_end/core/config/config_key.dart';
 import 'package:front_end/core/routes/app_path.dart';
 import 'package:front_end/features/authentication/presentation/widget/custom_button.dart';
 import 'package:go_router/go_router.dart';
@@ -31,7 +32,7 @@ class _SignupOtpVerificationPageState extends State<SignupOtpVerificationPage> {
   final TextEditingController otpController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
-  final String _baseUrl = 'http://192.168.248.220:8000/api/auth';
+  final String _baseUrl = '${ConfigKey.baseUrl}/auth';
 
   @override
   void initState() {

@@ -252,7 +252,7 @@ class _BookResourceState extends State<BookResource> {
                       );
                     },
                     child: const Icon(Icons.add),
-                    backgroundColor: Colors.purple,
+                    backgroundColor:Theme.of(context).colorScheme.primary,
                   )
                 : null,
       ),

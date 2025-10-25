@@ -77,7 +77,10 @@ const therapistschema = new mongoose.Schema({
         account_number: { type: String },
         bank_code: { type: Number },
     },
-    lastLogin: { type: Date }
+    lastLogin: { type: Date },
+    fcmToken: {
+        type: String,
+   },
 
 })
 
